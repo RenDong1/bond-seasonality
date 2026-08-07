@@ -83,6 +83,7 @@
   .mini-chart-wrap canvas{width:100%;height:100%}
   .section-title{font-size:12px;color:var(--muted);letter-spacing:1px;margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid #eee}
   .ind-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .ind-row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
   .ind-card{background:#fafafa;border:1px solid #eee;border-radius:8px;padding:10px 12px}
   .ind-card .ind-label{font-size:10px;color:var(--muted)}
   .ind-card .ind-value{font-size:17px;font-weight:700;color:#222;margin:2px 0}
@@ -116,6 +117,7 @@
     .quick-stats{grid-template-columns:1fr 1fr}
     .sig-grid{grid-template-columns:1fr 1fr}
     .ind-row{grid-template-columns:1fr 1fr}
+    .ind-row-4{grid-template-columns:1fr 1fr}
     .risk-grid{grid-template-columns:1fr 1fr}
   }
 </style>
@@ -244,12 +246,12 @@ const FUTURES_DATA = {
     },
     {
       "date": "08-06",
-      "o": 109.425,
-      "h": 109.435,
-      "l": 109.335,
-      "c": 109.39,
-      "v": 80167,
-      "oi": 365471
+      "o": 109.365,
+      "h": 109.455,
+      "l": 109.355,
+      "c": 109.425,
+      "v": 77524,
+      "oi": 367574
     }
   ],
   "data_tl": [
@@ -336,73 +338,105 @@ const FUTURES_DATA = {
     },
     {
       "date": "08-06",
-      "o": 115.49,
-      "h": 115.54,
-      "l": 115.21,
-      "c": 115.39,
-      "v": 95743,
-      "oi": 193693
+      "o": 115.3,
+      "h": 115.86,
+      "l": 115.26,
+      "c": 115.72,
+      "v": 112588,
+      "oi": 199074
     }
   ],
   "indicators_t": {
-    "macd_diff": 0.0766,
+    "macd_diff": 0.0792,
     "macd_sub": "正区间 · 偏多",
-    "kdj_k": 73.9665,
+    "kdj_k": 74.8012,
     "kdj_sub": "偏强区间",
-    "rsi_6": 61.196,
+    "rsi_6": 65.6084,
     "rsi_sub": "中性偏多",
-    "boll_mid": 109.2317,
+    "boll_mid": 109.2454,
     "boll_sub": "价格贴近中轨",
-    "atr_14": 0.10000000000001,
+    "atr_14": 0.099999999999994,
     "atr_sub": "低波环境",
-    "obv": 644.7659,
+    "obv": 652.5183,
     "obv_sub": "万手·年化",
     "volatility": 0.0996,
     "vol_sub": "高波动",
     "ctd_bond": "260007.IB",
-    "irr": 1.4221,
-    "bnoc": -0.0011,
+    "irr": null,
+    "bnoc": null,
     "basis": null,
-    "member_long": 63554,
-    "member_short": 63776,
-    "member_net": -222
+    "member_long": 0,
+    "member_short": 0,
+    "member_net": 0,
+    "cci": 92.2844,
+    "cci_sub": "正常区间",
+    "psy": 50,
+    "psy_sub": "中性",
+    "bias": 0.0949,
+    "bias_sub": "贴近均线",
+    "vr": 96.9195,
+    "vr_sub": "正常量能",
+    "dma": 0.17320000000001,
+    "dma_sub": "短均>长均·偏多",
+    "trix": 0.0098,
+    "trix_sub": "温和上升",
+    "mtm": 0.064999999999998,
+    "mtm_sub": "上涨动能",
+    "mfi": 72.7243,
+    "mfi_sub": "资金流入偏多"
   },
   "indicators_tl": {
-    "macd_diff": 0.473,
+    "macd_diff": 0.4899,
     "macd_sub": "正区间 · 强多头",
-    "kdj_k": 82.0777,
+    "kdj_k": 84.406,
     "kdj_sub": "偏强区间",
-    "rsi_6": 65.6503,
+    "rsi_6": 74.9972,
     "rsi_sub": "中性偏多",
-    "boll_mid": 114.3554,
-    "boll_sub": "价格在中轨上方",
-    "atr_14": 0.33000000000001,
-    "atr_sub": "正常波动",
-    "obv": 415.5964,
+    "boll_mid": 114.4438,
+    "boll_sub": "价格远超中轨",
+    "atr_14": 0.59999999999999,
+    "atr_sub": "极高波动⚠️",
+    "obv": 426.8552,
     "obv_sub": "万手·年化",
-    "volatility": 0.3322,
+    "volatility": 0.3329,
     "vol_sub": "高波动",
     "ctd_bond": "210014.IB",
-    "irr": 0.8329,
-    "bnoc": 0.0809,
+    "irr": null,
+    "bnoc": null,
     "basis": null,
     "member_long": 32818,
-    "member_short": 21847,
-    "member_net": 10971
+    "member_short": 23267,
+    "member_net": 9551,
+    "cci": 97.6384,
+    "cci_sub": "正常区间",
+    "psy": 66.6667,
+    "psy_sub": "偏多情绪",
+    "bias": 0.4521,
+    "bias_sub": "小幅正偏离",
+    "vr": 212.5443,
+    "vr_sub": "放量活跃",
+    "dma": 1.1758,
+    "dma_sub": "短均远高于长均",
+    "trix": 0.0651,
+    "trix_sub": "温和上升",
+    "mtm": 0.33,
+    "mtm_sub": "强上涨动能",
+    "mfi": 71.6812,
+    "mfi_sub": "资金流入偏多"
   },
   "quick_stats": {
-    "t_close": 109.39,
-    "t_change": -0.0046,
-    "t_direction": "down",
-    "tl_close": 115.39,
-    "tl_change": -0.0433,
-    "tl_direction": "down",
-    "t_margin": "21,876",
-    "tl_margin": "40,387",
-    "t_fund": 159.9,
-    "t_fund_change": -1.8,
-    "tl_fund": 156.5,
-    "tl_fund_change": -1.4
+    "t_close": 109.425,
+    "t_change": 0.0411,
+    "t_direction": "up",
+    "tl_close": 115.72,
+    "tl_change": 0.286,
+    "tl_direction": "up",
+    "t_margin": "21,888",
+    "tl_margin": "40,520",
+    "t_fund": 160.9,
+    "t_fund_change": 1,
+    "tl_fund": 161.3,
+    "tl_fund_change": 4.8
   }
 };
 
@@ -1089,6 +1123,17 @@ function renderAll() {
           <div class="ind-card"><div class="ind-label">ATR (14日)</div><div class="ind-value">${ind.atr_14}</div><div class="ind-sub">${ind.atr_sub}</div></div>
           <div class="ind-card"><div class="ind-label">OBV 能量潮</div><div class="ind-value">${ind.obv}</div><div class="ind-sub">${ind.obv_sub}</div></div>
           <div class="ind-card"><div class="ind-label">波动率</div><div class="ind-value">${ind.volatility}%</div><div class="ind-sub">${ind.vol_sub}</div></div>
+        </div>
+        <div class="section-title">📊 扩展技术指标 (MCP)</div>
+        <div class="ind-row-4">
+          <div class="ind-card"><div class="ind-label">CCI 顺势指标</div><div class="ind-value">${ind.cci != null ? ind.cci : '—'}</div><div class="ind-sub">${ind.cci_sub || '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">PSY 心理线</div><div class="ind-value">${ind.psy != null ? ind.psy : '—'}</div><div class="ind-sub">${ind.psy_sub || '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">BIAS 乖离率</div><div class="ind-value">${ind.bias != null ? ind.bias : '—'}</div><div class="ind-sub">${ind.bias_sub || '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">VR 成交量比率</div><div class="ind-value">${ind.vr != null ? ind.vr : '—'}</div><div class="ind-sub">${ind.vr_sub || '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">DMA 平均线差</div><div class="ind-value">${ind.dma != null ? ind.dma : '—'}</div><div class="ind-sub">${ind.dma_sub || '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">TRIX 三重平滑</div><div class="ind-value">${ind.trix != null ? ind.trix : '—'}</div><div class="ind-sub">${ind.trix_sub || '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">MTM 动量指标</div><div class="ind-value">${ind.mtm != null ? ind.mtm : '—'}</div><div class="ind-sub">${ind.mtm_sub || '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">MFI 资金流向</div><div class="ind-value">${ind.mfi != null ? ind.mfi : '—'}</div><div class="ind-sub">${ind.mfi_sub || '—'}</div></div>
         </div>
         <div class="section-title">📐 期现关系</div>
         <div class="ctd-box"><div class="ctd-label">最便宜可交割债券 CTD</div><div class="ctd-code">${ind.ctd_bond}</div></div>
