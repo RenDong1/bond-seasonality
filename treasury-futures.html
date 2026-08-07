@@ -110,10 +110,6 @@
   .trend-table td:first-child{text-align:left;color:var(--muted)}
   .trend-table tr:hover td{background:#f5f5f5}
   .trend-table .up{color:var(--red)} .trend-table .down{color:var(--green)}
-  /* 摘要 */
-  .summary{background:linear-gradient(135deg,#e8eaf6,#f5f5f5);border:1px solid #e0e0e0;border-radius:12px;padding:20px 24px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
-  .summary p{font-size:13px;color:var(--text);line-height:1.8}
-  .summary strong{color:#222}
   @media(max-width:900px){
     .main-grid{grid-template-columns:1fr}
     .signal-bar{grid-template-columns:1fr}
@@ -143,7 +139,6 @@
 
 <div class="signal-bar" id="signalBar"></div>
 <div class="quick-stats" id="quickStats"></div>
-<div class="summary"><p id="summaryText"></p></div>
 
 <div class="main-grid" id="contractsGrid"></div>
 
@@ -155,11 +150,6 @@
 <div class="full-panel">
   <h3>📋 近期信号回溯 — 近10个交易日行情明细（T + TL 并排）</h3>
   <div style="overflow-x:auto;"><table class="trend-table" id="trendTable"></table></div>
-</div>
-
-<div class="full-panel">
-  <h3>💡 市场观察 — 多维度交叉验证</h3>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:13px;" id="obsGrid"></div>
 </div>
 
 </div><!-- container -->
@@ -413,10 +403,7 @@ const FUTURES_DATA = {
     "t_fund_change": -1.8,
     "tl_fund": 156.5,
     "tl_fund_change": -1.4
-  },
-  "summary_html": "<strong>市场概述：</strong>8月6日国债期货窄幅震荡，成交量持续萎缩。十年期主力 <strong style=\"color:var(--green)\">TZL.CFE</strong> 收报 <strong>109.39</strong>（-0.005%），成交 8.0 万手。三十年期主力 <strong style=\"color:var(--purple)\">TLZL2.CFE</strong> 收报 <strong>115.39</strong>（-0.043%），成交 9.6 万手。综合信号方面，T 与 TL 均维持偏多判断，但动能减弱、信号共振数下降，短期需关注量能持续萎缩后的方向选择。",
-  "obs_t_html": "• 连续3日窄幅整理，围绕 <strong>109.40</strong> 中枢波动<br>• 成交量递减（10.2→9.3→8.5→8.0万手），市场等待方向<br>• MACD 0.077 正区间但走平，短期动能减弱<br>• KDJ 73.97 偏强但未超买，RSI 61.20 中性<br>• CTD 券 <strong>260007.IB</strong>，IRR 1.42% 中性<br>• 中信期货多空几乎完全对冲（净空仅 222 手）<br>• 波动率 0.0032% 处极低水平",
-  "obs_tl_html": "• 连续两日小幅回调，7/30 放量长阳后量能萎缩<br>• MACD <strong>0.473</strong> 正值但较前日 0.478 微降<br>• KDJ <strong>82.08</strong> 处超买边缘，需警惕回调风险<br>• 持仓量从 20.8 万降至 <strong>19.4 万手</strong>，部分多头离场<br>• CTD 券 <strong>210014.IB</strong>（老券），IRR 仅 0.83%<br>• 中信期货 <strong>净多 9,551 手</strong>，与 T 的中性策略形成对比<br>• 波动率 0.08% 远高于 T（25倍），久期效应"
+  }
 };
 
 // ====== TECHNICAL INDICATOR COMPUTATION ======
@@ -1054,9 +1041,6 @@ function renderAll() {
     <div class="stat-card"><div class="label">T 沉淀资金</div><div class="value">${qs.t_fund}<span style="font-size:14px">亿</span></div><div class="change down">较前日 ${qs.t_fund_change>0?'+':''}${qs.t_fund_change}亿</div></div>
     <div class="stat-card"><div class="label">TL 沉淀资金</div><div class="value">${qs.tl_fund}<span style="font-size:14px">亿</span></div><div class="change down">较前日 ${qs.tl_fund_change>0?'+':''}${qs.tl_fund_change}亿</div></div>`;
 
-  // Summary
-  document.getElementById('summaryText').innerHTML = D.summary_html;
-
   // Signal Bar
   function sigCard(name, code, sig) {
     const badgeIcon = sig.signalClass === 'long' ? '🔴' : (sig.signalClass === 'short' ? '🟢' : '🟡');
@@ -1147,11 +1131,6 @@ function renderAll() {
       <td>${tl.v?tl.v.toLocaleString():'—'}</td><td>${tl.oi?tl.oi.toLocaleString():'—'}</td></tr>`;
   });
   document.getElementById('trendTable').innerHTML = thtml + '</tbody>';
-
-  // Market Observation
-  document.getElementById('obsGrid').innerHTML = `
-    <div><p style="color:var(--muted);margin-bottom:8px;">🔟 十年期 TZL.CFE</p><p style="color:var(--text);line-height:1.8;">${D.obs_t_html}</p></div>
-    <div><p style="color:var(--muted);margin-bottom:8px;">🕐 三十年期 TLZL2.CFE</p><p style="color:var(--text);line-height:1.8;">${D.obs_tl_html}</p></div>`;
 
   // Draw charts
   setTimeout(() => {
