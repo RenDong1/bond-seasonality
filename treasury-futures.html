@@ -349,17 +349,17 @@ const FUTURES_DATA = {
   "indicators_t": {
     "macd_diff": 0.0766,
     "macd_sub": "正区间 · 偏多",
-    "kdj_k": 73.9665,
+    "kdj_k": 73.97,
     "kdj_sub": "偏强区间",
-    "rsi_6": 61.196,
+    "rsi_6": 61.2,
     "rsi_sub": "中性偏多",
     "boll_mid": 109.2317,
     "boll_sub": "价格贴近中轨",
-    "atr_14": 0.10000000000001,
+    "atr_14": 0.1,
     "atr_sub": "低波环境",
-    "obv": 644.7659,
+    "obv": 644.77,
     "obv_sub": "万手·年化",
-    "volatility": 0.0996,
+    "volatility": 0.0485,
     "vol_sub": "高波动",
     "ctd_bond": "260007.IB",
     "irr": 1.4221,
@@ -368,35 +368,35 @@ const FUTURES_DATA = {
     "member_long": 64845,
     "member_short": 61117,
     "member_net": 3728,
-    "cci": 92.2844,
+    "cci": 92.28,
     "cci_sub": "正常区间",
     "psy": 50,
     "psy_sub": "中性",
     "bias": 0.0949,
     "bias_sub": "贴近均线",
-    "vr": 96.9195,
+    "vr": 96.92,
     "vr_sub": "正常量能",
-    "dma": 0.17320000000001,
+    "dma": 0.1732,
     "dma_sub": "短均>长均·偏多",
     "trix": 0.0098,
     "trix_sub": "温和上升",
-    "mtm": 0.064999999999998,
+    "mtm": 0.065,
     "mtm_sub": "上涨动能",
-    "mfi": 72.7243,
+    "mfi": 72.72,
     "mfi_sub": "资金流入偏多"
   },
   "indicators_tl": {
     "macd_diff": 0.473,
     "macd_sub": "正区间 · 强多头",
-    "kdj_k": 82.0777,
+    "kdj_k": 82.08,
     "kdj_sub": "偏强区间",
-    "rsi_6": 65.6503,
+    "rsi_6": 65.65,
     "rsi_sub": "中性偏多",
     "boll_mid": 114.3554,
     "boll_sub": "价格在中轨上方",
-    "atr_14": 0.33000000000001,
+    "atr_14": 0.33,
     "atr_sub": "正常波动",
-    "obv": 415.5964,
+    "obv": 415.6,
     "obv_sub": "万手·年化",
     "volatility": 0.3329,
     "vol_sub": "高波动",
@@ -405,15 +405,15 @@ const FUTURES_DATA = {
     "bnoc": 0.0809,
     "basis": null,
     "member_long": 34339,
-    "member_short": 23565,
-    "member_net": 10774,
-    "cci": 97.6384,
+    "member_short": 21755,
+    "member_net": 12584,
+    "cci": 97.64,
     "cci_sub": "正常区间",
-    "psy": 66.6667,
+    "psy": 66.67,
     "psy_sub": "偏多情绪",
     "bias": 0.4521,
     "bias_sub": "小幅正偏离",
-    "vr": 212.5443,
+    "vr": 212.54,
     "vr_sub": "放量活跃",
     "dma": 1.1758,
     "dma_sub": "短均远高于长均",
@@ -421,7 +421,7 @@ const FUTURES_DATA = {
     "trix_sub": "温和上升",
     "mtm": 0.33,
     "mtm_sub": "强上涨动能",
-    "mfi": 71.6812,
+    "mfi": 71.68,
     "mfi_sub": "资金流入偏多"
   },
   "quick_stats": {
@@ -434,9 +434,9 @@ const FUTURES_DATA = {
     "t_margin": "21,888",
     "tl_margin": "40,520",
     "t_fund": 159.9,
-    "t_fund_change": 0,
+    "t_fund_change": -1.8,
     "tl_fund": 156.5,
-    "tl_fund_change": 0
+    "tl_fund_change": -1.4
   }
 };
 
@@ -1136,17 +1136,17 @@ function renderAll() {
           <div class="ind-card"><div class="ind-label">MFI 资金流向</div><div class="ind-value">${ind.mfi != null ? ind.mfi : '—'}</div><div class="ind-sub">${ind.mfi_sub || '—'}</div></div>
         </div>
         <div class="section-title">📐 期现关系</div>
-        <div class="ctd-box"><div class="ctd-label">最便宜可交割债券 CTD</div><div class="ctd-code">${ind.ctd_bond}</div></div>
+        <div class="ctd-box"><div class="ctd-label">最便宜可交割债券 CTD</div><div class="ctd-code">${ind.ctd_bond || '—'}</div></div>
         <div class="ind-row">
-          <div class="ind-card"><div class="ind-label">IRR 隐含回购利率</div><div class="ind-value">${ind.irr}%</div></div>
-          <div class="ind-card"><div class="ind-label">净基差 BNOC</div><div class="ind-value">${ind.bnoc}</div></div>
-          <div class="ind-card"><div class="ind-label">期现价差</div><div class="ind-value">${ind.basis}</div></div>
+          <div class="ind-card"><div class="ind-label">IRR 隐含回购利率</div><div class="ind-value">${ind.irr != null ? ind.irr.toFixed(2)+'%' : '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">净基差 BNOC</div><div class="ind-value">${ind.bnoc != null ? ind.bnoc.toFixed(4) : '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">期现价差</div><div class="ind-value">${ind.basis != null ? ind.basis : '—'}</div></div>
         </div>
         <div class="section-title">🏦 中信期货持仓</div>
         <div class="ind-row">
-          <div class="ind-card"><div class="ind-label">多头持仓</div><div class="ind-value">${ind.member_long.toLocaleString()}</div></div>
-          <div class="ind-card"><div class="ind-label">空头持仓</div><div class="ind-value">${ind.member_short.toLocaleString()}</div></div>
-          <div class="ind-card"><div class="ind-label">净持仓</div><div class="ind-value" style="color:${netColor}">${memberNet>0?'+':''}${memberNet.toLocaleString()} 手</div><div class="ind-sub">${netLabel}</div></div>
+          <div class="ind-card"><div class="ind-label">多头持仓</div><div class="ind-value">${(ind.member_long||0).toLocaleString()}</div></div>
+          <div class="ind-card"><div class="ind-label">空头持仓</div><div class="ind-value">${(ind.member_short||0).toLocaleString()}</div></div>
+          <div class="ind-card"><div class="ind-label">净持仓</div><div class="ind-value" style="color:${netColor}">${memberNet>0?'+':''}${(memberNet||0).toLocaleString()} 手</div><div class="ind-sub">${netLabel}</div></div>
         </div>
       </div></div>`;
   }
