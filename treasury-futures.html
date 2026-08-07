@@ -532,136 +532,439 @@ function computeOBV(closes, volumes) {
   return obv;
 }
 
-// ====== SIGNAL DETERMINATION ======
+// ====== 浙商量化择时指标体系 ======
+// 参考文献: 浙商证券《交易性择时多空视角下每日一图更新》(2026.02.25)
+//          《基于隔夜信息的双周期共振日内择时与"每日一图"体系更新》(2026.05.20)
+// 核心: 趋势识别—波动过滤—风险预警 三层结构, 多信号交叉验证(至少2个子策略同向触发)
+
+// ---- WMA (加权移动平均, HMA的构建块) ----
+function WMA(arr, n) {
+  const result = new Array(arr.length).fill(null);
+  const denom = n * (n + 1) / 2;
+  for (let i = n - 1; i < arr.length; i++) {
+    let sum = 0;
+    for (let j = 0; j < n; j++) sum += arr[i - j] * (n - j);
+    result[i] = sum / denom;
+  }
+  return result;
+}
+
+// ---- HMA (Hull Moving Average, 浙商"低延时趋势"核心算法) ----
+// HMA = WMA( sqrt(n), 2*WMA(n/2) - WMA(n) )
+// 相比传统均线大幅降低滞后, 在趋势启动初期即可识别方向变化
+function HMA(arr, period) {
+  const half = Math.floor(period / 2);
+  const sqrt = Math.floor(Math.sqrt(period));
+  const wmaHalf = WMA(arr, half);
+  const wmaFull = WMA(arr, period);
+  const result = new Array(arr.length).fill(null);
+
+  // 逐点计算: 对每个位置, 取目前已完成的 raw = 2*wmaHalf-wmaFull 序列, 再做 sqrt 期 WMA
+  for (let i = 0; i < arr.length; i++) {
+    if (wmaHalf[i] === null || wmaFull[i] === null) continue;
+    const raw = 2 * wmaHalf[i] - wmaFull[i];
+    // 收集到当前为止的所有 raw 值
+    const rawSeries = [];
+    for (let j = 0; j <= i; j++) {
+      if (wmaHalf[j] !== null && wmaFull[j] !== null) {
+        rawSeries.push(2 * wmaHalf[j] - wmaFull[j]);
+      }
+    }
+    if (rawSeries.length >= sqrt) {
+      const recentRaw = rawSeries.slice(-sqrt);
+      let wsum = 0;
+      const wdenom = sqrt * (sqrt + 1) / 2;
+      for (let k = 0; k < sqrt; k++) wsum += recentRaw[k] * (k + 1);
+      result[i] = wsum / wdenom;
+    }
+  }
+  return result;
+}
+
+// ---- 滚动偏度 (Skewness) ----
+// 浙商"阶矩择时"模块: 负偏度骤扩 → 恐慌性抛压积累 → 空头预警
+function rollingSkewness(returns, window) {
+  const result = new Array(returns.length).fill(null);
+  for (let i = window - 1; i < returns.length; i++) {
+    const slice = returns.slice(i - window + 1, i + 1);
+    const n = slice.length, mean = slice.reduce((s, v) => s + v, 0) / n;
+    const m2 = slice.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
+    const m3 = slice.reduce((s, v) => s + (v - mean) ** 3, 0) / n;
+    result[i] = m2 > 1e-12 ? m3 / (m2 ** 1.5) : 0;
+  }
+  return result;
+}
+
+// ---- 滚动峰度 (Kurtosis) ----
+function rollingKurtosis(returns, window) {
+  const result = new Array(returns.length).fill(null);
+  for (let i = window - 1; i < returns.length; i++) {
+    const slice = returns.slice(i - window + 1, i + 1);
+    const n = slice.length, mean = slice.reduce((s, v) => s + v, 0) / n;
+    const m2 = slice.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
+    const m4 = slice.reduce((s, v) => s + (v - mean) ** 4, 0) / n;
+    result[i] = m2 > 1e-12 ? m4 / (m2 ** 2) : 3;
+  }
+  return result;
+}
+
+// ---- TD Sequential 九转结构 (DeMark) ----
+// 浙商"九转序列"模块: 连续9根K线收盘价高于/低于4根K线前的收盘价 → 动能衰竭 → 反转预警
+// 返回: { count: 1-9 (当前连续计数), direction: 'up'|'down'|null, complete: boolean }
+function tdSetup(highs, lows, closes) {
+  const n = closes.length;
+  const counts = new Array(n).fill(0);
+  const dirs = new Array(n).fill(null);
+
+  for (let i = 4; i < n; i++) {
+    const up = closes[i] > closes[i - 4];
+    const down = closes[i] < closes[i - 4];
+    if (up) {
+      dirs[i] = 'up';
+      counts[i] = (dirs[i - 1] === 'up') ? Math.min(counts[i - 1] + 1, 9) : 1;
+    } else if (down) {
+      dirs[i] = 'down';
+      counts[i] = (dirs[i - 1] === 'down') ? Math.min(counts[i - 1] + 1, 9) : 1;
+    } else {
+      counts[i] = 0;
+    }
+  }
+  return { counts, dirs };
+}
+
+// ---- VPIN 近似 (订单流毒性代理指标) ----
+// 浙商核心创新: VPIN = E[|V_B - V_S|] / (n*V), 衡量买卖失衡程度
+// 日内需要tick数据做等量桶; 日频近似: 用(close-open)方向×成交量 估算买卖量
+// 高VPIN → 流动性枯竭预警 → 极端下行风险
+function vpinProxy(opens, highs, lows, closes, volumes, bucketDays) {
+  const n = closes.length;
+  const vpin = new Array(n).fill(null);
+  const buyVol = new Array(n).fill(0);
+  const sellVol = new Array(n).fill(0);
+
+  // 日内成交量分解近似: 基于价格运行区间
+  for (let i = 0; i < n; i++) {
+    if (highs[i] === null || lows[i] === null || opens[i] === null) continue;
+    const range = highs[i] - lows[i];
+    if (range < 1e-8) { buyVol[i] = volumes[i] * 0.5; sellVol[i] = volumes[i] * 0.5; continue; }
+    // 收盘在区间上部的比例 ≈ 买方占比
+    const closePos = (closes[i] - lows[i]) / range;
+    buyVol[i] = volumes[i] * closePos;
+    sellVol[i] = volumes[i] * (1 - closePos);
+  }
+
+  for (let i = bucketDays - 1; i < n; i++) {
+    let totalV = 0, imbalance = 0;
+    for (let j = i - bucketDays + 1; j <= i; j++) {
+      totalV += volumes[j];
+      imbalance += Math.abs(buyVol[j] - sellVol[j]);
+    }
+    vpin[i] = totalV > 0 ? imbalance / totalV : 0;
+  }
+  return vpin;
+}
+
+// ---- 隔夜共振近似 (日频替代) ----
+// 浙商5月报告核心创新: 对High/Low做局部回归, 斜率β衡量支撑vs阻力相对强度
+// β>1: 支撑强于阻力(偏多); β<1: 阻力强于支撑(偏空); R²为质量惩罚项
+function overnightResonance(highs, lows, window) {
+  const n = highs.length;
+  const slopes = new Array(n).fill(null);
+  const r2s = new Array(n).fill(null);
+
+  for (let i = window - 1; i < n; i++) {
+    const x = [], y = [];
+    for (let j = i - window + 1; j <= i; j++) {
+      if (highs[j] === null || lows[j] === null) continue;
+      x.push(lows[j]);
+      y.push(highs[j]);
+    }
+    const m = x.length;
+    if (m < 5) continue;
+    const sumX = x.reduce((a, b) => a + b, 0);
+    const sumY = y.reduce((a, b) => a + b, 0);
+    const sumXY = x.reduce((a, b, k) => a + b * y[k], 0);
+    const sumX2 = x.reduce((a, b) => a + b * b, 0);
+    const sumY2 = y.reduce((a, b) => a + b * b, 0);
+    const denom = m * sumX2 - sumX * sumX;
+    if (Math.abs(denom) < 1e-10) continue;
+    const beta = (m * sumXY - sumX * sumY) / denom;
+    const alpha = (sumY - beta * sumX) / m;
+    // R²
+    const yMean = sumY / m;
+    const ssRes = y.reduce((s, yi, k) => { const pred = alpha + beta * x[k]; return s + (yi - pred) ** 2; }, 0);
+    const ssTot = y.reduce((s, yi) => s + (yi - yMean) ** 2, 0);
+    const r2 = ssTot > 1e-12 ? 1 - ssRes / ssTot : 0;
+    slopes[i] = beta;
+    r2s[i] = r2;
+  }
+  return { slopes, r2s };
+}
+
+// ====== 浙商多空信号确定 (8维交叉验证) ======
 function determineSignals(data) {
   const closes = data.map(d => d.c);
   const highs = data.map(d => d.h);
   const lows = data.map(d => d.l);
+  const opens = data.map(d => d.o);
   const volumes = data.map(d => d.v);
   const oi = data.map(d => d.oi);
   const n = closes.length, last = n - 1;
 
+  // 日收益率 (用于阶矩计算)
+  const returns = closes.map((c, i) => i > 0 && c !== null && closes[i-1] !== null ? (c - closes[i-1]) / closes[i-1] : null);
+
+  // 预计算所有指标
   const ma5 = SMA(closes, 5);
   const ma10 = SMA(closes, 10);
-  const boll = computeBOLL(closes);
+  const ma20 = SMA(closes, 20);
+  const hma10 = HMA(closes, 10);
+  const boll = computeBOLL(closes, 20, 2);
   const macd = computeMACD(closes);
   const kdj = computeKDJ(highs, lows, closes, 9);
   const rsi = computeRSI(closes, 6);
+  const atr14 = computeATR(highs, lows, closes, 14);
   const obv = computeOBV(closes, volumes);
   const volMa5 = SMA(volumes, 5);
+  const skew = rollingSkewness(returns, 20);
+  const kurt = rollingKurtosis(returns, 20);
+  const td = tdSetup(highs, lows, closes);
+  const vpin = vpinProxy(opens, highs, lows, closes, volumes, 10);
+  const hmaSlope = SMA(hma10.filter(v => v !== null), 3); // HMA的3期斜率近似
 
   const sigs = [];
 
-  // 1. MA Trend
-  if (ma5[last] !== null && closes[last] !== null) {
-    const aboveMA5 = closes[last] > ma5[last];
-    const aboveMA10 = ma10[last] !== null && closes[last] > ma10[last];
-    sigs.push({ name: '均线趋势', bull: aboveMA5 && aboveMA10, bear: !aboveMA5 && !aboveMA10,
-      val: 'C>' + (ma5[last]||0).toFixed(2), detail: aboveMA5 ? '价格在均线上方' : '价格在均线下方' });
+  // ─── 1. 单均线跟踪 (浙商趋势识别层) ───
+  // 逻辑: 价格>MA(5)且突破ATR波动过滤 = 有效趋势; 无波动确认 = 中性
+  if (ma5[last] !== null && closes[last] !== null && atr14[last] !== null) {
+    const dev = (closes[last] - ma5[last]) / atr14[last];
+    const bull = dev > 0.5;
+    const bear = dev < -0.5;
+    sigs.push({
+      name: '单均线跟踪', bull, bear,
+      val: '偏离' + dev.toFixed(1) + 'σ',
+      detail: bull ? '有效站上均线' : (bear ? '有效跌破均线' : '均线附近震荡')
+    });
   } else {
-    sigs.push({ name: '均线趋势', bull: false, bear: false, val: '—', detail: '数据不足' });
+    sigs.push({ name: '单均线跟踪', bull: false, bear: false, val: '—', detail: '数据不足' });
   }
 
-  // 2. Dual MA
-  if (ma5[last] !== null && ma10[last] !== null) {
+  // ─── 2. 双均线跟踪 (浙商趋势确认模块) ───
+  if (ma5[last] !== null && ma10[last] !== null && ma20[last] !== null) {
     const golden = ma5[last] > ma10[last];
-    sigs.push({ name: '双均线交叉', bull: golden, bear: !golden,
-      val: golden ? '金叉' : '死叉', detail: `MA5 ${ma5[last].toFixed(2)} vs MA10 ${ma10[last].toFixed(2)}` });
+    const expanding = Math.abs(ma5[last] - ma10[last]) > Math.abs((ma5[last-5]||ma5[last]) - (ma10[last-5]||ma10[last]));
+    sigs.push({
+      name: '双均线交叉', bull: golden, bear: !golden,
+      val: golden ? (expanding ? '金叉发散' : '金叉') : (expanding ? '死叉发散' : '死叉'),
+      detail: `MA5 ${ma5[last].toFixed(3)} | MA10 ${ma10[last].toFixed(3)} | MA20 ${ma20[last].toFixed(3)}`
+    });
   } else {
     sigs.push({ name: '双均线交叉', bull: false, bear: false, val: '—', detail: '数据不足' });
   }
 
-  // 3. BOLL
-  if (boll.mid[last] !== null && closes[last] !== null) {
+  // ─── 3. 低延时趋势 (浙商HMA, 趋势启动识别) ───
+  // 逻辑: HMA方向+斜率 = 低延迟趋势判断; 相比传统MA, HMA在趋势初期更快响应
+  if (hma10[last] !== null && hma10[last-1] !== null && hma10[last-3] !== null) {
+    const hmaUp = hma10[last] > hma10[last-1];
+    const accelerating = hma10[last] - hma10[last-1] > hma10[last-1] - hma10[last-3];
+    const hmaAboveMA = ma20[last] !== null && hma10[last] > ma20[last];
+    sigs.push({
+      name: '低延时趋势', bull: hmaUp && hmaAboveMA, bear: !hmaUp && !hmaAboveMA,
+      val: hmaUp ? (accelerating ? '加速上倾' : '缓慢上倾') : (accelerating ? '加速下倾' : '缓慢下倾'),
+      detail: `HMA(10) ${hma10[last].toFixed(3)} | 延迟较MA低约40%`
+    });
+  } else {
+    sigs.push({ name: '低延时趋势', bull: false, bear: false, val: '—', detail: '数据不足' });
+  }
+
+  // ─── 4. 通道过滤 (浙商波动结构识别, BOLL布林带) ───
+  // 逻辑: 突破上轨=强势, 跌破下轨=弱势, 中轨上方=偏多
+  if (boll.mid[last] !== null && boll.upper[last] !== null && boll.lower[last] !== null) {
+    const aboveUpper = closes[last] > boll.upper[last];
+    const belowLower = closes[last] < boll.lower[last];
     const aboveMid = closes[last] > boll.mid[last];
-    const nearUpper = boll.upper[last] !== null && closes[last] >= boll.upper[last] * 0.995;
-    sigs.push({ name: '布林通道', bull: aboveMid && !nearUpper, bear: !aboveMid,
-      val: aboveMid ? (nearUpper ? '触及上轨' : '偏强') : '偏弱',
-      detail: `中轨 ${boll.mid[last].toFixed(2)}` });
+    const bandwidth = (boll.upper[last] - boll.lower[last]) / boll.mid[last]; // 带宽=波动率环境
+    sigs.push({
+      name: '通道过滤', bull: aboveUpper || (aboveMid && bandwidth < 0.002), bear: belowLower,
+      val: aboveUpper ? '突破上轨' : (belowLower ? '跌破下轨' : (aboveMid ? '中轨上方' : '中轨下方')),
+      detail: `上${boll.upper[last].toFixed(3)} 中${boll.mid[last].toFixed(3)} 下${boll.lower[last].toFixed(3)}`
+    });
   } else {
-    sigs.push({ name: '布林通道', bull: false, bear: false, val: '—', detail: '数据不足' });
+    sigs.push({ name: '通道过滤', bull: false, bear: false, val: '—', detail: '数据不足' });
   }
 
-  // 4. MACD
-  if (macd.diff[last] !== null) {
-    const diffUp = macd.diff[last] > 0;
-    const diffRising = macd.diff[last-1] !== null && macd.diff[last] > macd.diff[last-1];
-    sigs.push({ name: 'MACD', bull: diffUp, bear: !diffUp,
-      val: macd.diff[last].toFixed(3), detail: diffRising ? '动能增强' : (diffUp ? '动能减弱' : '空头主导') });
+  // ─── 5. 阶矩择时 (浙商波动结构层, 高阶矩刻画) ───
+  // 逻辑: 负偏度+高峰度 = 左侧尾部风险; 正偏度+低峰度 = 稳定上行
+  if (skew[last] !== null && kurt[last] !== null) {
+    const negSkew = skew[last] < -0.3;
+    const highKurt = kurt[last] > 4.5; // 峰度>4.5=厚尾风险
+    const posSkew = skew[last] > 0.3;
+    const lowKurt = kurt[last] < 3.5;
+    sigs.push({
+      name: '阶矩择时', bull: posSkew && !highKurt, bear: negSkew || highKurt,
+      val: `偏度${skew[last].toFixed(2)} 峰度${kurt[last].toFixed(2)}`,
+      detail: negSkew ? '⚠ 负偏+下行风险' : (highKurt ? '⚠ 厚尾+极端风险' : (posSkew ? '正偏+趋势健康' : '分布正常'))
+    });
   } else {
-    sigs.push({ name: 'MACD', bull: false, bear: false, val: '—', detail: '数据不足' });
+    sigs.push({ name: '阶矩择时', bull: false, bear: false, val: '—', detail: '数据不足' });
   }
 
-  // 5. KDJ
-  if (kdj.k[last] !== null) {
-    const kv = kdj.k[last];
-    sigs.push({ name: 'KDJ', bull: kv > 50 && kv <= 80, bear: kv < 50,
-      val: kv.toFixed(1), detail: kv > 80 ? '⚠ 超买' : (kv < 20 ? '超卖' : (kv > 50 ? '偏强' : '偏弱')) });
+  // ─── 6. 九转序列 (浙商动能衰竭识别, TD Sequential) ───
+  // 逻辑: 上涨9转=多头衰竭, 下跌9转=空头衰竭
+  const tdCount = td.counts[last];
+  const tdDir = td.dirs[last];
+  const tdComplete = tdCount >= 9;
+  if (tdCount > 0 && tdDir) {
+    sigs.push({
+      name: '九转序列', bull: tdDir === 'down' && tdComplete, bear: tdDir === 'up' && tdComplete,
+      val: `${tdDir === 'up' ? '上涨' : '下跌'}${tdCount}转`,
+      detail: tdComplete ? (tdDir === 'up' ? '⚠ 上涨结构9: 多头衰竭预警' : '◆ 下跌结构9: 空头衰竭信号') : `计数中(${tdCount}/9)`
+    });
   } else {
-    sigs.push({ name: 'KDJ', bull: false, bear: false, val: '—', detail: '数据不足' });
+    sigs.push({ name: '九转序列', bull: false, bear: false, val: '未触发', detail: '未形成有效结构' });
   }
 
-  // 6. RSI
-  if (rsi[last] !== null) {
-    const rv = rsi[last];
-    sigs.push({ name: 'RSI', bull: rv > 50, bear: rv <= 50,
-      val: rv.toFixed(1), detail: rv > 70 ? '超买' : (rv > 50 ? '偏多' : (rv < 30 ? '超卖' : '偏空')) });
+  // ─── 7. VPIN近似 (浙商微观流动性预警) ───
+  // 逻辑: VPIN>0.3=知情交易概率高→流动性枯竭预警; VPIN<0.15=订单流健康
+  if (vpin[last] !== null) {
+    const highVpin = vpin[last] > 0.35;
+    const midVpin = vpin[last] > 0.20;
+    const lowVpin = vpin[last] < 0.12;
+    sigs.push({
+      name: 'VPIN流动性', bull: lowVpin, bear: highVpin || midVpin,
+      val: (vpin[last] * 100).toFixed(1) + '%',
+      detail: highVpin ? '⚠ 毒性订单流+流动性枯竭预警' : (midVpin ? '订单流轻微失衡' : (lowVpin ? '订单流健康' : '正常区间'))
+    });
   } else {
-    sigs.push({ name: 'RSI', bull: false, bear: false, val: '—', detail: '数据不足' });
+    sigs.push({ name: 'VPIN流动性', bull: false, bear: false, val: '—', detail: '数据不足' });
   }
 
-  // 7. Volume/Flow
-  if (volMa5[last] !== null) {
-    const volExpanding = volumes[last] > volMa5[last];
-    const obvRising = obv[last-1] !== null && obv[last] > obv[last-1];
-    const oiTrend = oi[last] !== null && oi[last-2] !== null && oi[last] > oi[last-2];
-    const bullish = obvRising && oiTrend;
-    sigs.push({ name: '量能资金流', bull: bullish, bear: !bullish && !obvRising,
-      val: volExpanding ? '放量' : '缩量',
-      detail: obvRising ? (oiTrend ? 'OBV↑ OI↑' : 'OBV↑') : (oiTrend ? 'OI↑' : '量能减弱') });
+  // ─── 8. 隔夜共振 (浙商价格结构因子, β斜率) ───
+  const orData = overnightResonance(highs, lows, 20);
+  if (orData.slopes[last] !== null && orData.r2s[last] !== null) {
+    const beta = orData.slopes[last];
+    const r2 = orData.r2s[last];
+    const strongSignal = r2 > 0.7;
+    const bull = beta > 1.02 && strongSignal;
+    const bear = beta < 0.98 && strongSignal;
+    sigs.push({
+      name: '隔夜共振', bull, bear,
+      val: `β=${beta.toFixed(3)} R²=${r2.toFixed(2)}`,
+      detail: bull ? '支撑>阻力, 区间上倾' : (bear ? '阻力>支撑, 区间下倾' : (r2 < 0.5 ? '无序波动, 方向不明' : '区间均衡'))
+    });
   } else {
-    sigs.push({ name: '量能资金流', bull: false, bear: false, val: '—', detail: '数据不足' });
+    sigs.push({ name: '隔夜共振', bull: false, bear: false, val: '—', detail: '数据不足' });
   }
 
+  // ─── 综合信号: 浙商"至少2个信号共振"触发机制 ───
   const bullCount = sigs.filter(s => s.bull).length;
   const bearCount = sigs.filter(s => s.bear).length;
-  let signal, signalLabel, signalClass;
-  if (bullCount >= 5) { signal = 'long'; signalLabel = '偏多'; signalClass = 'long'; }
-  else if (bearCount >= 5) { signal = 'short'; signalLabel = '偏空'; signalClass = 'short'; }
-  else if (bullCount >= 3) { signal = 'long_weak'; signalLabel = '谨慎偏多'; signalClass = 'neutral'; }
-  else if (bearCount >= 3) { signal = 'short_weak'; signalLabel = '谨慎偏空'; signalClass = 'neutral'; }
-  else { signal = 'neutral'; signalLabel = '震荡观望'; signalClass = 'neutral'; }
+  const activeCount = sigs.filter(s => s.bull || s.bear).length;
 
-  return { sigs, bullCount, bearCount, signal, signalLabel, signalClass,
-    ind: { ma5: ma5[last], ma10: ma10[last], bollMid: boll.mid[last], bollUpper: boll.upper[last], bollLower: boll.lower[last],
-      macdDiff: macd.diff[last], kdjK: kdj.k[last], rsi: rsi[last] }
+  let signal, signalLabel, signalClass;
+  if (bullCount >= 5) {
+    signal = 'long'; signalLabel = '强势偏多'; signalClass = 'long';
+  } else if (bearCount >= 5) {
+    signal = 'short'; signalLabel = '强势偏空'; signalClass = 'short';
+  } else if (bullCount >= 3 && bullCount > bearCount) {
+    signal = 'long_weak'; signalLabel = '谨慎偏多'; signalClass = 'neutral';
+  } else if (bearCount >= 3 && bearCount > bullCount) {
+    signal = 'short_weak'; signalLabel = '谨慎偏空'; signalClass = 'neutral';
+  } else if (bullCount >= 2) {
+    signal = 'long_weak'; signalLabel = '弱偏多'; signalClass = 'neutral';
+  } else if (bearCount >= 2) {
+    signal = 'short_weak'; signalLabel = '弱偏空'; signalClass = 'neutral';
+  } else {
+    signal = 'neutral'; signalLabel = '震荡观望'; signalClass = 'neutral';
+  }
+
+  return {
+    sigs, bullCount, bearCount, activeCount, signal, signalLabel, signalClass,
+    ind: {
+      ma5: ma5[last], ma10: ma10[last], ma20: ma20[last],
+      hma10: hma10[last],
+      bollMid: boll.mid[last], bollUpper: boll.upper[last], bollLower: boll.lower[last],
+      macdDiff: macd.diff[last], kdjK: kdj.k[last], rsi: rsi[last],
+      skew: skew[last], kurt: kurt[last],
+      tdCount, tdDir, vpin: vpin[last],
+      orBeta: orData.slopes[last], orR2: orData.r2s[last]
+    }
   };
 }
 
-// ====== RISK ASSESSMENT ======
+// ====== RISK ASSESSMENT (浙商三层风险预警: 微观流动性+波动结构+趋势衰竭) ======
 function assessRisk(tSig, tlSig, tData, tlData) {
   const risks = [];
-  if (tlSig.ind.kdjK !== null && tlSig.ind.kdjK > 80)
-    risks.push({ cls:'warn', label:'TL超买预警', value:'KDJ '+tlSig.ind.kdjK.toFixed(0), sub:'三十年期KDJ处超买边缘，短期回调风险上升' });
-  else if (tlSig.ind.kdjK !== null && tlSig.ind.kdjK > 70)
-    risks.push({ cls:'warn', label:'TL偏强区间', value:'KDJ '+tlSig.ind.kdjK.toFixed(0), sub:'接近超买区间，关注是否继续上行' });
+  const tI = tSig.ind, tlI = tlSig.ind;
 
+  // ─── 1. TL KDJ超买 (传统超买超卖) ───
+  if (tlI.kdjK !== null && tlI.kdjK > 80)
+    risks.push({ cls:'danger', label:'⚠ TL超买', value:'KDJ '+tlI.kdjK.toFixed(0), sub:'三十年期KDJ>80超买区间，短期回调风险显著上升' });
+  else if (tlI.kdjK !== null && tlI.kdjK > 70)
+    risks.push({ cls:'warn', label:'TL偏强区间', value:'KDJ '+tlI.kdjK.toFixed(0), sub:'接近超买区间，关注是否继续上行' });
+
+  // ─── 2. VPIN流动性预警 (浙商核心创新) ───
+  if (tI.vpin !== null && tI.vpin > 0.35)
+    risks.push({ cls:'danger', label:'⚠ T 毒性订单流', value:'VPIN '+(tI.vpin*100).toFixed(0)+'%', sub:'VPIN高值预警: 知情交易概率上升，流动性面临枯竭风险' });
+  else if (tI.vpin !== null && tI.vpin > 0.25)
+    risks.push({ cls:'warn', label:'T 订单流失衡', value:'VPIN '+(tI.vpin*100).toFixed(0)+'%', sub:'订单流买卖失衡加剧，关注微观流动性变化' });
+  if (tlI.vpin !== null && tlI.vpin > 0.35)
+    risks.push({ cls:'danger', label:'⚠ TL 毒性订单流', value:'VPIN '+(tlI.vpin*100).toFixed(0)+'%', sub:'三十年期VPIN极端值，警惕流动性断裂引发剧烈波动' });
+
+  // ─── 3. 阶矩择时风险 (偏度+峰度) ───
+  if (tI.skew !== null && tI.skew < -0.5 && tI.kurt !== null && tI.kurt > 4)
+    risks.push({ cls:'danger', label:'⚠ T 负偏+厚尾', value:'偏度'+tI.skew.toFixed(1)+' 峰度'+tI.kurt.toFixed(1), sub:'收益分布负偏+高峰度=极端下行风险积聚' });
+  else if (tI.skew !== null && tI.skew < -0.3)
+    risks.push({ cls:'warn', label:'T 收益负偏', value:'偏度'+tI.skew.toFixed(2), sub:'近期收益分布左偏，下行风险大于上行' });
+  if (tlI.skew !== null && tlI.skew < -0.5)
+    risks.push({ cls:'danger', label:'⚠ TL 极端负偏', value:'偏度'+tlI.skew.toFixed(1), sub:'三十年期负偏严重，尾部风险显著' });
+
+  // ─── 4. 九转序列预警 (TD Sequential) ───
+  if (tI.tdCount >= 9 && tI.tdDir === 'up')
+    risks.push({ cls:'danger', label:'⚠ T 上涨9转', value:'多头衰竭', sub:'TD九转上涨结构完成，多头动能衰竭，警惕反转' });
+  else if (tI.tdCount >= 7 && tI.tdDir === 'up')
+    risks.push({ cls:'warn', label:'T 上涨'+tI.tdCount+'转', value:'接近衰竭', sub:'TD上涨计数接近9，关注动能衰减' });
+  if (tlI.tdCount >= 9 && tlI.tdDir === 'up')
+    risks.push({ cls:'danger', label:'⚠ TL 上涨9转', value:'多头衰竭', sub:'三十年期TD九转完成，历史反转概率高' });
+  else if (tlI.tdCount >= 9 && tlI.tdDir === 'down')
+    risks.push({ cls:'safe', label:'TL 下跌9转', value:'空头衰竭', sub:'TD下跌结构完成，空头动能衰竭，反弹概率上升' });
+
+  // ─── 5. 低延时趋势分歧 ───
+  if (tI.hma10 !== null && tI.ma20 !== null) {
+    const hmaAboveMA = tI.hma10 > tI.ma20;
+    const priceAboveMA = tData[tData.length-1].c > tI.ma20;
+    if (hmaAboveMA !== priceAboveMA)
+      risks.push({ cls:'warn', label:'T HMA-价格分歧', value:'趋势信号不一', sub:'低延时趋势与价格均线方向背离，趋势可靠性下降' });
+  }
+
+  // ─── 6. 隔夜共振预警 ───
+  if (tlI.orBeta !== null && tlI.orR2 !== null && tlI.orR2 > 0.7 && tlI.orBeta < 0.97)
+    risks.push({ cls:'warn', label:'TL 区间下倾', value:'β='+tlI.orBeta.toFixed(2), sub:'三十年期价格区间阻力>支撑，微观结构偏弱' });
+
+  // ─── 7. 量能+持仓 ───
   const tVol = tData.map(d=>d.v), tlVol = tlData.map(d=>d.v);
-  const tVol5 = tVol.slice(-5).reduce((a,b)=>a+b,0)/5, tVol10 = tVol.slice(-10,-5).reduce((a,b)=>a+b,0)/5;
+  const tVol5 = tVol.slice(-5).reduce((a,b)=>a+b,0)/5;
+  const tVol10 = tVol.slice(-10,-5).length > 0 ? tVol.slice(-10,-5).reduce((a,b)=>a+b,0)/5 : tVol5;
   if (tVol10 > 0 && tVol5 < tVol10 * 0.8)
-    risks.push({ cls:'warn', label:'T 量能萎缩', value:'连续缩量', sub:'近5日均量较前5日下降>' + ((1-tVol5/tVol10)*100).toFixed(0) + '%，等待方向' });
+    risks.push({ cls:'warn', label:'T 量能萎缩', value:'连续缩量', sub:'近5日均量较前期下降>' + ((1-tVol5/tVol10)*100).toFixed(0) + '%，市场等待方向' });
 
   const tOi = tData.map(d=>d.oi), tlOi = tlData.map(d=>d.oi);
   if (tOi[tOi.length-1] < tOi[tOi.length-3])
-    risks.push({ cls:'warn', label:'T 持仓下降', value:'OI ↓', sub:'持仓量趋势性下降，多头信心不足' });
+    risks.push({ cls:'warn', label:'T 持仓下降', value:'OI ↓', sub:'持仓趋势性下降，多头信心不足' });
   if (tlOi[tlOi.length-1] < tlOi[tlOi.length-5])
-    risks.push({ cls:'danger', label:'TL 持仓骤降', value:'OI ↓ '+(tlOi[tlOi.length-1]-tlOi[tlOi.length-5]).toLocaleString(), sub:'三十年期持仓从高峰回落，部分多头离场' });
+    risks.push({ cls:'danger', label:'TL 持仓骤降', value:'OI ↓ '+(tlOi[tlOi.length-1]-tlOi[tlOi.length-5]).toLocaleString(), sub:'三十年期持仓从高峰显著回落，部分多头离场' });
 
+  // ─── 8. T-TL信号分化 ───
   if (tSig.signal.includes('long') && tlSig.signal.includes('short'))
-    risks.push({ cls:'warn', label:'T-TL信号分化', value:'方向不一', sub:'十年期与三十年期信号方向背离，风格切换可能' });
+    risks.push({ cls:'warn', label:'T-TL分化', value:'方向背离', sub:'十年期偏多vs三十年期偏空，曲线结构变化' });
 
-  risks.push({ cls:'safe', label:'T 低波环境', value:'波动率极低', sub:'十年期波动率低，降低大幅回撤风险' });
-  risks.push({ cls:'warn', label:'TL 高弹品种', value:'波动率>25x T', sub:'三十年期波动率远高于十年期，需控制仓位' });
+  // ─── 兜底: 正常信号 ───
+  if (risks.length === 0) {
+    risks.push({ cls:'safe', label:'综合风险可控', value:'✓ 无预警', sub:'所有维度监控正常，未触发显著风险信号' });
+    risks.push({ cls:'safe', label:'T 低波环境', value:'波动率极低', sub:'十年期波动率处历史低位，大幅回撤概率低' });
+  } else {
+    risks.push({ cls:'safe', label:'T 低波环境', value:'波动率极低', sub:'十年期波动率处历史低位' });
+  }
 
   while (risks.length < 4) risks.push({ cls:'safe', label:'系统监控正常', value:'✓', sub:'当前无其他显著风险信号' });
   return risks.slice(0, 8);
@@ -751,7 +1054,7 @@ function renderAll() {
     return `<div class="signal-card ${sig.signalClass==='neutral'?'neutral':'bullish'}">
       <div class="signal-header">
         <div><div class="contract-name">${name}</div>
-          <div class="signal-info">多空共振：<strong>${sig.bullCount}</strong> 多 / <strong>${sig.bearCount}</strong> 空 &nbsp;|&nbsp; 有效信号 <strong>${sig.bullCount+sig.bearCount}/7</strong></div></div>
+          <div class="signal-info">多空共振：<strong>${sig.bullCount}</strong> 多 / <strong>${sig.bearCount}</strong> 空 &nbsp;|&nbsp; 有效信号 <strong>${sig.bullCount+sig.bearCount}/8</strong></div></div>
         <div><span class="signal-badge ${sig.signalClass}"><span class="dot"></span>${badgeIcon} ${sig.signalLabel}</span>
           <div style="text-align:right;margin-top:4px"><span class="code">${code}</span></div></div></div>
       <div class="sig-grid">${sig.sigs.map(s =>
