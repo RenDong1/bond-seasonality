@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>国债期货市场日报 — 2026年8月6日</title>
+<title>国债期货市场日报</title>
 <style>
   :root {
     --bg: #0f1117; --card: #161822; --border: #1e2130;
@@ -13,8 +13,6 @@
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { background:var(--bg); color:var(--text); font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; line-height:1.5; }
-
-  /* ===== TOP NAV ===== */
   .top-nav{display:flex;justify-content:space-between;align-items:center;padding:10px 30px;background:#12141d;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200}
   .top-nav .brand{font-size:15px;font-weight:700;color:var(--bright);text-decoration:none}
   .top-nav .brand span{color:var(--blue)}
@@ -22,16 +20,11 @@
   .top-nav .nav-links a{padding:5px 14px;border-radius:5px;font-size:12px;color:var(--muted);text-decoration:none;transition:all 0.2s}
   .top-nav .nav-links a:hover{color:var(--bright);background:rgba(255,255,255,0.05)}
   .top-nav .nav-links a.active{color:var(--bright);background:rgba(66,165,245,0.15)}
-
   .container { max-width:1400px; margin:0 auto; padding:20px; }
-
-  /* ===== HEADER ===== */
   .header { text-align:center; padding:24px 0 16px; border-bottom:1px solid var(--border); margin-bottom:20px; }
   .header h1 { font-size:26px; color:var(--bright); font-weight:700; }
   .header .date { font-size:13px; color:var(--muted); margin-top:4px; }
   .header .status { display:inline-block; background:#1b5e20; color:#66bb6a; padding:2px 10px; border-radius:4px; font-size:11px; margin-left:10px; }
-
-  /* ===== COMPOSITE SIGNAL BAR ===== */
   .signal-bar { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
   .signal-card { background:var(--card); border:2px solid var(--border); border-radius:12px; padding:20px 24px; position:relative; overflow:hidden; transition:border-color 0.3s; }
   .signal-card.bullish { border-color:rgba(239,83,80,0.4); }
@@ -49,10 +42,7 @@
   .signal-badge.neutral .dot { background:var(--gold); box-shadow:0 0 8px var(--gold); }
   .signal-info { margin-top:10px; font-size:12px; color:var(--muted); }
   .signal-info strong { color:var(--bright); }
-
-  /* Signal decomposition */
   .sig-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:12px; }
-  .sig-grid.col3 { grid-template-columns:repeat(3,1fr); }
   .sig-item { display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:5px; background:rgba(255,255,255,0.02); font-size:11px; }
   .sig-item .sig-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
   .sig-item .sig-dot.bull { background:var(--red); }
@@ -60,8 +50,6 @@
   .sig-item .sig-dot.neut { background:var(--muted); }
   .sig-item .sig-name { color:var(--muted); flex:1; }
   .sig-item .sig-val { font-weight:600; color:var(--bright); font-variant-numeric:tabular-nums; }
-
-  /* ===== QUICK STATS ===== */
   .quick-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
   .stat-card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:16px 20px; }
   .stat-card .label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
@@ -69,38 +57,29 @@
   .stat-card .change { font-size:12px; }
   .stat-card .change.up { color:var(--red); }
   .stat-card .change.down { color:var(--green); }
-
-  /* ===== MAIN GRID ===== */
   .main-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
   .contract-panel { background:var(--card); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
   .contract-header { padding:14px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
   .contract-header h2 { font-size:16px; color:var(--bright); }
   .contract-header .code { font-size:11px; color:var(--muted); background:#1a1d2e; padding:2px 10px; border-radius:4px; }
   .contract-body { padding:16px 20px; }
-
   .ohlc-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px 16px; margin-bottom:14px; }
   .ohlc-item { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
   .ohlc-item .k { font-size:12px; color:var(--muted); }
   .ohlc-item .v { font-size:14px; font-weight:600; color:var(--bright); }
   .ohlc-item .v.red { color:var(--red); }
   .ohlc-item .v.green { color:var(--green); }
-
   .mini-chart-wrap { width:100%; height:180px; margin:8px 0; position:relative; }
   .mini-chart-wrap canvas { width:100%; height:100%; }
-
   .section-title { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; margin:18px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--border); }
-
   .ind-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
   .ind-card { background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:6px; padding:10px 12px; }
   .ind-card .ind-label { font-size:10px; color:var(--muted); }
   .ind-card .ind-value { font-size:17px; font-weight:700; color:var(--bright); margin:2px 0; }
   .ind-card .ind-sub { font-size:10px; color:var(--muted); }
-
   .ctd-box { background:rgba(66,165,245,0.08); border:1px solid rgba(66,165,245,0.2); border-radius:8px; padding:12px 16px; margin-bottom:12px; }
   .ctd-box .ctd-label { font-size:10px; color:var(--blue); margin-bottom:3px; }
   .ctd-box .ctd-code { font-size:18px; font-weight:700; color:var(--bright); }
-
-  /* ===== RISK DASHBOARD ===== */
   .risk-panel { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:20px; margin-bottom:20px; }
   .risk-panel h3 { font-size:15px; color:var(--bright); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
   .risk-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
@@ -114,12 +93,8 @@
   .risk-card.warn .risk-value { color:var(--gold); }
   .risk-card.danger .risk-value { color:var(--red); }
   .risk-card.safe .risk-value { color:var(--green); }
-
-  /* ===== FULL PANEL ===== */
   .full-panel { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:20px; margin-bottom:20px; }
   .full-panel h3 { font-size:15px; color:var(--bright); margin-bottom:14px; }
-
-  /* ===== TREND TABLE ===== */
   .trend-table { width:100%; border-collapse:collapse; font-size:12px; }
   .trend-table th { text-align:right; color:var(--muted); font-weight:500; padding:5px 6px; border-bottom:1px solid var(--border); font-size:10px; white-space:nowrap; }
   .trend-table th:first-child { text-align:left; }
@@ -127,24 +102,9 @@
   .trend-table td:first-child { text-align:left; color:var(--muted); }
   .trend-table tr:hover td { background:rgba(255,255,255,0.02); }
   .trend-table .up { color:var(--red); } .trend-table .down { color:var(--green); }
-  .trend-table .signal-col { text-align:center; font-weight:700; font-size:12px; }
-
-  /* ===== SUMMARY ===== */
   .summary { background:linear-gradient(135deg, #1a1d2e, #1e2130); border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
   .summary p { font-size:13px; color:var(--text); line-height:1.8; }
   .summary strong { color:var(--bright); }
-
-  /* ===== SIGNAL HISTORY TABLE ===== */
-  .sig-history { width:100%; border-collapse:collapse; font-size:12px; }
-  .sig-history th { text-align:center; color:var(--muted); font-weight:500; padding:6px 10px; border-bottom:1px solid var(--border); font-size:10px; }
-  .sig-history td { text-align:center; padding:5px 10px; border-bottom:1px solid rgba(255,255,255,0.03); }
-  .sig-history .tag { display:inline-block; padding:2px 10px; border-radius:4px; font-size:11px; font-weight:700; }
-  .sig-history .tag.long { background:rgba(239,83,80,0.15); color:var(--red); }
-  .sig-history .tag.short { background:rgba(38,166,154,0.15); color:var(--green); }
-  .sig-history .tag.neutral { background:rgba(255,183,77,0.15); color:var(--gold); }
-  .sig-history .hit { color:var(--green); }
-  .sig-history .miss { color:var(--red); }
-
   @media(max-width:900px) {
     .main-grid { grid-template-columns:1fr; }
     .signal-bar { grid-template-columns:1fr; }
@@ -157,7 +117,6 @@
 </head>
 <body>
 
-<!-- ===== NAVIGATION ===== -->
 <nav class="top-nav">
   <a href="index.html" class="brand">📊 债市<span>投资策略</span>平台</a>
   <div class="nav-links">
@@ -168,234 +127,288 @@
 
 <div class="container">
 
-<!-- ===== HEADER ===== -->
 <div class="header">
-  <h1>📊 国债期货市场日报<span class="status">● 已收盘</span></h1>
-  <div class="date">2026年8月6日（周四）· 中金所 15:15 收盘 · 交易性择时多空信号跟踪</div>
+  <h1>📊 国债期货市场日报<span class="status">● <span id="hdStatus"></span></span></h1>
+  <div class="date" id="hdDate"></div>
 </div>
 
-<!-- ===== COMPOSITE SIGNAL BAR ===== -->
 <div class="signal-bar" id="signalBar"></div>
+<div class="quick-stats" id="quickStats"></div>
+<div class="summary"><p id="summaryText"></p></div>
 
-<!-- ===== QUICK STATS ===== -->
-<div class="quick-stats">
-  <div class="stat-card">
-    <div class="label">十年期 T 收盘</div>
-    <div class="value">109.39</div>
-    <div class="change down">▼ 0.005%</div>
-  </div>
-  <div class="stat-card">
-    <div class="label">三十年期 TL 收盘</div>
-    <div class="value">115.39</div>
-    <div class="change down">▼ 0.043%</div>
-  </div>
-  <div class="stat-card">
-    <div class="label">T 沉淀资金</div>
-    <div class="value">159.9<span style="font-size:14px">亿</span></div>
-    <div class="change down">较前日 -1.8亿</div>
-  </div>
-  <div class="stat-card">
-    <div class="label">TL 沉淀资金</div>
-    <div class="value">156.5<span style="font-size:14px">亿</span></div>
-    <div class="change down">较前日 -1.4亿</div>
-  </div>
-</div>
+<div class="main-grid" id="contractsGrid"></div>
 
-<!-- ===== MARKET SUMMARY ===== -->
-<div class="summary">
-  <p>
-    <strong>市场概述：</strong>8月6日国债期货窄幅震荡，成交量持续萎缩。十年期主力 <strong style="color:var(--green)">TZL.CFE</strong> 收报 <strong>109.39</strong>（-0.005%），成交 8.0 万手。三十年期主力 <strong style="color:var(--purple)">TLZL2.CFE</strong> 收报 <strong>115.39</strong>（-0.043%），成交 9.6 万手。综合信号方面，T 与 TL 均维持偏多判断，但动能减弱、信号共振数下降，短期需关注量能持续萎缩后的方向选择。
-  </p>
-</div>
-
-<!-- ===== T & TL SIDE BY SIDE ===== -->
-<div class="main-grid">
-
-<!-- ===== 十年期 T ===== -->
-<div class="contract-panel">
-  <div class="contract-header">
-    <h2>🔟 十年期国债期货</h2>
-    <span class="code">TZL.CFE</span>
-  </div>
-  <div class="contract-body">
-
-    <div class="ohlc-grid">
-      <div class="ohlc-item"><span class="k">开盘价</span><span class="v">109.425</span></div>
-      <div class="ohlc-item"><span class="k">收盘价</span><span class="v green">109.390 ▼</span></div>
-      <div class="ohlc-item"><span class="k">最高价</span><span class="v">109.435</span></div>
-      <div class="ohlc-item"><span class="k">最低价</span><span class="v">—</span></div>
-      <div class="ohlc-item"><span class="k">成交量</span><span class="v">80,167 手</span></div>
-      <div class="ohlc-item"><span class="k">持仓量</span><span class="v">365,471 手</span></div>
-      <div class="ohlc-item"><span class="k">涨跌幅</span><span class="v green">-0.0046%</span></div>
-      <div class="ohlc-item"><span class="k">保证金</span><span class="v">21,876 元/手</span></div>
-    </div>
-
-    <div class="mini-chart-wrap"><canvas id="chartT"></canvas></div>
-
-    <!-- 技术指标 -->
-    <div class="section-title">📈 技术指标</div>
-    <div class="ind-row">
-      <div class="ind-card"><div class="ind-label">MACD (DIFF)</div><div class="ind-value">0.077</div><div class="ind-sub">正区间 · 偏多</div></div>
-      <div class="ind-card"><div class="ind-label">KDJ (K值)</div><div class="ind-value">73.97</div><div class="ind-sub">偏强区间</div></div>
-      <div class="ind-card"><div class="ind-label">RSI (6日)</div><div class="ind-value">61.20</div><div class="ind-sub">中性偏多</div></div>
-      <div class="ind-card"><div class="ind-label">BOLL 中轨</div><div class="ind-value">109.23</div><div class="ind-sub">价格在中轨上方</div></div>
-      <div class="ind-card"><div class="ind-label">ATR (14日)</div><div class="ind-value">0.10</div><div class="ind-sub">低波环境</div></div>
-      <div class="ind-card"><div class="ind-label">OBV 能量潮</div><div class="ind-value">644.77</div><div class="ind-sub">万手·年化</div></div>
-      <div class="ind-card"><div class="ind-label">波动率</div><div class="ind-value">0.0032%</div><div class="ind-sub">极低波动</div></div>
-    </div>
-
-    <!-- 期现关系 -->
-    <div class="section-title">📐 期现关系</div>
-    <div class="ctd-box">
-      <div class="ctd-label">最便宜可交割债券 CTD</div>
-      <div class="ctd-code">260007.IB</div>
-    </div>
-    <div class="ind-row">
-      <div class="ind-card"><div class="ind-label">IRR 隐含回购利率</div><div class="ind-value">1.42%</div></div>
-      <div class="ind-card"><div class="ind-label">净基差 BNOC</div><div class="ind-value">-0.0011</div></div>
-      <div class="ind-card"><div class="ind-label">期现价差</div><div class="ind-value">0.1581</div></div>
-    </div>
-
-    <!-- 会员持仓 -->
-    <div class="section-title">🏦 中信期货持仓</div>
-    <div class="ind-row">
-      <div class="ind-card"><div class="ind-label">多头持仓</div><div class="ind-value">63,554</div></div>
-      <div class="ind-card"><div class="ind-label">空头持仓</div><div class="ind-value">63,776</div></div>
-      <div class="ind-card"><div class="ind-label">净持仓</div><div class="ind-value" style="color:var(--green)">-222 手</div><div class="ind-sub">几乎完全对冲</div></div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ===== 三十年期 TL ===== -->
-<div class="contract-panel">
-  <div class="contract-header">
-    <h2>🕐 三十年期国债期货</h2>
-    <span class="code">TLZL2.CFE</span>
-  </div>
-  <div class="contract-body">
-
-    <div class="ohlc-grid">
-      <div class="ohlc-item"><span class="k">开盘价</span><span class="v">115.49</span></div>
-      <div class="ohlc-item"><span class="k">收盘价</span><span class="v green">115.39 ▼</span></div>
-      <div class="ohlc-item"><span class="k">最高价</span><span class="v">115.54</span></div>
-      <div class="ohlc-item"><span class="k">最低价</span><span class="v">115.21</span></div>
-      <div class="ohlc-item"><span class="k">成交量</span><span class="v">95,743 手</span></div>
-      <div class="ohlc-item"><span class="k">持仓量</span><span class="v">193,693 手</span></div>
-      <div class="ohlc-item"><span class="k">涨跌幅</span><span class="v green">-0.0433%</span></div>
-      <div class="ohlc-item"><span class="k">保证金</span><span class="v">34,617 元/手</span></div>
-    </div>
-
-    <div class="mini-chart-wrap"><canvas id="chartTL"></canvas></div>
-
-    <!-- 技术指标 -->
-    <div class="section-title">📈 技术指标</div>
-    <div class="ind-row">
-      <div class="ind-card"><div class="ind-label">MACD (DIFF)</div><div class="ind-value">0.473</div><div class="ind-sub">正区间 · 偏多</div></div>
-      <div class="ind-card"><div class="ind-label">KDJ (K值)</div><div class="ind-value">82.08</div><div class="ind-sub">超买边缘</div></div>
-      <div class="ind-card"><div class="ind-label">RSI (6日)</div><div class="ind-value">65.65</div><div class="ind-sub">中性偏多</div></div>
-      <div class="ind-card"><div class="ind-label">BOLL 中轨</div><div class="ind-value">114.36</div><div class="ind-sub">价格在中轨上方</div></div>
-      <div class="ind-card"><div class="ind-label">ATR (14日)</div><div class="ind-value">0.33</div><div class="ind-sub">低波环境</div></div>
-      <div class="ind-card"><div class="ind-label">OBV 能量潮</div><div class="ind-value">415.60</div><div class="ind-sub">万手·年化</div></div>
-      <div class="ind-card"><div class="ind-label">波动率</div><div class="ind-value">0.0795%</div><div class="ind-sub">低波动</div></div>
-    </div>
-
-    <!-- 期现关系 -->
-    <div class="section-title">📐 期现关系</div>
-    <div class="ctd-box">
-      <div class="ctd-label">最便宜可交割债券 CTD</div>
-      <div class="ctd-code">210014.IB</div>
-    </div>
-    <div class="ind-row">
-      <div class="ind-card"><div class="ind-label">IRR 隐含回购利率</div><div class="ind-value">0.83%</div></div>
-      <div class="ind-card"><div class="ind-label">净基差 BNOC</div><div class="ind-value">0.0809</div></div>
-      <div class="ind-card"><div class="ind-label">期现价差</div><div class="ind-value">0.1163</div></div>
-    </div>
-
-    <!-- 会员持仓 -->
-    <div class="section-title">🏦 中信期货持仓</div>
-    <div class="ind-row">
-      <div class="ind-card"><div class="ind-label">多头持仓</div><div class="ind-value">32,818</div></div>
-      <div class="ind-card"><div class="ind-label">空头持仓</div><div class="ind-value">23,267</div></div>
-      <div class="ind-card"><div class="ind-label">净持仓</div><div class="ind-value" style="color:var(--red)">+9,551 手</div><div class="ind-sub">明显净多头</div></div>
-    </div>
-
-  </div>
-</div>
-</div>
-
-<!-- ===== RISK WARNING DASHBOARD ===== -->
 <div class="risk-panel">
   <h3>⚠️ 风险预警面板 — 多维度风险监控</h3>
   <div class="risk-grid" id="riskGrid"></div>
 </div>
 
-<!-- ===== SIGNAL HISTORY ===== -->
 <div class="full-panel">
-  <h3>📋 近期信号回溯 — 近10个交易日多空信号与行情验证</h3>
+  <h3>📋 近期信号回溯 — 近10个交易日行情明细（T + TL 并排）</h3>
   <div style="overflow-x:auto;"><table class="trend-table" id="trendTable"></table></div>
 </div>
 
-<!-- ===== MARKET OBSERVATION ===== -->
 <div class="full-panel">
   <h3>💡 市场观察 — 多维度交叉验证</h3>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:13px;">
-    <div>
-      <p style="color:var(--muted);margin-bottom:8px;">🔟 十年期 TZL.CFE</p>
-      <p style="color:var(--text);line-height:1.8;">
-        • 连续3日窄幅整理，围绕 <strong>109.40</strong> 中枢波动<br>
-        • 成交量递减（10.2→9.3→8.5→8.0万手），市场等待方向<br>
-        • MACD 0.077 正区间但走平，短期动能减弱<br>
-        • KDJ 73.97 偏强但未超买，RSI 61.20 中性<br>
-        • CTD 券 <strong>260007.IB</strong>，IRR 1.42% 中性<br>
-        • 中信期货多空几乎完全对冲（净空仅 222 手）<br>
-        • 波动率 0.0032% 处极低水平
-      </p>
-    </div>
-    <div>
-      <p style="color:var(--muted);margin-bottom:8px;">🕐 三十年期 TLZL2.CFE</p>
-      <p style="color:var(--text);line-height:1.8;">
-        • 连续两日小幅回调，7/30 放量长阳后量能萎缩<br>
-        • MACD <strong>0.473</strong> 正值但较前日 0.478 微降<br>
-        • KDJ <strong>82.08</strong> 处超买边缘，需警惕回调风险<br>
-        • 持仓量从 20.8 万降至 <strong>19.4 万手</strong>，部分多头离场<br>
-        • CTD 券 <strong>210014.IB</strong>（老券），IRR 仅 0.83%<br>
-        • 中信期货 <strong>净多 9,551 手</strong>，与 T 的中性策略形成对比<br>
-        • 波动率 0.08% 远高于 T（25倍），久期效应
-      </p>
-    </div>
-  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:13px;" id="obsGrid"></div>
 </div>
 
 </div><!-- container -->
 
 <script>
-// ====== RAW DATA ======
-const tData = [
-  {date:'07-24',o:109.21,h:109.295,l:109.10,c:109.29,v:88780,oi:375819},
-  {date:'07-27',o:109.26,h:109.295,l:109.15,c:109.22,v:79260,oi:371406},
-  {date:'07-28',o:109.22,h:109.25,l:109.10,c:109.175,v:73806,oi:360977},
-  {date:'07-29',o:109.195,h:109.27,l:109.13,c:109.20,v:85982,oi:364564},
-  {date:'07-30',o:109.215,h:109.37,l:109.18,c:109.36,v:108695,oi:365969},
-  {date:'07-31',o:109.35,h:109.425,l:109.28,c:109.40,v:96023,oi:376798},
-  {date:'08-03',o:109.405,h:109.475,l:109.28,c:109.345,v:101182,oi:364084},
-  {date:'08-04',o:109.34,h:109.44,l:109.25,c:109.425,v:93357,oi:373501},
-  {date:'08-05',o:109.505,h:109.505,l:109.32,c:109.41,v:84792,oi:369603},
-  {date:'08-06',o:109.425,h:109.435,l:109.30,c:109.39,v:80167,oi:365471},
-];
-
-const tlData = [
-  {date:'07-24',o:114.61,h:114.86,l:114.52,c:114.84,v:82771,oi:206221},
-  {date:'07-27',o:114.86,h:115.18,l:114.73,c:114.84,v:111756,oi:202113},
-  {date:'07-28',o:114.78,h:115.02,l:114.74,c:114.91,v:77953,oi:204242},
-  {date:'07-29',o:114.96,h:115.15,l:114.58,c:114.64,v:117519,oi:201860},
-  {date:'07-30',o:114.79,h:115.40,l:114.68,c:115.39,v:126700,oi:207828},
-  {date:'07-31',o:115.26,h:115.55,l:115.22,c:115.40,v:93644,oi:205938},
-  {date:'08-03',o:115.45,h:115.52,l:115.27,c:115.42,v:71763,oi:201901},
-  {date:'08-04',o:115.37,h:115.69,l:115.23,c:115.63,v:100957,oi:204575},
-  {date:'08-05',o:115.66,h:115.72,l:115.29,c:115.49,v:102759,oi:195280},
-  {date:'08-06',o:115.49,h:115.54,l:115.21,c:115.39,v:95743,oi:193693},
-];
+// ====== DATA INJECTION ======
+const FUTURES_DATA = {
+  "date": "2026-08-06",
+  "day_of_week": "周四",
+  "status": "已收盘",
+  "data_t": [
+    {
+      "date": "07-24",
+      "o": 109.21,
+      "h": 109.295,
+      "l": 109.1,
+      "c": 109.29,
+      "v": 88780,
+      "oi": 375819
+    },
+    {
+      "date": "07-27",
+      "o": 109.26,
+      "h": 109.295,
+      "l": 109.15,
+      "c": 109.22,
+      "v": 79260,
+      "oi": 371406
+    },
+    {
+      "date": "07-28",
+      "o": 109.22,
+      "h": 109.25,
+      "l": 109.1,
+      "c": 109.175,
+      "v": 73806,
+      "oi": 360977
+    },
+    {
+      "date": "07-29",
+      "o": 109.195,
+      "h": 109.27,
+      "l": 109.13,
+      "c": 109.2,
+      "v": 85982,
+      "oi": 364564
+    },
+    {
+      "date": "07-30",
+      "o": 109.215,
+      "h": 109.37,
+      "l": 109.18,
+      "c": 109.36,
+      "v": 108695,
+      "oi": 365969
+    },
+    {
+      "date": "07-31",
+      "o": 109.35,
+      "h": 109.425,
+      "l": 109.28,
+      "c": 109.4,
+      "v": 96023,
+      "oi": 376798
+    },
+    {
+      "date": "08-03",
+      "o": 109.405,
+      "h": 109.475,
+      "l": 109.28,
+      "c": 109.345,
+      "v": 101182,
+      "oi": 364084
+    },
+    {
+      "date": "08-04",
+      "o": 109.34,
+      "h": 109.44,
+      "l": 109.25,
+      "c": 109.425,
+      "v": 93357,
+      "oi": 373501
+    },
+    {
+      "date": "08-05",
+      "o": 109.505,
+      "h": 109.505,
+      "l": 109.32,
+      "c": 109.41,
+      "v": 84792,
+      "oi": 369603
+    },
+    {
+      "date": "08-06",
+      "o": 109.425,
+      "h": 109.435,
+      "l": 109.3,
+      "c": 109.39,
+      "v": 80167,
+      "oi": 365471
+    }
+  ],
+  "data_tl": [
+    {
+      "date": "07-24",
+      "o": 114.61,
+      "h": 114.86,
+      "l": 114.52,
+      "c": 114.84,
+      "v": 82771,
+      "oi": 206221
+    },
+    {
+      "date": "07-27",
+      "o": 114.86,
+      "h": 115.18,
+      "l": 114.73,
+      "c": 114.84,
+      "v": 111756,
+      "oi": 202113
+    },
+    {
+      "date": "07-28",
+      "o": 114.78,
+      "h": 115.02,
+      "l": 114.74,
+      "c": 114.91,
+      "v": 77953,
+      "oi": 204242
+    },
+    {
+      "date": "07-29",
+      "o": 114.96,
+      "h": 115.15,
+      "l": 114.58,
+      "c": 114.64,
+      "v": 117519,
+      "oi": 201860
+    },
+    {
+      "date": "07-30",
+      "o": 114.79,
+      "h": 115.4,
+      "l": 114.68,
+      "c": 115.39,
+      "v": 126700,
+      "oi": 207828
+    },
+    {
+      "date": "07-31",
+      "o": 115.26,
+      "h": 115.55,
+      "l": 115.22,
+      "c": 115.4,
+      "v": 93644,
+      "oi": 205938
+    },
+    {
+      "date": "08-03",
+      "o": 115.45,
+      "h": 115.52,
+      "l": 115.27,
+      "c": 115.42,
+      "v": 71763,
+      "oi": 201901
+    },
+    {
+      "date": "08-04",
+      "o": 115.37,
+      "h": 115.69,
+      "l": 115.23,
+      "c": 115.63,
+      "v": 100957,
+      "oi": 204575
+    },
+    {
+      "date": "08-05",
+      "o": 115.66,
+      "h": 115.72,
+      "l": 115.29,
+      "c": 115.49,
+      "v": 102759,
+      "oi": 195280
+    },
+    {
+      "date": "08-06",
+      "o": 115.49,
+      "h": 115.54,
+      "l": 115.21,
+      "c": 115.39,
+      "v": 95743,
+      "oi": 193693
+    }
+  ],
+  "indicators_t": {
+    "macd_diff": 0.077,
+    "macd_sub": "正区间 · 偏多",
+    "kdj_k": 73.97,
+    "kdj_sub": "偏强区间",
+    "rsi_6": 61.2,
+    "rsi_sub": "中性偏多",
+    "boll_mid": 109.23,
+    "boll_sub": "价格在中轨上方",
+    "atr_14": 0.1,
+    "atr_sub": "低波环境",
+    "obv": 644.77,
+    "obv_sub": "万手·年化",
+    "volatility": 0.0032,
+    "vol_sub": "极低波动",
+    "ctd_bond": "260007.IB",
+    "irr": 1.42,
+    "bnoc": -0.0011,
+    "basis": 0.1581,
+    "member_long": 63554,
+    "member_short": 63776,
+    "member_net": -222
+  },
+  "indicators_tl": {
+    "macd_diff": 0.473,
+    "macd_sub": "正区间 · 偏多",
+    "kdj_k": 82.08,
+    "kdj_sub": "超买边缘",
+    "rsi_6": 65.65,
+    "rsi_sub": "中性偏多",
+    "boll_mid": 114.36,
+    "boll_sub": "价格在中轨上方",
+    "atr_14": 0.33,
+    "atr_sub": "低波环境",
+    "obv": 415.6,
+    "obv_sub": "万手·年化",
+    "volatility": 0.0795,
+    "vol_sub": "低波动",
+    "ctd_bond": "210014.IB",
+    "irr": 0.83,
+    "bnoc": 0.0809,
+    "basis": 0.1163,
+    "member_long": 32818,
+    "member_short": 23267,
+    "member_net": 9551
+  },
+  "quick_stats": {
+    "t_close": 109.39,
+    "t_change": -0.005,
+    "t_direction": "down",
+    "tl_close": 115.39,
+    "tl_change": -0.043,
+    "tl_direction": "down",
+    "t_margin": "21,876",
+    "tl_margin": "34,617",
+    "t_fund": 159.9,
+    "t_fund_change": -1.8,
+    "tl_fund": 156.5,
+    "tl_fund_change": -1.4
+  },
+  "summary_html": "<strong>市场概述：</strong>8月6日国债期货窄幅震荡，成交量持续萎缩。十年期主力 <strong style=\"color:var(--green)\">TZL.CFE</strong> 收报 <strong>109.39</strong>（-0.005%），成交 8.0 万手。三十年期主力 <strong style=\"color:var(--purple)\">TLZL2.CFE</strong> 收报 <strong>115.39</strong>（-0.043%），成交 9.6 万手。综合信号方面，T 与 TL 均维持偏多判断，但动能减弱、信号共振数下降，短期需关注量能持续萎缩后的方向选择。",
+  "obs_t_html": "• 连续3日窄幅整理，围绕 <strong>109.40</strong> 中枢波动<br>• 成交量递减（10.2→9.3→8.5→8.0万手），市场等待方向<br>• MACD 0.077 正区间但走平，短期动能减弱<br>• KDJ 73.97 偏强但未超买，RSI 61.20 中性<br>• CTD 券 <strong>260007.IB</strong>，IRR 1.42% 中性<br>• 中信期货多空几乎完全对冲（净空仅 222 手）<br>• 波动率 0.0032% 处极低水平",
+  "obs_tl_html": "• 连续两日小幅回调，7/30 放量长阳后量能萎缩<br>• MACD <strong>0.473</strong> 正值但较前日 0.478 微降<br>• KDJ <strong>82.08</strong> 处超买边缘，需警惕回调风险<br>• 持仓量从 20.8 万降至 <strong>19.4 万手</strong>，部分多头离场<br>• CTD 券 <strong>210014.IB</strong>（老券），IRR 仅 0.83%<br>• 中信期货 <strong>净多 9,551 手</strong>，与 T 的中性策略形成对比<br>• 波动率 0.08% 远高于 T（25倍），久期效应"
+};
 
 // ====== TECHNICAL INDICATOR COMPUTATION ======
 function SMA(arr, n) {
@@ -410,7 +423,6 @@ function SMA(arr, n) {
 function EMA(arr, n) {
   const k = 2 / (n + 1);
   const result = new Array(arr.length).fill(null);
-  // Seed with SMA
   let sum = 0;
   for (let i = 0; i < n; i++) sum += arr[i];
   result[n-1] = sum / n;
@@ -420,52 +432,24 @@ function EMA(arr, n) {
   return result;
 }
 
-function computeMACD(closes, fast=12, slow=26, signal=9) {
+function computeMACD(closes, fast, slow, signal) {
+  fast = fast || 12; slow = slow || 26; signal = signal || 9;
   const emaFast = EMA(closes, fast);
   const emaSlow = EMA(closes, slow);
   const diffs = emaFast.map((v, i) => (v != null && emaSlow[i] != null) ? v - emaSlow[i] : null);
-  const deaArr = EMA(diffs.filter(v => v !== null), signal);
-  const deas = new Array(diffs.length).fill(null);
-  let deaI = 0;
+  const valid = diffs.filter(v => v !== null);
+  const deaVals = EMA(valid, signal);
+  const dea = new Array(diffs.length).fill(null);
+  let j = 0;
   for (let i = 0; i < diffs.length; i++) {
-    if (diffs[i] !== null) {
-      const di = signal - 1 + deaI;
-      deas[i] = deaI < deaArr.length ? deaArr[deaI] : null;
-      deaI++;
-    }
+    if (diffs[i] !== null && j < deaVals.length && deaVals[j] !== null) { dea[i] = deaVals[j]; j++; }
   }
-  // Actually simplify: compute DEA from diffs directly
-  const validDiffs = diffs.filter(v => v !== null);
-  const deaEma = EMA(validDiffs, signal);
-  const deaResult = new Array(diffs.length).fill(null);
-  let idx = 0;
-  for (let i = 0; i < diffs.length; i++) {
-    if (diffs[i] !== null && idx < deaEma.length) {
-      deaResult[i] = deaEma[idx];
-      if (deaEma[idx] !== null) idx++;
-    }
-  }
-  // Recompute properly
-  const macdDiff = [...diffs];
-  const deaFinal = new Array(diffs.length).fill(null);
-  // Find first non-null diff
-  let start = diffs.findIndex(v => v !== null);
-  if (start >= 0) {
-    const valid = diffs.slice(start).filter(v => v !== null);
-    const deaVals = EMA(valid, signal);
-    let j = 0;
-    for (let i = start; i < diffs.length; i++) {
-      if (diffs[i] !== null && j < deaVals.length) {
-        deaFinal[i] = deaVals[j];
-        j++;
-      }
-    }
-  }
-  const macdBar = macdDiff.map((v, i) => (v !== null && deaFinal[i] !== null) ? 2 * (v - deaFinal[i]) : null);
-  return { diff: macdDiff, dea: deaFinal, bar: macdBar };
+  const bar = diffs.map((v, i) => (v !== null && dea[i] !== null) ? 2 * (v - dea[i]) : null);
+  return { diff: diffs, dea, bar };
 }
 
-function computeKDJ(highs, lows, closes, n=9) {
+function computeKDJ(highs, lows, closes, n) {
+  n = n || 9;
   const k = new Array(closes.length).fill(null);
   const d = new Array(closes.length).fill(null);
   const j = new Array(closes.length).fill(null);
@@ -482,14 +466,14 @@ function computeKDJ(highs, lows, closes, n=9) {
   return { k, d, j };
 }
 
-function computeRSI(closes, n=6) {
+function computeRSI(closes, n) {
+  n = n || 6;
   const rsi = new Array(closes.length).fill(null);
   if (closes.length < n+1) return rsi;
   let avgGain = 0, avgLoss = 0;
   for (let i = 1; i <= n; i++) {
     const chg = closes[i] - closes[i-1];
-    if (chg > 0) avgGain += chg;
-    else avgLoss += Math.abs(chg);
+    if (chg > 0) avgGain += chg; else avgLoss += Math.abs(chg);
   }
   avgGain /= n; avgLoss /= n;
   rsi[n] = avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss);
@@ -504,7 +488,8 @@ function computeRSI(closes, n=6) {
   return rsi;
 }
 
-function computeBOLL(closes, n=20, k=2) {
+function computeBOLL(closes, n, k) {
+  n = n || 20; k = k || 2;
   const mid = SMA(closes, n);
   const upper = new Array(closes.length).fill(null);
   const lower = new Array(closes.length).fill(null);
@@ -519,16 +504,20 @@ function computeBOLL(closes, n=20, k=2) {
   return { mid, upper, lower };
 }
 
-function computeATR(highs, lows, closes, n=14) {
+function computeATR(highs, lows, closes, n) {
+  n = n || 14;
   const tr = new Array(closes.length).fill(null);
-  tr[0] = highs[0] - lows[0];
+  if (highs[0] != null && lows[0] != null) tr[0] = highs[0] - lows[0];
   for (let i = 1; i < closes.length; i++) {
+    if (highs[i] == null || lows[i] == null) continue;
     tr[i] = Math.max(highs[i]-lows[i], Math.abs(highs[i]-closes[i-1]), Math.abs(lows[i]-closes[i-1]));
   }
   const atr = new Array(closes.length).fill(null);
-  atr[n-1] = tr.slice(0, n).reduce((s,v) => s+v, 0) / n;
+  const firstN = tr.slice(0, n).filter(v => v !== null);
+  if (firstN.length > 0) atr[n-1] = firstN.reduce((s,v) => s+v, 0) / firstN.length;
   for (let i = n; i < closes.length; i++) {
-    atr[i] = (atr[i-1] * (n-1) + tr[i]) / n;
+    if (tr[i] != null && atr[i-1] != null) atr[i] = (atr[i-1] * (n-1) + tr[i]) / n;
+    else atr[i] = atr[i-1];
   }
   return atr;
 }
@@ -550,54 +539,39 @@ function determineSignals(data) {
   const lows = data.map(d => d.l);
   const volumes = data.map(d => d.v);
   const oi = data.map(d => d.oi);
-  const n = closes.length;
-  const last = n - 1;
+  const n = closes.length, last = n - 1;
 
-  // 1. MA Trend: close vs MA(5) and MA(10)
   const ma5 = SMA(closes, 5);
   const ma10 = SMA(closes, 10);
-
-  // 2. Dual MA: MA(5) vs MA(10) golden/death cross
-  // 3. BOLL: close vs middle band
-  const boll = computeBOLL(closes, 20, 2);
-
-  // 4. MACD
+  const boll = computeBOLL(closes);
   const macd = computeMACD(closes);
-
-  // 5. KDJ
   const kdj = computeKDJ(highs, lows, closes, 9);
-
-  // 6. RSI
   const rsi = computeRSI(closes, 6);
-
-  // 7. Volume/Flow: OBV + volume trend
   const obv = computeOBV(closes, volumes);
   const volMa5 = SMA(volumes, 5);
 
-  // Determine signals
   const sigs = [];
 
-  // 1. 均线趋势 MA Trend
+  // 1. MA Trend
   if (ma5[last] !== null && closes[last] !== null) {
     const aboveMA5 = closes[last] > ma5[last];
     const aboveMA10 = ma10[last] !== null && closes[last] > ma10[last];
     sigs.push({ name: '均线趋势', bull: aboveMA5 && aboveMA10, bear: !aboveMA5 && !aboveMA10,
-      val: 'C>' + (ma5[last]||0).toFixed(2), detail: '价格在均线上方' });
+      val: 'C>' + (ma5[last]||0).toFixed(2), detail: aboveMA5 ? '价格在均线上方' : '价格在均线下方' });
   } else {
     sigs.push({ name: '均线趋势', bull: false, bear: false, val: '—', detail: '数据不足' });
   }
 
-  // 2. 双均线 Dual MA
+  // 2. Dual MA
   if (ma5[last] !== null && ma10[last] !== null) {
     const golden = ma5[last] > ma10[last];
-    const prevGold = ma5[last-1] !== null && ma10[last-1] !== null && ma5[last-1] > ma10[last-1];
     sigs.push({ name: '双均线交叉', bull: golden, bear: !golden,
       val: golden ? '金叉' : '死叉', detail: `MA5 ${ma5[last].toFixed(2)} vs MA10 ${ma10[last].toFixed(2)}` });
   } else {
     sigs.push({ name: '双均线交叉', bull: false, bear: false, val: '—', detail: '数据不足' });
   }
 
-  // 3. 布林通道 BOLL
+  // 3. BOLL
   if (boll.mid[last] !== null && closes[last] !== null) {
     const aboveMid = closes[last] > boll.mid[last];
     const nearUpper = boll.upper[last] !== null && closes[last] >= boll.upper[last] * 0.995;
@@ -608,7 +582,7 @@ function determineSignals(data) {
     sigs.push({ name: '布林通道', bull: false, bear: false, val: '—', detail: '数据不足' });
   }
 
-  // 4. MACD 动量
+  // 4. MACD
   if (macd.diff[last] !== null) {
     const diffUp = macd.diff[last] > 0;
     const diffRising = macd.diff[last-1] !== null && macd.diff[last] > macd.diff[last-1];
@@ -618,28 +592,26 @@ function determineSignals(data) {
     sigs.push({ name: 'MACD', bull: false, bear: false, val: '—', detail: '数据不足' });
   }
 
-  // 5. KDJ 超买超卖
+  // 5. KDJ
   if (kdj.k[last] !== null) {
-    const k = kdj.k[last];
-    const overbought = k > 80;
-    const oversold = k < 20;
-    sigs.push({ name: 'KDJ', bull: k > 50 && !overbought, bear: k < 50,
-      val: k.toFixed(1), detail: overbought ? '⚠ 超买' : (oversold ? '超卖' : (k > 50 ? '偏强' : '偏弱')) });
+    const kv = kdj.k[last];
+    sigs.push({ name: 'KDJ', bull: kv > 50 && kv <= 80, bear: kv < 50,
+      val: kv.toFixed(1), detail: kv > 80 ? '⚠ 超买' : (kv < 20 ? '超卖' : (kv > 50 ? '偏强' : '偏弱')) });
   } else {
     sigs.push({ name: 'KDJ', bull: false, bear: false, val: '—', detail: '数据不足' });
   }
 
-  // 6. RSI 强弱
+  // 6. RSI
   if (rsi[last] !== null) {
-    const r = rsi[last];
-    sigs.push({ name: 'RSI', bull: r > 50, bear: r <= 50,
-      val: r.toFixed(1), detail: r > 70 ? '超买' : (r > 50 ? '偏多' : (r < 30 ? '超卖' : '偏空')) });
+    const rv = rsi[last];
+    sigs.push({ name: 'RSI', bull: rv > 50, bear: rv <= 50,
+      val: rv.toFixed(1), detail: rv > 70 ? '超买' : (rv > 50 ? '偏多' : (rv < 30 ? '超卖' : '偏空')) });
   } else {
     sigs.push({ name: 'RSI', bull: false, bear: false, val: '—', detail: '数据不足' });
   }
 
-  // 7. 量能趋势 Volume/Flow
-  if (volMa5[last] !== null && obv[last] !== null) {
+  // 7. Volume/Flow
+  if (volMa5[last] !== null) {
     const volExpanding = volumes[last] > volMa5[last];
     const obvRising = obv[last-1] !== null && obv[last] > obv[last-1];
     const oiTrend = oi[last] !== null && oi[last-2] !== null && oi[last] > oi[last-2];
@@ -651,160 +623,56 @@ function determineSignals(data) {
     sigs.push({ name: '量能资金流', bull: false, bear: false, val: '—', detail: '数据不足' });
   }
 
-  // Composite signal
   const bullCount = sigs.filter(s => s.bull).length;
   const bearCount = sigs.filter(s => s.bear).length;
-  const activeCount = sigs.filter(s => s.bull || s.bear).length;
-
   let signal, signalLabel, signalClass;
-  if (bullCount >= 5) {
-    signal = 'long'; signalLabel = '偏多'; signalClass = 'long';
-  } else if (bearCount >= 5) {
-    signal = 'short'; signalLabel = '偏空'; signalClass = 'short';
-  } else if (bullCount >= 3) {
-    signal = 'long_weak'; signalLabel = '谨慎偏多'; signalClass = 'neutral';
-  } else if (bearCount >= 3) {
-    signal = 'short_weak'; signalLabel = '谨慎偏空'; signalClass = 'neutral';
-  } else {
-    signal = 'neutral'; signalLabel = '震荡观望'; signalClass = 'neutral';
-  }
+  if (bullCount >= 5) { signal = 'long'; signalLabel = '偏多'; signalClass = 'long'; }
+  else if (bearCount >= 5) { signal = 'short'; signalLabel = '偏空'; signalClass = 'short'; }
+  else if (bullCount >= 3) { signal = 'long_weak'; signalLabel = '谨慎偏多'; signalClass = 'neutral'; }
+  else if (bearCount >= 3) { signal = 'short_weak'; signalLabel = '谨慎偏空'; signalClass = 'neutral'; }
+  else { signal = 'neutral'; signalLabel = '震荡观望'; signalClass = 'neutral'; }
 
-  return {
-    sigs,
-    bullCount, bearCount, activeCount,
-    signal, signalLabel, signalClass,
-    indicators: {
-      ma5: ma5[last], ma10: ma10[last],
-      bollMid: boll.mid[last], bollUpper: boll.upper[last], bollLower: boll.lower[last],
-      macdDiff: macd.diff[last], macdDea: macd.dea[last],
-      kdjK: kdj.k[last], kdjD: kdj.d[last], kdjJ: kdj.j[last],
-      rsi: rsi[last],
-      closes, highs, lows, volumes, oi,
-      ma5Arr: ma5, ma10Arr: ma10,
-    }
+  return { sigs, bullCount, bearCount, signal, signalLabel, signalClass,
+    ind: { ma5: ma5[last], ma10: ma10[last], bollMid: boll.mid[last], bollUpper: boll.upper[last], bollLower: boll.lower[last],
+      macdDiff: macd.diff[last], kdjK: kdj.k[last], rsi: rsi[last] }
   };
 }
 
 // ====== RISK ASSESSMENT ======
 function assessRisk(tSig, tlSig, tData, tlData) {
   const risks = [];
+  if (tlSig.ind.kdjK !== null && tlSig.ind.kdjK > 80)
+    risks.push({ cls:'warn', label:'TL超买预警', value:'KDJ '+tlSig.ind.kdjK.toFixed(0), sub:'三十年期KDJ处超买边缘，短期回调风险上升' });
+  else if (tlSig.ind.kdjK !== null && tlSig.ind.kdjK > 70)
+    risks.push({ cls:'warn', label:'TL偏强区间', value:'KDJ '+tlSig.ind.kdjK.toFixed(0), sub:'接近超买区间，关注是否继续上行' });
 
-  // 1. TL KDJ overbought
-  if (tlSig.indicators.kdjK !== null && tlSig.indicators.kdjK > 80) {
-    risks.push({ level: 'warn', label: 'TL超买预警', value: 'KDJ ' + tlSig.indicators.kdjK.toFixed(0),
-      sub: '三十年期KDJ处超买边缘，短期回调风险上升', cls: 'warn' });
-  } else if (tlSig.indicators.kdjK !== null && tlSig.indicators.kdjK > 70) {
-    risks.push({ level: 'warn', label: 'TL偏强区间', value: 'KDJ ' + tlSig.indicators.kdjK.toFixed(0),
-      sub: '接近超买区间，关注是否继续上行', cls: 'warn' });
-  }
+  const tVol = tData.map(d=>d.v), tlVol = tlData.map(d=>d.v);
+  const tVol5 = tVol.slice(-5).reduce((a,b)=>a+b,0)/5, tVol10 = tVol.slice(-10,-5).reduce((a,b)=>a+b,0)/5;
+  if (tVol10 > 0 && tVol5 < tVol10 * 0.8)
+    risks.push({ cls:'warn', label:'T 量能萎缩', value:'连续缩量', sub:'近5日均量较前5日下降>' + ((1-tVol5/tVol10)*100).toFixed(0) + '%，等待方向' });
 
-  // 2. Volume contraction
-  const tVol = tData.map(d=>d.v);
-  const tlVol = tlData.map(d=>d.v);
-  const tVol5 = tVol.slice(-5).reduce((a,b)=>a+b,0)/5;
-  const tVol10 = tVol.slice(-10,-5).reduce((a,b)=>a+b,0)/5;
-  if (tVol10 > 0 && tVol5 < tVol10 * 0.8) {
-    risks.push({ level: 'warn', label: 'T 量能萎缩', value: '连续缩量',
-      sub: '近5日均量较前5日下降>' + ((1-tVol5/tVol10)*100).toFixed(0) + '%，等待方向', cls: 'warn' });
-  }
+  const tOi = tData.map(d=>d.oi), tlOi = tlData.map(d=>d.oi);
+  if (tOi[tOi.length-1] < tOi[tOi.length-3])
+    risks.push({ cls:'warn', label:'T 持仓下降', value:'OI ↓', sub:'持仓量趋势性下降，多头信心不足' });
+  if (tlOi[tlOi.length-1] < tlOi[tlOi.length-5])
+    risks.push({ cls:'danger', label:'TL 持仓骤降', value:'OI ↓ '+(tlOi[tlOi.length-1]-tlOi[tlOi.length-5]).toLocaleString(), sub:'三十年期持仓从高峰回落，部分多头离场' });
 
-  // 3. T OI decline
-  const tOi = tData.map(d=>d.oi);
-  if (tOi[tOi.length-1] < tOi[tOi.length-3] && tOi[tOi.length-1] < tOi[tOi.length-5]) {
-    risks.push({ level: 'warn', label: 'T 持仓下降', value: 'OI ↓',
-      sub: '持仓量趋势性下降，多头信心不足', cls: 'warn' });
-  }
+  if (tSig.signal.includes('long') && tlSig.signal.includes('short'))
+    risks.push({ cls:'warn', label:'T-TL信号分化', value:'方向不一', sub:'十年期与三十年期信号方向背离，风格切换可能' });
 
-  // 4. TL OI decline
-  const tlOi = tlData.map(d=>d.oi);
-  if (tlOi[tlOi.length-1] < tlOi[tlOi.length-5]) {
-    risks.push({ level: 'danger', label: 'TL 持仓骤降', value: 'OI ↓ ' + (tlOi[tlOi.length-1]-tlOi[tlOi.length-5]).toLocaleString(),
-      sub: '三十年期持仓从高峰回落，部分多头离场', cls: 'danger' });
-  }
+  risks.push({ cls:'safe', label:'T 低波环境', value:'波动率极低', sub:'十年期波动率低，降低大幅回撤风险' });
+  risks.push({ cls:'warn', label:'TL 高弹品种', value:'波动率>25x T', sub:'三十年期波动率远高于十年期，需控制仓位' });
 
-  // 5. Signal divergence
-  if (tSig.signal.includes('long') && tlSig.signal.includes('short')) {
-    risks.push({ level: 'warn', label: 'T-TL信号分化', value: '方向不一',
-      sub: '十年期与三十年期信号方向背离，风格切换可能', cls: 'warn' });
-  }
-
-  // 6. Low vol regime
-  risks.push({ level: 'safe', label: 'T 低波环境', value: '波动率极低',
-    sub: '十年期波动率0.003%，低波动降低大幅回撤风险', cls: 'safe' });
-
-  // 7. TL higher vol
-  risks.push({ level: 'warn', label: 'TL 高弹品种', value: '波动率25x T',
-    sub: '三十年期波动率远高于十年期，适合增厚收益但需控制仓位', cls: 'warn' });
-
-  // Fill to 4
-  while (risks.length < 4) {
-    risks.push({ level: 'safe', label: '系统监控正常', value: '✓',
-      sub: '当前无其他显著风险信号', cls: 'safe' });
-  }
+  while (risks.length < 4) risks.push({ cls:'safe', label:'系统监控正常', value:'✓', sub:'当前无其他显著风险信号' });
   return risks.slice(0, 8);
 }
 
-// ====== COMPUTE SIGNALS ======
+// ====== COMPUTE ALL ======
+const tData = FUTURES_DATA.data_t;
+const tlData = FUTURES_DATA.data_tl;
 const tSignal = determineSignals(tData);
 const tlSignal = determineSignals(tlData);
 const risks = assessRisk(tSignal, tlSignal, tData, tlData);
-
-// ====== RENDER SIGNAL BAR ======
-function renderSignalBar() {
-  const bar = document.getElementById('signalBar');
-
-  function sigCard(name, code, sig, color) {
-    const badgeClass = sig.signalClass;
-    const badgeLabel = sig.signalLabel;
-    const badgeIcon = sig.signalClass === 'long' ? '🔴' : (sig.signalClass === 'short' ? '🟢' : '🟡');
-
-    let sigHTML = sig.sigs.map(s => {
-      let dotClass = s.bull ? 'bull' : (s.bear ? 'bear' : 'neut');
-      return `<div class="sig-item">
-        <span class="sig-dot ${dotClass}"></span>
-        <span class="sig-name">${s.name}</span>
-        <span class="sig-val">${s.val}</span>
-      </div>`;
-    }).join('');
-
-    return `
-    <div class="signal-card ${badgeClass === 'neutral' ? 'neutral' : 'bullish'}">
-      <div class="signal-header">
-        <div>
-          <div class="contract-name">${name}</div>
-          <div class="signal-info">
-            多空共振：<strong>${sig.bullCount}</strong> 多 / <strong>${sig.bearCount}</strong> 空
-            &nbsp;|&nbsp; 有效信号 <strong>${sig.activeCount}/7</strong>
-          </div>
-        </div>
-        <div>
-          <span class="signal-badge ${badgeClass}">
-            <span class="dot"></span>${badgeIcon} ${badgeLabel}
-          </span>
-          <div style="text-align:right;margin-top:4px">
-            <span class="code">${code}</span>
-          </div>
-        </div>
-      </div>
-      <div class="sig-grid">${sigHTML}</div>
-    </div>`;
-  }
-
-  bar.innerHTML = sigCard('🔟 十年期国债期货', 'TZL.CFE', tSignal, '#26a69a')
-    + sigCard('🕐 三十年期国债期货', 'TLZL2.CFE', tlSignal, '#ab47bc');
-}
-
-// ====== RENDER RISK GRID ======
-function renderRiskGrid() {
-  const grid = document.getElementById('riskGrid');
-  grid.innerHTML = risks.map(r => `
-    <div class="risk-card ${r.cls}">
-      <div class="risk-label">${r.label}</div>
-      <div class="risk-value">${r.value}</div>
-      <div class="risk-sub">${r.sub}</div>
-    </div>
-  `).join('');
-}
 
 // ====== CHART DRAWING ======
 function drawChart(canvasId, data, color) {
@@ -817,98 +685,170 @@ function drawChart(canvasId, data, color) {
   canvas.width = W * dpr; canvas.height = H * dpr;
   canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
   ctx.scale(dpr, dpr);
-
   const prices = data.map(d=>d.c).filter(p=>p);
   const vols = data.map(d=>d.v).filter(v=>v);
   const minP = Math.min(...prices) * 0.999, maxP = Math.max(...prices) * 1.001;
   const maxV = Math.max(...vols), n = data.length, pw = W / (n - 1);
   const volH = 40, volY = H - volH;
-
-  // Volume bars
   ctx.fillStyle = 'rgba(255,255,255,0.06)';
   data.forEach((d,i) => {
     if (!d.v) return;
     const bw = Math.max(1, pw * 0.6), bh = (d.v / maxV) * volH;
     ctx.fillRect(i * pw - bw/2, volY + (volH - bh), bw, bh);
   });
-
-  // Price line with area fill
   ctx.strokeStyle = color; ctx.lineWidth = 1.8; ctx.lineJoin = 'round';
   ctx.beginPath();
-  let started = false;
+  let started = false, firstI = -1;
   data.forEach((d,i) => {
     if (!d.c) return;
+    if (firstI < 0) firstI = i;
     const x = i * pw, y = volY * ((maxP - d.c) / (maxP - minP));
     started ? ctx.lineTo(x, y) : (ctx.moveTo(x, y), started = true);
   });
   ctx.stroke();
-
-  ctx.lineTo((data.filter(d=>d.c).length-1)*pw, volY);
-  ctx.lineTo(data.findIndex(d=>d.c)*pw, volY);
-  ctx.closePath();
-  const grad = ctx.createLinearGradient(0,0,0,volY);
-  grad.addColorStop(0, color+'30'); grad.addColorStop(1, color+'00');
-  ctx.fillStyle = grad; ctx.fill();
-
-  // Last point dot
+  if (firstI >= 0) {
+    ctx.lineTo((data.filter(d=>d.c).length-1)*pw, volY);
+    ctx.lineTo(firstI*pw, volY);
+    ctx.closePath();
+    const grad = ctx.createLinearGradient(0,0,0,volY);
+    grad.addColorStop(0, color+'30'); grad.addColorStop(1, color+'00');
+    ctx.fillStyle = grad; ctx.fill();
+  }
   const last = data.filter(d=>d.c).pop(), lastI = data.lastIndexOf(last);
-  ctx.fillStyle = color; ctx.beginPath();
-  ctx.arc(lastI * pw, volY * ((maxP - last.c) / (maxP - minP)), 4, 0, Math.PI*2); ctx.fill();
-
-  // Labels
-  ctx.fillStyle = '#787b86'; ctx.font = '10px "Segoe UI","PingFang SC",sans-serif';
-  ctx.fillText(maxP.toFixed(3), 4, 14);
-  ctx.fillText(minP.toFixed(3), 4, volY - 4);
-  ctx.fillText(last.c.toFixed(3), Math.min(lastI * pw + 6, W - 50), 14);
+  if (lastI >= 0) {
+    ctx.fillStyle = color; ctx.beginPath();
+    ctx.arc(lastI * pw, volY * ((maxP - last.c) / (maxP - minP)), 4, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#787b86'; ctx.font = '10px "Segoe UI","PingFang SC",sans-serif';
+    ctx.fillText(maxP.toFixed(3), 4, 14);
+    ctx.fillText(minP.toFixed(3), 4, volY - 4);
+    ctx.fillText(last.c.toFixed(3), Math.min(lastI * pw + 6, W - 50), 14);
+  }
 }
 
-// ====== TREND TABLE WITH SIGNALS ======
-function buildTable() {
-  const tbody = document.getElementById('trendTable');
+// ====== RENDER FUNCTIONS ======
+function renderAll() {
+  const D = FUTURES_DATA;
+
+  // Header
+  document.getElementById('hdStatus').textContent = D.status || '已收盘';
+  document.getElementById('hdDate').textContent =
+    (D.date||'') + '（' + (D.day_of_week||'') + '）· 中金所 15:15 收盘 · 交易性择时多空信号跟踪';
+
+  // Quick Stats
+  const qs = D.quick_stats;
+  document.getElementById('quickStats').innerHTML = `
+    <div class="stat-card"><div class="label">十年期 T 收盘</div><div class="value">${qs.t_close}</div><div class="change ${qs.t_direction}">${qs.t_change>0?'▲':'▼'} ${Math.abs(qs.t_change).toFixed(3)}%</div></div>
+    <div class="stat-card"><div class="label">三十年期 TL 收盘</div><div class="value">${qs.tl_close}</div><div class="change ${qs.tl_direction}">${qs.tl_change>0?'▲':'▼'} ${Math.abs(qs.tl_change).toFixed(3)}%</div></div>
+    <div class="stat-card"><div class="label">T 沉淀资金</div><div class="value">${qs.t_fund}<span style="font-size:14px">亿</span></div><div class="change down">较前日 ${qs.t_fund_change>0?'+':''}${qs.t_fund_change}亿</div></div>
+    <div class="stat-card"><div class="label">TL 沉淀资金</div><div class="value">${qs.tl_fund}<span style="font-size:14px">亿</span></div><div class="change down">较前日 ${qs.tl_fund_change>0?'+':''}${qs.tl_fund_change}亿</div></div>`;
+
+  // Summary
+  document.getElementById('summaryText').innerHTML = D.summary_html;
+
+  // Signal Bar
+  function sigCard(name, code, sig) {
+    const badgeIcon = sig.signalClass === 'long' ? '🔴' : (sig.signalClass === 'short' ? '🟢' : '🟡');
+    return `<div class="signal-card ${sig.signalClass==='neutral'?'neutral':'bullish'}">
+      <div class="signal-header">
+        <div><div class="contract-name">${name}</div>
+          <div class="signal-info">多空共振：<strong>${sig.bullCount}</strong> 多 / <strong>${sig.bearCount}</strong> 空 &nbsp;|&nbsp; 有效信号 <strong>${sig.bullCount+sig.bearCount}/7</strong></div></div>
+        <div><span class="signal-badge ${sig.signalClass}"><span class="dot"></span>${badgeIcon} ${sig.signalLabel}</span>
+          <div style="text-align:right;margin-top:4px"><span class="code">${code}</span></div></div></div>
+      <div class="sig-grid">${sig.sigs.map(s =>
+        `<div class="sig-item"><span class="sig-dot ${s.bull?'bull':(s.bear?'bear':'neut')}"></span><span class="sig-name">${s.name}</span><span class="sig-val">${s.val}</span></div>`).join('')}</div></div>`;
+  }
+  document.getElementById('signalBar').innerHTML = sigCard('🔟 十年期国债期货', 'TZL.CFE', tSignal) + sigCard('🕐 三十年期国债期货', 'TLZL2.CFE', tlSignal);
+
+  // Contract panels
+  function contractPanel(icon, name, code, data, ind, chartId, chartColor) {
+    const last = data[data.length-1];
+    const prev = data.length > 1 ? data[data.length-2] : null;
+    const chgPct = prev ? ((last.c-prev.c)/prev.c*100) : 0;
+    const chgDir = chgPct >= 0 ? 'red' : 'green';
+    const chgArrow = chgPct >= 0 ? '▲' : '▼';
+    const memberNet = ind.member_net;
+    const netColor = memberNet > 0 ? 'var(--red)' : 'var(--green)';
+    const netLabel = memberNet > 5000 ? '明显净多头' : (memberNet < -5000 ? '明显净空头' : (Math.abs(memberNet) < 500 ? '几乎完全对冲' : (memberNet > 0 ? '小幅净多' : '小幅净空')));
+
+    return `<div class="contract-panel">
+      <div class="contract-header"><h2>${icon} ${name}</h2><span class="code">${code}</span></div>
+      <div class="contract-body">
+        <div class="ohlc-grid">
+          <div class="ohlc-item"><span class="k">开盘价</span><span class="v">${last.o||'—'}</span></div>
+          <div class="ohlc-item"><span class="k">收盘价</span><span class="v ${chgDir}">${last.c} ${chgArrow}</span></div>
+          <div class="ohlc-item"><span class="k">最高价</span><span class="v">${last.h||'—'}</span></div>
+          <div class="ohlc-item"><span class="k">最低价</span><span class="v">${last.l||'—'}</span></div>
+          <div class="ohlc-item"><span class="k">成交量</span><span class="v">${last.v?last.v.toLocaleString():'—'} 手</span></div>
+          <div class="ohlc-item"><span class="k">持仓量</span><span class="v">${last.oi?last.oi.toLocaleString():'—'} 手</span></div>
+          <div class="ohlc-item"><span class="k">涨跌幅</span><span class="v ${chgDir}">${chgPct.toFixed(4)}%</span></div>
+          <div class="ohlc-item"><span class="k">保证金</span><span class="v">${D.quick_stats[code==='TZL.CFE'?'t_margin':'tl_margin']} 元/手</span></div>
+        </div>
+        <div class="mini-chart-wrap"><canvas id="${chartId}"></canvas></div>
+        <div class="section-title">📈 技术指标</div>
+        <div class="ind-row">
+          <div class="ind-card"><div class="ind-label">MACD (DIFF)</div><div class="ind-value">${ind.macd_diff}</div><div class="ind-sub">${ind.macd_sub}</div></div>
+          <div class="ind-card"><div class="ind-label">KDJ (K值)</div><div class="ind-value">${ind.kdj_k}</div><div class="ind-sub">${ind.kdj_sub}</div></div>
+          <div class="ind-card"><div class="ind-label">RSI (6日)</div><div class="ind-value">${ind.rsi_6}</div><div class="ind-sub">${ind.rsi_sub}</div></div>
+          <div class="ind-card"><div class="ind-label">BOLL 中轨</div><div class="ind-value">${ind.boll_mid}</div><div class="ind-sub">${ind.boll_sub}</div></div>
+          <div class="ind-card"><div class="ind-label">ATR (14日)</div><div class="ind-value">${ind.atr_14}</div><div class="ind-sub">${ind.atr_sub}</div></div>
+          <div class="ind-card"><div class="ind-label">OBV 能量潮</div><div class="ind-value">${ind.obv}</div><div class="ind-sub">${ind.obv_sub}</div></div>
+          <div class="ind-card"><div class="ind-label">波动率</div><div class="ind-value">${ind.volatility}%</div><div class="ind-sub">${ind.vol_sub}</div></div>
+        </div>
+        <div class="section-title">📐 期现关系</div>
+        <div class="ctd-box"><div class="ctd-label">最便宜可交割债券 CTD</div><div class="ctd-code">${ind.ctd_bond}</div></div>
+        <div class="ind-row">
+          <div class="ind-card"><div class="ind-label">IRR 隐含回购利率</div><div class="ind-value">${ind.irr}%</div></div>
+          <div class="ind-card"><div class="ind-label">净基差 BNOC</div><div class="ind-value">${ind.bnoc}</div></div>
+          <div class="ind-card"><div class="ind-label">期现价差</div><div class="ind-value">${ind.basis}</div></div>
+        </div>
+        <div class="section-title">🏦 中信期货持仓</div>
+        <div class="ind-row">
+          <div class="ind-card"><div class="ind-label">多头持仓</div><div class="ind-value">${ind.member_long.toLocaleString()}</div></div>
+          <div class="ind-card"><div class="ind-label">空头持仓</div><div class="ind-value">${ind.member_short.toLocaleString()}</div></div>
+          <div class="ind-card"><div class="ind-label">净持仓</div><div class="ind-value" style="color:${netColor}">${memberNet>0?'+':''}${memberNet.toLocaleString()} 手</div><div class="ind-sub">${netLabel}</div></div>
+        </div>
+      </div></div>`;
+  }
+  document.getElementById('contractsGrid').innerHTML =
+    contractPanel('🔟', '十年期国债期货', 'TZL.CFE', tData, D.indicators_t, 'chartT', '#26a69a') +
+    contractPanel('🕐', '三十年期国债期货', 'TLZL2.CFE', tlData, D.indicators_tl, 'chartTL', '#ab47bc');
+
+  // Risk Grid
+  document.getElementById('riskGrid').innerHTML = risks.map(r =>
+    `<div class="risk-card ${r.cls}"><div class="risk-label">${r.label}</div><div class="risk-value">${r.value}</div><div class="risk-sub">${r.sub}</div></div>`).join('');
+
+  // Trend Table
   const allDates = [...new Set([...tData.map(d=>d.date), ...tlData.map(d=>d.date)])].sort();
-
-  let html = `<thead><tr>
-    <th>日期</th>
-    <th>T 开盘</th><th>T 最高</th><th>T 最低</th><th>T 收盘</th><th>T 涨跌%</th><th>T 成交</th><th>T 持仓</th>
-    <th>TL 开盘</th><th>TL 最高</th><th>TL 最低</th><th>TL 收盘</th><th>TL 涨跌%</th><th>TL 成交</th><th>TL 持仓</th>
-  </tr></thead><tbody>`;
-
+  let thtml = `<thead><tr><th>日期</th><th>T 开盘</th><th>T 最高</th><th>T 最低</th><th>T 收盘</th><th>T 涨跌%</th><th>T 成交</th><th>T 持仓</th><th>TL 开盘</th><th>TL 最高</th><th>TL 最低</th><th>TL 收盘</th><th>TL 涨跌%</th><th>TL 成交</th><th>TL 持仓</th></tr></thead><tbody>`;
   allDates.forEach(date => {
-    const t = tData.find(d=>d.date===date) || {};
-    const tl = tlData.find(d=>d.date===date) || {};
+    const t = tData.find(d=>d.date===date)||{}, tl = tlData.find(d=>d.date===date)||{};
     const ti = tData.indexOf(t), tli = tlData.indexOf(tl);
-    const prevT = ti > 0 ? tData[ti-1] : null;
-    const prevTL = tli > 0 ? tlData[tli-1] : null;
-    const tChg = prevT&&t.c&&prevT.c ? ((t.c-prevT.c)/prevT.c*100) : null;
-    const tlChg = prevTL&&tl.c&&prevTL.c ? ((tl.c-prevTL.c)/prevTL.c*100) : null;
-    const isLast = date === allDates[allDates.length-1];
-    const clsT = isLast ? ' style="font-weight:700;color:#26a69a"' : '';
-    const clsTL = isLast ? ' style="font-weight:700;color:#ab47bc"' : '';
-
-    html += `<tr>
-      <td>${date}</td>
-      <td>${t.o||'—'}</td><td>${t.h||'—'}</td><td>${t.l||'—'}</td>
-      <td${clsT}>${t.c||'—'}</td>
-      <td class="${tChg>0?'up':tChg<0?'down':''}">${tChg!=null?tChg.toFixed(4)+'%':'—'}</td>
+    const pt = ti>0?tData[ti-1]:null, ptl = tli>0?tlData[tli-1]:null;
+    const tc = pt&&t.c?((t.c-pt.c)/pt.c*100):null, tlc = ptl&&tl.c?((tl.c-ptl.c)/ptl.c*100):null;
+    const isL = date===allDates[allDates.length-1];
+    thtml += `<tr><td>${date}</td>
+      <td>${t.o||'—'}</td><td>${t.h||'—'}</td><td>${t.l||'—'}</td><td${isL?' style="font-weight:700;color:#26a69a"':''}>${t.c||'—'}</td>
+      <td class="${tc>0?'up':tc<0?'down':''}">${tc!=null?tc.toFixed(4)+'%':'—'}</td>
       <td>${t.v?t.v.toLocaleString():'—'}</td><td>${t.oi?t.oi.toLocaleString():'—'}</td>
-      <td>${tl.o||'—'}</td><td>${tl.h||'—'}</td><td>${tl.l||'—'}</td>
-      <td${clsTL}>${tl.c||'—'}</td>
-      <td class="${tlChg>0?'up':tlChg<0?'down':''}">${tlChg!=null?tlChg.toFixed(4)+'%':'—'}</td>
-      <td>${tl.v?tl.v.toLocaleString():'—'}</td><td>${tl.oi?tl.oi.toLocaleString():'—'}</td>
-    </tr>`;
+      <td>${tl.o||'—'}</td><td>${tl.h||'—'}</td><td>${tl.l||'—'}</td><td${isL?' style="font-weight:700;color:#ab47bc"':''}>${tl.c||'—'}</td>
+      <td class="${tlc>0?'up':tlc<0?'down':''}">${tlc!=null?tlc.toFixed(4)+'%':'—'}</td>
+      <td>${tl.v?tl.v.toLocaleString():'—'}</td><td>${tl.oi?tl.oi.toLocaleString():'—'}</td></tr>`;
   });
-  html += '</tbody>';
-  tbody.innerHTML = html;
+  document.getElementById('trendTable').innerHTML = thtml + '</tbody>';
+
+  // Market Observation
+  document.getElementById('obsGrid').innerHTML = `
+    <div><p style="color:var(--muted);margin-bottom:8px;">🔟 十年期 TZL.CFE</p><p style="color:var(--text);line-height:1.8;">${D.obs_t_html}</p></div>
+    <div><p style="color:var(--muted);margin-bottom:8px;">🕐 三十年期 TLZL2.CFE</p><p style="color:var(--text);line-height:1.8;">${D.obs_tl_html}</p></div>`;
+
+  // Draw charts
+  setTimeout(() => {
+    drawChart('chartT', tData, '#26a69a');
+    drawChart('chartTL', tlData, '#ab47bc');
+  }, 50);
 }
 
-// ====== INIT ======
-window.addEventListener('DOMContentLoaded', () => {
-  renderSignalBar();
-  renderRiskGrid();
-  drawChart('chartT', tData, '#26a69a');
-  drawChart('chartTL', tlData, '#ab47bc');
-  buildTable();
-});
+window.addEventListener('DOMContentLoaded', renderAll);
 window.addEventListener('resize', () => {
   drawChart('chartT', tData, '#26a69a');
   drawChart('chartTL', tlData, '#ab47bc');
