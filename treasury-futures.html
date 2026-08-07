@@ -1122,7 +1122,7 @@ function renderAll() {
           <div class="ind-card"><div class="ind-label">BOLL 中轨</div><div class="ind-value">${ind.boll_mid}</div><div class="ind-sub">${ind.boll_sub}</div></div>
           <div class="ind-card"><div class="ind-label">ATR (14日)</div><div class="ind-value">${ind.atr_14}</div><div class="ind-sub">${ind.atr_sub}</div></div>
           <div class="ind-card"><div class="ind-label">OBV 能量潮</div><div class="ind-value">${ind.obv}</div><div class="ind-sub">${ind.obv_sub}</div></div>
-          <div class="ind-card"><div class="ind-label">波动率</div><div class="ind-value">${ind.volatility}%</div><div class="ind-sub">${ind.vol_sub}</div></div>
+          <div class="ind-card"><div class="ind-label">波动率</div><div class="ind-value">${ind.volatility != null ? ind.volatility : '—'}%</div><div class="ind-sub">${ind.vol_sub || '—'}</div></div>
         </div>
         <div class="section-title">📊 扩展技术指标 (MCP)</div>
         <div class="ind-row-4">
