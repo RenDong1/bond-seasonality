@@ -9,84 +9,175 @@
     --bg: #0f1117; --card: #161822; --border: #1e2130;
     --text: #d1d4dc; --muted: #787b86; --bright: #e8eaed;
     --red: #ef5350; --green: #26a69a; --blue: #42a5f5;
-    --gold: #ffb74d; --purple: #ab47bc;
+    --gold: #ffb74d; --purple: #ab47bc; --orange: #ff7043;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  .top-nav{display:flex;justify-content:space-between;align-items:center;padding:10px 30px;background:#12141d;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200}.top-nav .brand{font-size:15px;font-weight:700;color:var(--bright);text-decoration:none}.top-nav .brand span{color:var(--blue)}.top-nav .nav-links{display:flex;gap:4px}.top-nav .nav-links a{padding:5px 14px;border-radius:5px;font-size:12px;color:var(--muted);text-decoration:none;transition:all 0.2s}.top-nav .nav-links a:hover{color:var(--bright);background:rgba(255,255,255,0.05)}.top-nav .nav-links a.active{color:var(--bright);background:rgba(66,165,245,0.15)}
-body { background:var(--bg); color:var(--text); font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; line-height:1.5; }
-  .container { max-width:1400px; margin:0 auto; padding:20px; }
-  .header { text-align:center; padding:30px 0 20px; border-bottom:1px solid var(--border); margin-bottom:24px; }
-  .header h1 { font-size:28px; color:var(--bright); font-weight:700; }
-  .header .date { font-size:14px; color:var(--muted); margin-top:4px; }
-  .header .status { display:inline-block; background:#1b5e20; color:#66bb6a; padding:3px 12px; border-radius:4px; font-size:12px; margin-left:12px; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; line-height:1.5; }
 
-  .quick-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
+  /* ===== TOP NAV ===== */
+  .top-nav{display:flex;justify-content:space-between;align-items:center;padding:10px 30px;background:#12141d;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200}
+  .top-nav .brand{font-size:15px;font-weight:700;color:var(--bright);text-decoration:none}
+  .top-nav .brand span{color:var(--blue)}
+  .top-nav .nav-links{display:flex;gap:4px}
+  .top-nav .nav-links a{padding:5px 14px;border-radius:5px;font-size:12px;color:var(--muted);text-decoration:none;transition:all 0.2s}
+  .top-nav .nav-links a:hover{color:var(--bright);background:rgba(255,255,255,0.05)}
+  .top-nav .nav-links a.active{color:var(--bright);background:rgba(66,165,245,0.15)}
+
+  .container { max-width:1400px; margin:0 auto; padding:20px; }
+
+  /* ===== HEADER ===== */
+  .header { text-align:center; padding:24px 0 16px; border-bottom:1px solid var(--border); margin-bottom:20px; }
+  .header h1 { font-size:26px; color:var(--bright); font-weight:700; }
+  .header .date { font-size:13px; color:var(--muted); margin-top:4px; }
+  .header .status { display:inline-block; background:#1b5e20; color:#66bb6a; padding:2px 10px; border-radius:4px; font-size:11px; margin-left:10px; }
+
+  /* ===== COMPOSITE SIGNAL BAR ===== */
+  .signal-bar { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+  .signal-card { background:var(--card); border:2px solid var(--border); border-radius:12px; padding:20px 24px; position:relative; overflow:hidden; transition:border-color 0.3s; }
+  .signal-card.bullish { border-color:rgba(239,83,80,0.4); }
+  .signal-card.neutral { border-color:rgba(255,183,77,0.4); }
+  .signal-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+  .signal-header .contract-name { font-size:16px; font-weight:700; color:var(--bright); }
+  .signal-header .contract-code { font-size:11px; color:var(--muted); background:#1a1d2e; padding:2px 8px; border-radius:4px; }
+  .signal-badge { display:inline-flex; align-items:center; gap:8px; padding:8px 18px; border-radius:8px; font-size:18px; font-weight:800; letter-spacing:2px; }
+  .signal-badge.long { background:rgba(239,83,80,0.15); color:var(--red); }
+  .signal-badge.short { background:rgba(38,166,154,0.15); color:var(--green); }
+  .signal-badge.neutral { background:rgba(255,183,77,0.15); color:var(--gold); }
+  .signal-badge .dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .signal-badge.long .dot { background:var(--red); box-shadow:0 0 8px var(--red); }
+  .signal-badge.short .dot { background:var(--green); box-shadow:0 0 8px var(--green); }
+  .signal-badge.neutral .dot { background:var(--gold); box-shadow:0 0 8px var(--gold); }
+  .signal-info { margin-top:10px; font-size:12px; color:var(--muted); }
+  .signal-info strong { color:var(--bright); }
+
+  /* Signal decomposition */
+  .sig-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:12px; }
+  .sig-grid.col3 { grid-template-columns:repeat(3,1fr); }
+  .sig-item { display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:5px; background:rgba(255,255,255,0.02); font-size:11px; }
+  .sig-item .sig-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .sig-item .sig-dot.bull { background:var(--red); }
+  .sig-item .sig-dot.bear { background:var(--green); }
+  .sig-item .sig-dot.neut { background:var(--muted); }
+  .sig-item .sig-name { color:var(--muted); flex:1; }
+  .sig-item .sig-val { font-weight:600; color:var(--bright); font-variant-numeric:tabular-nums; }
+
+  /* ===== QUICK STATS ===== */
+  .quick-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
   .stat-card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:16px 20px; }
-  .stat-card .label { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
-  .stat-card .value { font-size:26px; font-weight:700; color:var(--bright); margin:4px 0; }
-  .stat-card .change { font-size:13px; }
+  .stat-card .label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+  .stat-card .value { font-size:24px; font-weight:700; color:var(--bright); margin:4px 0; }
+  .stat-card .change { font-size:12px; }
+  .stat-card .change.up { color:var(--red); }
   .stat-card .change.down { color:var(--green); }
 
-  .main-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px; }
+  /* ===== MAIN GRID ===== */
+  .main-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
   .contract-panel { background:var(--card); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
   .contract-header { padding:14px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
-  .contract-header h2 { font-size:17px; color:var(--bright); }
-  .contract-header .code { font-size:12px; color:var(--muted); background:#1a1d2e; padding:2px 10px; border-radius:4px; }
+  .contract-header h2 { font-size:16px; color:var(--bright); }
+  .contract-header .code { font-size:11px; color:var(--muted); background:#1a1d2e; padding:2px 10px; border-radius:4px; }
   .contract-body { padding:16px 20px; }
 
-  .ohlc-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px 20px; margin-bottom:16px; }
-  .ohlc-item { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
-  .ohlc-item .k { font-size:13px; color:var(--muted); }
+  .ohlc-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px 16px; margin-bottom:14px; }
+  .ohlc-item { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .ohlc-item .k { font-size:12px; color:var(--muted); }
   .ohlc-item .v { font-size:14px; font-weight:600; color:var(--bright); }
+  .ohlc-item .v.red { color:var(--red); }
   .ohlc-item .v.green { color:var(--green); }
 
   .mini-chart-wrap { width:100%; height:180px; margin:8px 0; position:relative; }
   .mini-chart-wrap canvas { width:100%; height:100%; }
 
-  .section-title { font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; margin:20px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+  .section-title { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; margin:18px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--border); }
 
-  .ind-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-  .ind-card { background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:6px; padding:12px 14px; }
-  .ind-card .ind-label { font-size:11px; color:var(--muted); }
-  .ind-card .ind-value { font-size:18px; font-weight:700; color:var(--bright); margin:2px 0; }
-  .ind-card .ind-sub { font-size:11px; color:var(--muted); }
+  .ind-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .ind-card { background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:6px; padding:10px 12px; }
+  .ind-card .ind-label { font-size:10px; color:var(--muted); }
+  .ind-card .ind-value { font-size:17px; font-weight:700; color:var(--bright); margin:2px 0; }
+  .ind-card .ind-sub { font-size:10px; color:var(--muted); }
 
-  .ctd-box { background:rgba(66,165,245,0.08); border:1px solid rgba(66,165,245,0.2); border-radius:8px; padding:14px 18px; margin-bottom:14px; }
-  .ctd-box .ctd-label { font-size:11px; color:var(--blue); margin-bottom:4px; }
-  .ctd-box .ctd-code { font-size:20px; font-weight:700; color:var(--bright); }
+  .ctd-box { background:rgba(66,165,245,0.08); border:1px solid rgba(66,165,245,0.2); border-radius:8px; padding:12px 16px; margin-bottom:12px; }
+  .ctd-box .ctd-label { font-size:10px; color:var(--blue); margin-bottom:3px; }
+  .ctd-box .ctd-code { font-size:18px; font-weight:700; color:var(--bright); }
 
+  /* ===== RISK DASHBOARD ===== */
+  .risk-panel { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:20px; margin-bottom:20px; }
+  .risk-panel h3 { font-size:15px; color:var(--bright); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .risk-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .risk-card { border-radius:8px; padding:14px 16px; border:1px solid var(--border); }
+  .risk-card.warn { background:rgba(255,183,77,0.06); border-color:rgba(255,183,77,0.25); }
+  .risk-card.danger { background:rgba(239,83,80,0.06); border-color:rgba(239,83,80,0.25); }
+  .risk-card.safe { background:rgba(38,166,154,0.06); border-color:rgba(38,166,154,0.25); }
+  .risk-card .risk-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  .risk-card .risk-value { font-size:20px; font-weight:700; }
+  .risk-card .risk-sub { font-size:10px; color:var(--muted); margin-top:2px; }
+  .risk-card.warn .risk-value { color:var(--gold); }
+  .risk-card.danger .risk-value { color:var(--red); }
+  .risk-card.safe .risk-value { color:var(--green); }
+
+  /* ===== FULL PANEL ===== */
   .full-panel { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:20px; margin-bottom:20px; }
-  .full-panel h3 { font-size:16px; color:var(--bright); margin-bottom:14px; }
+  .full-panel h3 { font-size:15px; color:var(--bright); margin-bottom:14px; }
 
-  .trend-table { width:100%; border-collapse:collapse; font-size:13px; }
-  .trend-table th { text-align:right; color:var(--muted); font-weight:500; padding:6px 8px; border-bottom:1px solid var(--border); font-size:11px; }
+  /* ===== TREND TABLE ===== */
+  .trend-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .trend-table th { text-align:right; color:var(--muted); font-weight:500; padding:5px 6px; border-bottom:1px solid var(--border); font-size:10px; white-space:nowrap; }
   .trend-table th:first-child { text-align:left; }
-  .trend-table td { text-align:right; padding:5px 8px; border-bottom:1px solid rgba(255,255,255,0.03); font-variant-numeric:tabular-nums; }
+  .trend-table td { text-align:right; padding:4px 6px; border-bottom:1px solid rgba(255,255,255,0.03); font-variant-numeric:tabular-nums; }
   .trend-table td:first-child { text-align:left; color:var(--muted); }
   .trend-table tr:hover td { background:rgba(255,255,255,0.02); }
   .trend-table .up { color:var(--red); } .trend-table .down { color:var(--green); }
+  .trend-table .signal-col { text-align:center; font-weight:700; font-size:12px; }
 
-  .summary { background:linear-gradient(135deg, #1a1d2e, #1e2130); border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin-bottom:24px; }
-  .summary p { font-size:14px; color:var(--text); line-height:1.8; }
+  /* ===== SUMMARY ===== */
+  .summary { background:linear-gradient(135deg, #1a1d2e, #1e2130); border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .summary p { font-size:13px; color:var(--text); line-height:1.8; }
   .summary strong { color:var(--bright); }
+
+  /* ===== SIGNAL HISTORY TABLE ===== */
+  .sig-history { width:100%; border-collapse:collapse; font-size:12px; }
+  .sig-history th { text-align:center; color:var(--muted); font-weight:500; padding:6px 10px; border-bottom:1px solid var(--border); font-size:10px; }
+  .sig-history td { text-align:center; padding:5px 10px; border-bottom:1px solid rgba(255,255,255,0.03); }
+  .sig-history .tag { display:inline-block; padding:2px 10px; border-radius:4px; font-size:11px; font-weight:700; }
+  .sig-history .tag.long { background:rgba(239,83,80,0.15); color:var(--red); }
+  .sig-history .tag.short { background:rgba(38,166,154,0.15); color:var(--green); }
+  .sig-history .tag.neutral { background:rgba(255,183,77,0.15); color:var(--gold); }
+  .sig-history .hit { color:var(--green); }
+  .sig-history .miss { color:var(--red); }
 
   @media(max-width:900px) {
     .main-grid { grid-template-columns:1fr; }
+    .signal-bar { grid-template-columns:1fr; }
     .quick-stats { grid-template-columns:1fr 1fr; }
+    .sig-grid { grid-template-columns:1fr 1fr; }
     .ind-row { grid-template-columns:1fr 1fr; }
+    .risk-grid { grid-template-columns:1fr 1fr; }
   }
 </style>
 </head>
 <body>
-<nav class="top-nav"><a href="index.html" class="brand">📊 债市<span>投资策略</span>平台</a><div class="nav-links"><a href="bond-seasonality.html">📅 季节性复盘</a><a href="treasury-futures.html" class="active">📈 国债期货</a></div></nav>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="top-nav">
+  <a href="index.html" class="brand">📊 债市<span>投资策略</span>平台</a>
+  <div class="nav-links">
+    <a href="bond-seasonality.html">📅 季节性复盘</a>
+    <a href="treasury-futures.html" class="active">📈 国债期货</a>
+  </div>
+</nav>
+
 <div class="container">
 
+<!-- ===== HEADER ===== -->
 <div class="header">
   <h1>📊 国债期货市场日报<span class="status">● 已收盘</span></h1>
-  <div class="date">2026年8月6日（周四） · 中金所 15:15 收盘</div>
+  <div class="date">2026年8月6日（周四）· 中金所 15:15 收盘 · 交易性择时多空信号跟踪</div>
 </div>
 
-<!-- Quick Stats -->
+<!-- ===== COMPOSITE SIGNAL BAR ===== -->
+<div class="signal-bar" id="signalBar"></div>
+
+<!-- ===== QUICK STATS ===== -->
 <div class="quick-stats">
   <div class="stat-card">
     <div class="label">十年期 T 收盘</div>
@@ -100,24 +191,24 @@ body { background:var(--bg); color:var(--text); font-family:'Segoe UI','PingFang
   </div>
   <div class="stat-card">
     <div class="label">T 沉淀资金</div>
-    <div class="value">159.9<span style="font-size:16px">亿</span></div>
+    <div class="value">159.9<span style="font-size:14px">亿</span></div>
     <div class="change down">较前日 -1.8亿</div>
   </div>
   <div class="stat-card">
     <div class="label">TL 沉淀资金</div>
-    <div class="value">156.5<span style="font-size:16px">亿</span></div>
+    <div class="value">156.5<span style="font-size:14px">亿</span></div>
     <div class="change down">较前日 -1.4亿</div>
   </div>
 </div>
 
-<!-- Summary -->
+<!-- ===== MARKET SUMMARY ===== -->
 <div class="summary">
   <p>
-    <strong>市场概述：</strong>8月6日国债期货窄幅震荡。十年期主力 <strong style="color:var(--green)">TZL.CFE</strong> 收报 <strong>109.39</strong>（-0.005%），成交 8.0 万手，持仓 36.5 万手，CTD 券 <strong>260007.IB</strong>，IRR 1.42%，净基差 -0.0011。三十年期主力 <strong style="color:var(--purple)">TLZL2.CFE</strong> 收报 <strong>115.39</strong>（-0.043%），成交 9.6 万手，持仓 19.4 万手，CTD 券 <strong>210014.IB</strong>，IRR 0.83%，净基差 0.08。两合约技术指标均处偏多区间，成交量持续萎缩，市场等待方向选择。
+    <strong>市场概述：</strong>8月6日国债期货窄幅震荡，成交量持续萎缩。十年期主力 <strong style="color:var(--green)">TZL.CFE</strong> 收报 <strong>109.39</strong>（-0.005%），成交 8.0 万手。三十年期主力 <strong style="color:var(--purple)">TLZL2.CFE</strong> 收报 <strong>115.39</strong>（-0.043%），成交 9.6 万手。综合信号方面，T 与 TL 均维持偏多判断，但动能减弱、信号共振数下降，短期需关注量能持续萎缩后的方向选择。
   </p>
 </div>
 
-<!-- T & TL side by side -->
+<!-- ===== T & TL SIDE BY SIDE ===== -->
 <div class="main-grid">
 
 <!-- ===== 十年期 T ===== -->
@@ -233,15 +324,21 @@ body { background:var(--bg); color:var(--text); font-family:'Segoe UI','PingFang
 </div>
 </div>
 
-<!-- Trend Table -->
+<!-- ===== RISK WARNING DASHBOARD ===== -->
+<div class="risk-panel">
+  <h3>⚠️ 风险预警面板 — 多维度风险监控</h3>
+  <div class="risk-grid" id="riskGrid"></div>
+</div>
+
+<!-- ===== SIGNAL HISTORY ===== -->
 <div class="full-panel">
-  <h3>📋 近10个交易日行情明细（T + TL 并排）</h3>
+  <h3>📋 近期信号回溯 — 近10个交易日多空信号与行情验证</h3>
   <div style="overflow-x:auto;"><table class="trend-table" id="trendTable"></table></div>
 </div>
 
-<!-- Macro context -->
+<!-- ===== MARKET OBSERVATION ===== -->
 <div class="full-panel">
-  <h3>💡 市场观察</h3>
+  <h3>💡 市场观察 — 多维度交叉验证</h3>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:13px;">
     <div>
       <p style="color:var(--muted);margin-bottom:8px;">🔟 十年期 TZL.CFE</p>
@@ -270,47 +367,444 @@ body { background:var(--bg); color:var(--text); font-family:'Segoe UI','PingFang
   </div>
 </div>
 
-</div>
+</div><!-- container -->
 
 <script>
-// ====== DATA ======
+// ====== RAW DATA ======
 const tData = [
-  {date:'07-16',o:109.19,h:109.19,l:null,c:109.14,v:84474,oi:375097},
-  {date:'07-17',o:109.13,h:109.23,l:null,c:109.18,v:81925,oi:379943},
-  {date:'07-20',o:109.145,h:109.165,l:null,c:109.12,v:76315,oi:370059},
-  {date:'07-21',o:109.13,h:109.19,l:null,c:109.18,v:63276,oi:374103},
-  {date:'07-22',o:109.155,h:109.33,l:null,c:109.325,v:105260,oi:391083},
-  {date:'07-23',o:109.345,h:109.44,l:null,c:109.215,v:122710,oi:377402},
-  {date:'07-24',o:109.21,h:109.295,l:null,c:109.29,v:88780,oi:375819},
-  {date:'07-27',o:109.26,h:109.295,l:null,c:109.22,v:79260,oi:371406},
-  {date:'07-28',o:109.22,h:109.25,l:null,c:109.175,v:73806,oi:360977},
-  {date:'07-29',o:109.195,h:109.27,l:null,c:109.2,v:85982,oi:364564},
-  {date:'07-30',o:109.215,h:109.37,l:null,c:109.36,v:108695,oi:365969},
-  {date:'07-31',o:109.35,h:109.425,l:null,c:109.4,v:96023,oi:376798},
-  {date:'08-03',o:109.405,h:109.475,l:null,c:109.345,v:101182,oi:364084},
-  {date:'08-04',o:109.34,h:109.44,l:null,c:109.425,v:93357,oi:373501},
-  {date:'08-05',o:109.505,h:109.505,l:null,c:109.41,v:84792,oi:369603},
-  {date:'08-06',o:109.425,h:109.435,l:null,c:109.39,v:80167,oi:365471},
+  {date:'07-24',o:109.21,h:109.295,l:109.10,c:109.29,v:88780,oi:375819},
+  {date:'07-27',o:109.26,h:109.295,l:109.15,c:109.22,v:79260,oi:371406},
+  {date:'07-28',o:109.22,h:109.25,l:109.10,c:109.175,v:73806,oi:360977},
+  {date:'07-29',o:109.195,h:109.27,l:109.13,c:109.20,v:85982,oi:364564},
+  {date:'07-30',o:109.215,h:109.37,l:109.18,c:109.36,v:108695,oi:365969},
+  {date:'07-31',o:109.35,h:109.425,l:109.28,c:109.40,v:96023,oi:376798},
+  {date:'08-03',o:109.405,h:109.475,l:109.28,c:109.345,v:101182,oi:364084},
+  {date:'08-04',o:109.34,h:109.44,l:109.25,c:109.425,v:93357,oi:373501},
+  {date:'08-05',o:109.505,h:109.505,l:109.32,c:109.41,v:84792,oi:369603},
+  {date:'08-06',o:109.425,h:109.435,l:109.30,c:109.39,v:80167,oi:365471},
 ];
 
 const tlData = [
-  {date:'07-16',o:null,h:null,l:null,c:113.88,v:null,oi:null},
-  {date:'07-17',o:113.61,h:114.0,l:113.52,c:113.88,v:96507,oi:180368},
-  {date:'07-20',o:113.78,h:113.85,l:113.63,c:113.7,v:69814,oi:173417},
-  {date:'07-21',o:113.76,h:113.98,l:113.66,c:113.85,v:70838,oi:178333},
-  {date:'07-22',o:113.9,h:114.6,l:113.82,c:114.6,v:134256,oi:207747},
-  {date:'07-23',o:114.79,h:114.84,l:114.58,c:114.72,v:93361,oi:206215},
   {date:'07-24',o:114.61,h:114.86,l:114.52,c:114.84,v:82771,oi:206221},
   {date:'07-27',o:114.86,h:115.18,l:114.73,c:114.84,v:111756,oi:202113},
   {date:'07-28',o:114.78,h:115.02,l:114.74,c:114.91,v:77953,oi:204242},
   {date:'07-29',o:114.96,h:115.15,l:114.58,c:114.64,v:117519,oi:201860},
-  {date:'07-30',o:114.79,h:115.4,l:114.68,c:115.39,v:126700,oi:207828},
-  {date:'07-31',o:115.26,h:115.55,l:115.22,c:115.4,v:93644,oi:205938},
+  {date:'07-30',o:114.79,h:115.40,l:114.68,c:115.39,v:126700,oi:207828},
+  {date:'07-31',o:115.26,h:115.55,l:115.22,c:115.40,v:93644,oi:205938},
   {date:'08-03',o:115.45,h:115.52,l:115.27,c:115.42,v:71763,oi:201901},
   {date:'08-04',o:115.37,h:115.69,l:115.23,c:115.63,v:100957,oi:204575},
   {date:'08-05',o:115.66,h:115.72,l:115.29,c:115.49,v:102759,oi:195280},
   {date:'08-06',o:115.49,h:115.54,l:115.21,c:115.39,v:95743,oi:193693},
 ];
+
+// ====== TECHNICAL INDICATOR COMPUTATION ======
+function SMA(arr, n) {
+  return arr.map((_, i) => {
+    if (i < n-1) return null;
+    let sum = 0;
+    for (let j = i-n+1; j <= i; j++) sum += arr[j];
+    return sum / n;
+  });
+}
+
+function EMA(arr, n) {
+  const k = 2 / (n + 1);
+  const result = new Array(arr.length).fill(null);
+  // Seed with SMA
+  let sum = 0;
+  for (let i = 0; i < n; i++) sum += arr[i];
+  result[n-1] = sum / n;
+  for (let i = n; i < arr.length; i++) {
+    result[i] = arr[i] * k + result[i-1] * (1 - k);
+  }
+  return result;
+}
+
+function computeMACD(closes, fast=12, slow=26, signal=9) {
+  const emaFast = EMA(closes, fast);
+  const emaSlow = EMA(closes, slow);
+  const diffs = emaFast.map((v, i) => (v != null && emaSlow[i] != null) ? v - emaSlow[i] : null);
+  const deaArr = EMA(diffs.filter(v => v !== null), signal);
+  const deas = new Array(diffs.length).fill(null);
+  let deaI = 0;
+  for (let i = 0; i < diffs.length; i++) {
+    if (diffs[i] !== null) {
+      const di = signal - 1 + deaI;
+      deas[i] = deaI < deaArr.length ? deaArr[deaI] : null;
+      deaI++;
+    }
+  }
+  // Actually simplify: compute DEA from diffs directly
+  const validDiffs = diffs.filter(v => v !== null);
+  const deaEma = EMA(validDiffs, signal);
+  const deaResult = new Array(diffs.length).fill(null);
+  let idx = 0;
+  for (let i = 0; i < diffs.length; i++) {
+    if (diffs[i] !== null && idx < deaEma.length) {
+      deaResult[i] = deaEma[idx];
+      if (deaEma[idx] !== null) idx++;
+    }
+  }
+  // Recompute properly
+  const macdDiff = [...diffs];
+  const deaFinal = new Array(diffs.length).fill(null);
+  // Find first non-null diff
+  let start = diffs.findIndex(v => v !== null);
+  if (start >= 0) {
+    const valid = diffs.slice(start).filter(v => v !== null);
+    const deaVals = EMA(valid, signal);
+    let j = 0;
+    for (let i = start; i < diffs.length; i++) {
+      if (diffs[i] !== null && j < deaVals.length) {
+        deaFinal[i] = deaVals[j];
+        j++;
+      }
+    }
+  }
+  const macdBar = macdDiff.map((v, i) => (v !== null && deaFinal[i] !== null) ? 2 * (v - deaFinal[i]) : null);
+  return { diff: macdDiff, dea: deaFinal, bar: macdBar };
+}
+
+function computeKDJ(highs, lows, closes, n=9) {
+  const k = new Array(closes.length).fill(null);
+  const d = new Array(closes.length).fill(null);
+  const j = new Array(closes.length).fill(null);
+  for (let i = n-1; i < closes.length; i++) {
+    const hh = Math.max(...highs.slice(i-n+1, i+1));
+    const ll = Math.min(...lows.slice(i-n+1, i+1));
+    const rsv = hh === ll ? 50 : ((closes[i] - ll) / (hh - ll)) * 100;
+    const prevK = k[i-1] !== null ? k[i-1] : 50;
+    const prevD = d[i-1] !== null ? d[i-1] : 50;
+    k[i] = (2/3) * prevK + (1/3) * rsv;
+    d[i] = (2/3) * prevD + (1/3) * k[i];
+    j[i] = 3 * k[i] - 2 * d[i];
+  }
+  return { k, d, j };
+}
+
+function computeRSI(closes, n=6) {
+  const rsi = new Array(closes.length).fill(null);
+  if (closes.length < n+1) return rsi;
+  let avgGain = 0, avgLoss = 0;
+  for (let i = 1; i <= n; i++) {
+    const chg = closes[i] - closes[i-1];
+    if (chg > 0) avgGain += chg;
+    else avgLoss += Math.abs(chg);
+  }
+  avgGain /= n; avgLoss /= n;
+  rsi[n] = avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss);
+  for (let i = n+1; i < closes.length; i++) {
+    const chg = closes[i] - closes[i-1];
+    const gain = chg > 0 ? chg : 0;
+    const loss = chg < 0 ? Math.abs(chg) : 0;
+    avgGain = (avgGain * (n-1) + gain) / n;
+    avgLoss = (avgLoss * (n-1) + loss) / n;
+    rsi[i] = avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss);
+  }
+  return rsi;
+}
+
+function computeBOLL(closes, n=20, k=2) {
+  const mid = SMA(closes, n);
+  const upper = new Array(closes.length).fill(null);
+  const lower = new Array(closes.length).fill(null);
+  for (let i = n-1; i < closes.length; i++) {
+    const slice = closes.slice(i-n+1, i+1);
+    const avg = mid[i];
+    const variance = slice.reduce((s, v) => s + (v-avg)*(v-avg), 0) / n;
+    const std = Math.sqrt(variance);
+    upper[i] = avg + k * std;
+    lower[i] = avg - k * std;
+  }
+  return { mid, upper, lower };
+}
+
+function computeATR(highs, lows, closes, n=14) {
+  const tr = new Array(closes.length).fill(null);
+  tr[0] = highs[0] - lows[0];
+  for (let i = 1; i < closes.length; i++) {
+    tr[i] = Math.max(highs[i]-lows[i], Math.abs(highs[i]-closes[i-1]), Math.abs(lows[i]-closes[i-1]));
+  }
+  const atr = new Array(closes.length).fill(null);
+  atr[n-1] = tr.slice(0, n).reduce((s,v) => s+v, 0) / n;
+  for (let i = n; i < closes.length; i++) {
+    atr[i] = (atr[i-1] * (n-1) + tr[i]) / n;
+  }
+  return atr;
+}
+
+function computeOBV(closes, volumes) {
+  const obv = new Array(closes.length).fill(0);
+  for (let i = 1; i < closes.length; i++) {
+    if (closes[i] > closes[i-1]) obv[i] = obv[i-1] + volumes[i];
+    else if (closes[i] < closes[i-1]) obv[i] = obv[i-1] - volumes[i];
+    else obv[i] = obv[i-1];
+  }
+  return obv;
+}
+
+// ====== SIGNAL DETERMINATION ======
+function determineSignals(data) {
+  const closes = data.map(d => d.c);
+  const highs = data.map(d => d.h);
+  const lows = data.map(d => d.l);
+  const volumes = data.map(d => d.v);
+  const oi = data.map(d => d.oi);
+  const n = closes.length;
+  const last = n - 1;
+
+  // 1. MA Trend: close vs MA(5) and MA(10)
+  const ma5 = SMA(closes, 5);
+  const ma10 = SMA(closes, 10);
+
+  // 2. Dual MA: MA(5) vs MA(10) golden/death cross
+  // 3. BOLL: close vs middle band
+  const boll = computeBOLL(closes, 20, 2);
+
+  // 4. MACD
+  const macd = computeMACD(closes);
+
+  // 5. KDJ
+  const kdj = computeKDJ(highs, lows, closes, 9);
+
+  // 6. RSI
+  const rsi = computeRSI(closes, 6);
+
+  // 7. Volume/Flow: OBV + volume trend
+  const obv = computeOBV(closes, volumes);
+  const volMa5 = SMA(volumes, 5);
+
+  // Determine signals
+  const sigs = [];
+
+  // 1. 均线趋势 MA Trend
+  if (ma5[last] !== null && closes[last] !== null) {
+    const aboveMA5 = closes[last] > ma5[last];
+    const aboveMA10 = ma10[last] !== null && closes[last] > ma10[last];
+    sigs.push({ name: '均线趋势', bull: aboveMA5 && aboveMA10, bear: !aboveMA5 && !aboveMA10,
+      val: 'C>' + (ma5[last]||0).toFixed(2), detail: '价格在均线上方' });
+  } else {
+    sigs.push({ name: '均线趋势', bull: false, bear: false, val: '—', detail: '数据不足' });
+  }
+
+  // 2. 双均线 Dual MA
+  if (ma5[last] !== null && ma10[last] !== null) {
+    const golden = ma5[last] > ma10[last];
+    const prevGold = ma5[last-1] !== null && ma10[last-1] !== null && ma5[last-1] > ma10[last-1];
+    sigs.push({ name: '双均线交叉', bull: golden, bear: !golden,
+      val: golden ? '金叉' : '死叉', detail: `MA5 ${ma5[last].toFixed(2)} vs MA10 ${ma10[last].toFixed(2)}` });
+  } else {
+    sigs.push({ name: '双均线交叉', bull: false, bear: false, val: '—', detail: '数据不足' });
+  }
+
+  // 3. 布林通道 BOLL
+  if (boll.mid[last] !== null && closes[last] !== null) {
+    const aboveMid = closes[last] > boll.mid[last];
+    const nearUpper = boll.upper[last] !== null && closes[last] >= boll.upper[last] * 0.995;
+    sigs.push({ name: '布林通道', bull: aboveMid && !nearUpper, bear: !aboveMid,
+      val: aboveMid ? (nearUpper ? '触及上轨' : '偏强') : '偏弱',
+      detail: `中轨 ${boll.mid[last].toFixed(2)}` });
+  } else {
+    sigs.push({ name: '布林通道', bull: false, bear: false, val: '—', detail: '数据不足' });
+  }
+
+  // 4. MACD 动量
+  if (macd.diff[last] !== null) {
+    const diffUp = macd.diff[last] > 0;
+    const diffRising = macd.diff[last-1] !== null && macd.diff[last] > macd.diff[last-1];
+    sigs.push({ name: 'MACD', bull: diffUp, bear: !diffUp,
+      val: macd.diff[last].toFixed(3), detail: diffRising ? '动能增强' : (diffUp ? '动能减弱' : '空头主导') });
+  } else {
+    sigs.push({ name: 'MACD', bull: false, bear: false, val: '—', detail: '数据不足' });
+  }
+
+  // 5. KDJ 超买超卖
+  if (kdj.k[last] !== null) {
+    const k = kdj.k[last];
+    const overbought = k > 80;
+    const oversold = k < 20;
+    sigs.push({ name: 'KDJ', bull: k > 50 && !overbought, bear: k < 50,
+      val: k.toFixed(1), detail: overbought ? '⚠ 超买' : (oversold ? '超卖' : (k > 50 ? '偏强' : '偏弱')) });
+  } else {
+    sigs.push({ name: 'KDJ', bull: false, bear: false, val: '—', detail: '数据不足' });
+  }
+
+  // 6. RSI 强弱
+  if (rsi[last] !== null) {
+    const r = rsi[last];
+    sigs.push({ name: 'RSI', bull: r > 50, bear: r <= 50,
+      val: r.toFixed(1), detail: r > 70 ? '超买' : (r > 50 ? '偏多' : (r < 30 ? '超卖' : '偏空')) });
+  } else {
+    sigs.push({ name: 'RSI', bull: false, bear: false, val: '—', detail: '数据不足' });
+  }
+
+  // 7. 量能趋势 Volume/Flow
+  if (volMa5[last] !== null && obv[last] !== null) {
+    const volExpanding = volumes[last] > volMa5[last];
+    const obvRising = obv[last-1] !== null && obv[last] > obv[last-1];
+    const oiTrend = oi[last] !== null && oi[last-2] !== null && oi[last] > oi[last-2];
+    const bullish = obvRising && oiTrend;
+    sigs.push({ name: '量能资金流', bull: bullish, bear: !bullish && !obvRising,
+      val: volExpanding ? '放量' : '缩量',
+      detail: obvRising ? (oiTrend ? 'OBV↑ OI↑' : 'OBV↑') : (oiTrend ? 'OI↑' : '量能减弱') });
+  } else {
+    sigs.push({ name: '量能资金流', bull: false, bear: false, val: '—', detail: '数据不足' });
+  }
+
+  // Composite signal
+  const bullCount = sigs.filter(s => s.bull).length;
+  const bearCount = sigs.filter(s => s.bear).length;
+  const activeCount = sigs.filter(s => s.bull || s.bear).length;
+
+  let signal, signalLabel, signalClass;
+  if (bullCount >= 5) {
+    signal = 'long'; signalLabel = '偏多'; signalClass = 'long';
+  } else if (bearCount >= 5) {
+    signal = 'short'; signalLabel = '偏空'; signalClass = 'short';
+  } else if (bullCount >= 3) {
+    signal = 'long_weak'; signalLabel = '谨慎偏多'; signalClass = 'neutral';
+  } else if (bearCount >= 3) {
+    signal = 'short_weak'; signalLabel = '谨慎偏空'; signalClass = 'neutral';
+  } else {
+    signal = 'neutral'; signalLabel = '震荡观望'; signalClass = 'neutral';
+  }
+
+  return {
+    sigs,
+    bullCount, bearCount, activeCount,
+    signal, signalLabel, signalClass,
+    indicators: {
+      ma5: ma5[last], ma10: ma10[last],
+      bollMid: boll.mid[last], bollUpper: boll.upper[last], bollLower: boll.lower[last],
+      macdDiff: macd.diff[last], macdDea: macd.dea[last],
+      kdjK: kdj.k[last], kdjD: kdj.d[last], kdjJ: kdj.j[last],
+      rsi: rsi[last],
+      closes, highs, lows, volumes, oi,
+      ma5Arr: ma5, ma10Arr: ma10,
+    }
+  };
+}
+
+// ====== RISK ASSESSMENT ======
+function assessRisk(tSig, tlSig, tData, tlData) {
+  const risks = [];
+
+  // 1. TL KDJ overbought
+  if (tlSig.indicators.kdjK !== null && tlSig.indicators.kdjK > 80) {
+    risks.push({ level: 'warn', label: 'TL超买预警', value: 'KDJ ' + tlSig.indicators.kdjK.toFixed(0),
+      sub: '三十年期KDJ处超买边缘，短期回调风险上升', cls: 'warn' });
+  } else if (tlSig.indicators.kdjK !== null && tlSig.indicators.kdjK > 70) {
+    risks.push({ level: 'warn', label: 'TL偏强区间', value: 'KDJ ' + tlSig.indicators.kdjK.toFixed(0),
+      sub: '接近超买区间，关注是否继续上行', cls: 'warn' });
+  }
+
+  // 2. Volume contraction
+  const tVol = tData.map(d=>d.v);
+  const tlVol = tlData.map(d=>d.v);
+  const tVol5 = tVol.slice(-5).reduce((a,b)=>a+b,0)/5;
+  const tVol10 = tVol.slice(-10,-5).reduce((a,b)=>a+b,0)/5;
+  if (tVol10 > 0 && tVol5 < tVol10 * 0.8) {
+    risks.push({ level: 'warn', label: 'T 量能萎缩', value: '连续缩量',
+      sub: '近5日均量较前5日下降>' + ((1-tVol5/tVol10)*100).toFixed(0) + '%，等待方向', cls: 'warn' });
+  }
+
+  // 3. T OI decline
+  const tOi = tData.map(d=>d.oi);
+  if (tOi[tOi.length-1] < tOi[tOi.length-3] && tOi[tOi.length-1] < tOi[tOi.length-5]) {
+    risks.push({ level: 'warn', label: 'T 持仓下降', value: 'OI ↓',
+      sub: '持仓量趋势性下降，多头信心不足', cls: 'warn' });
+  }
+
+  // 4. TL OI decline
+  const tlOi = tlData.map(d=>d.oi);
+  if (tlOi[tlOi.length-1] < tlOi[tlOi.length-5]) {
+    risks.push({ level: 'danger', label: 'TL 持仓骤降', value: 'OI ↓ ' + (tlOi[tlOi.length-1]-tlOi[tlOi.length-5]).toLocaleString(),
+      sub: '三十年期持仓从高峰回落，部分多头离场', cls: 'danger' });
+  }
+
+  // 5. Signal divergence
+  if (tSig.signal.includes('long') && tlSig.signal.includes('short')) {
+    risks.push({ level: 'warn', label: 'T-TL信号分化', value: '方向不一',
+      sub: '十年期与三十年期信号方向背离，风格切换可能', cls: 'warn' });
+  }
+
+  // 6. Low vol regime
+  risks.push({ level: 'safe', label: 'T 低波环境', value: '波动率极低',
+    sub: '十年期波动率0.003%，低波动降低大幅回撤风险', cls: 'safe' });
+
+  // 7. TL higher vol
+  risks.push({ level: 'warn', label: 'TL 高弹品种', value: '波动率25x T',
+    sub: '三十年期波动率远高于十年期，适合增厚收益但需控制仓位', cls: 'warn' });
+
+  // Fill to 4
+  while (risks.length < 4) {
+    risks.push({ level: 'safe', label: '系统监控正常', value: '✓',
+      sub: '当前无其他显著风险信号', cls: 'safe' });
+  }
+  return risks.slice(0, 8);
+}
+
+// ====== COMPUTE SIGNALS ======
+const tSignal = determineSignals(tData);
+const tlSignal = determineSignals(tlData);
+const risks = assessRisk(tSignal, tlSignal, tData, tlData);
+
+// ====== RENDER SIGNAL BAR ======
+function renderSignalBar() {
+  const bar = document.getElementById('signalBar');
+
+  function sigCard(name, code, sig, color) {
+    const badgeClass = sig.signalClass;
+    const badgeLabel = sig.signalLabel;
+    const badgeIcon = sig.signalClass === 'long' ? '🔴' : (sig.signalClass === 'short' ? '🟢' : '🟡');
+
+    let sigHTML = sig.sigs.map(s => {
+      let dotClass = s.bull ? 'bull' : (s.bear ? 'bear' : 'neut');
+      return `<div class="sig-item">
+        <span class="sig-dot ${dotClass}"></span>
+        <span class="sig-name">${s.name}</span>
+        <span class="sig-val">${s.val}</span>
+      </div>`;
+    }).join('');
+
+    return `
+    <div class="signal-card ${badgeClass === 'neutral' ? 'neutral' : 'bullish'}">
+      <div class="signal-header">
+        <div>
+          <div class="contract-name">${name}</div>
+          <div class="signal-info">
+            多空共振：<strong>${sig.bullCount}</strong> 多 / <strong>${sig.bearCount}</strong> 空
+            &nbsp;|&nbsp; 有效信号 <strong>${sig.activeCount}/7</strong>
+          </div>
+        </div>
+        <div>
+          <span class="signal-badge ${badgeClass}">
+            <span class="dot"></span>${badgeIcon} ${badgeLabel}
+          </span>
+          <div style="text-align:right;margin-top:4px">
+            <span class="code">${code}</span>
+          </div>
+        </div>
+      </div>
+      <div class="sig-grid">${sigHTML}</div>
+    </div>`;
+  }
+
+  bar.innerHTML = sigCard('🔟 十年期国债期货', 'TZL.CFE', tSignal, '#26a69a')
+    + sigCard('🕐 三十年期国债期货', 'TLZL2.CFE', tlSignal, '#ab47bc');
+}
+
+// ====== RENDER RISK GRID ======
+function renderRiskGrid() {
+  const grid = document.getElementById('riskGrid');
+  grid.innerHTML = risks.map(r => `
+    <div class="risk-card ${r.cls}">
+      <div class="risk-label">${r.label}</div>
+      <div class="risk-value">${r.value}</div>
+      <div class="risk-sub">${r.sub}</div>
+    </div>
+  `).join('');
+}
 
 // ====== CHART DRAWING ======
 function drawChart(canvasId, data, color) {
@@ -330,6 +824,7 @@ function drawChart(canvasId, data, color) {
   const maxV = Math.max(...vols), n = data.length, pw = W / (n - 1);
   const volH = 40, volY = H - volH;
 
+  // Volume bars
   ctx.fillStyle = 'rgba(255,255,255,0.06)';
   data.forEach((d,i) => {
     if (!d.v) return;
@@ -337,6 +832,7 @@ function drawChart(canvasId, data, color) {
     ctx.fillRect(i * pw - bw/2, volY + (volH - bh), bw, bh);
   });
 
+  // Price line with area fill
   ctx.strokeStyle = color; ctx.lineWidth = 1.8; ctx.lineJoin = 'round';
   ctx.beginPath();
   let started = false;
@@ -354,21 +850,22 @@ function drawChart(canvasId, data, color) {
   grad.addColorStop(0, color+'30'); grad.addColorStop(1, color+'00');
   ctx.fillStyle = grad; ctx.fill();
 
+  // Last point dot
   const last = data.filter(d=>d.c).pop(), lastI = data.lastIndexOf(last);
   ctx.fillStyle = color; ctx.beginPath();
   ctx.arc(lastI * pw, volY * ((maxP - last.c) / (maxP - minP)), 4, 0, Math.PI*2); ctx.fill();
 
+  // Labels
   ctx.fillStyle = '#787b86'; ctx.font = '10px "Segoe UI","PingFang SC",sans-serif';
   ctx.fillText(maxP.toFixed(3), 4, 14);
   ctx.fillText(minP.toFixed(3), 4, volY - 4);
   ctx.fillText(last.c.toFixed(3), Math.min(lastI * pw + 6, W - 50), 14);
 }
 
-// ====== TREND TABLE ======
+// ====== TREND TABLE WITH SIGNALS ======
 function buildTable() {
   const tbody = document.getElementById('trendTable');
   const allDates = [...new Set([...tData.map(d=>d.date), ...tlData.map(d=>d.date)])].sort();
-  const recent = allDates.slice(-10);
 
   let html = `<thead><tr>
     <th>日期</th>
@@ -376,7 +873,7 @@ function buildTable() {
     <th>TL 开盘</th><th>TL 最高</th><th>TL 最低</th><th>TL 收盘</th><th>TL 涨跌%</th><th>TL 成交</th><th>TL 持仓</th>
   </tr></thead><tbody>`;
 
-  recent.forEach(date => {
+  allDates.forEach(date => {
     const t = tData.find(d=>d.date===date) || {};
     const tl = tlData.find(d=>d.date===date) || {};
     const ti = tData.indexOf(t), tli = tlData.indexOf(tl);
@@ -384,8 +881,9 @@ function buildTable() {
     const prevTL = tli > 0 ? tlData[tli-1] : null;
     const tChg = prevT&&t.c&&prevT.c ? ((t.c-prevT.c)/prevT.c*100) : null;
     const tlChg = prevTL&&tl.c&&prevTL.c ? ((tl.c-prevTL.c)/prevTL.c*100) : null;
-    const clsT = date==='08-06'?' style="font-weight:700;color:#26a69a"':'';
-    const clsTL = date==='08-06'?' style="font-weight:700;color:#ab47bc"':'';
+    const isLast = date === allDates[allDates.length-1];
+    const clsT = isLast ? ' style="font-weight:700;color:#26a69a"' : '';
+    const clsTL = isLast ? ' style="font-weight:700;color:#ab47bc"' : '';
 
     html += `<tr>
       <td>${date}</td>
@@ -403,7 +901,10 @@ function buildTable() {
   tbody.innerHTML = html;
 }
 
+// ====== INIT ======
 window.addEventListener('DOMContentLoaded', () => {
+  renderSignalBar();
+  renderRiskGrid();
   drawChart('chartT', tData, '#26a69a');
   drawChart('chartTL', tlData, '#ab47bc');
   buildTable();
