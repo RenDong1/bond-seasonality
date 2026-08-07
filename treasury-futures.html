@@ -79,7 +79,7 @@
   .ohlc-item .v{font-size:14px;font-weight:600;color:#222}
   .ohlc-item .v.red{color:var(--red)}
   .ohlc-item .v.green{color:var(--green)}
-  .mini-chart-wrap{width:100%;height:180px;margin:8px 0;position:relative;background:#fafafa;border-radius:8px}
+  .mini-chart-wrap{width:100%;height:200px;margin:8px 0;position:relative;background:#fafafa;border-radius:8px}
   .mini-chart-wrap canvas{width:100%;height:100%}
   .section-title{font-size:12px;color:var(--muted);letter-spacing:1px;margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid #eee}
   .ind-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
@@ -1007,55 +1007,88 @@ const tSignal = determineSignals(tData);
 const tlSignal = determineSignals(tlData);
 const risks = assessRisk(tSignal, tlSignal, tData, tlData);
 
-// ====== CHART DRAWING ======
-function drawChart(canvasId, data, color) {
+// ====== CHART DRAWING (日K线) ======
+function drawChart(canvasId, data, accentColor) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
   const rect = canvas.parentElement.getBoundingClientRect();
-  const W = rect.width, H = 180;
+  const W = rect.width, H = 200;
   canvas.width = W * dpr; canvas.height = H * dpr;
   canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
   ctx.scale(dpr, dpr);
-  const prices = data.map(d=>d.c).filter(p=>p);
-  const vols = data.map(d=>d.v).filter(v=>v);
-  const minP = Math.min(...prices) * 0.999, maxP = Math.max(...prices) * 1.001;
-  const maxV = Math.max(...vols), n = data.length, pw = W / (n - 1);
-  const volH = 40, volY = H - volH;
-  ctx.fillStyle = 'rgba(0,0,0,0.06)';
-  data.forEach((d,i) => {
+
+  const valid = data.filter(d => d.o != null && d.h != null && d.l != null && d.c != null);
+  const n = valid.length;
+  if (n < 2) return;
+
+  const allH = valid.map(d => d.h), allL = valid.map(d => d.l), allV = valid.map(d => d.v);
+  const priceMin = Math.min(...allL), priceMax = Math.max(...allH);
+  const pRange = priceMax - priceMin || 0.01;
+  const pad = pRange * 0.1;
+  const chartMin = priceMin - pad, chartMax = priceMax + pad;
+
+  const volH = 40, chartH = H - volH - 5, maxV = Math.max(...allV) || 1;
+  const pw = W / (n + 0.5);
+  const bodyW = Math.max(1.5, pw * 0.65);
+  const UP_COLOR = '#c62828', DOWN_COLOR = '#2e7d32';
+
+  // ---- 水平网格线 ----
+  ctx.strokeStyle = '#e8e8e8'; ctx.lineWidth = 0.5;
+  [0.25, 0.5, 0.75].forEach(ratio => {
+    const y = chartH * (1 - ratio);
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  });
+
+  // ---- 成交量柱 ----
+  valid.forEach((d, i) => {
     if (!d.v) return;
-    const bw = Math.max(1, pw * 0.6), bh = (d.v / maxV) * volH;
-    ctx.fillRect(i * pw - bw/2, volY + (volH - bh), bw, bh);
+    const x = (i + 0.5) * pw;
+    const bw = Math.max(1, pw * 0.6);
+    const bh = (d.v / maxV) * volH;
+    ctx.fillStyle = d.c >= d.o ? 'rgba(198,40,40,0.25)' : 'rgba(46,125,50,0.25)';
+    ctx.fillRect(x - bw/2, chartH + 5 + (volH - bh), bw, Math.max(bh, 1));
   });
-  ctx.strokeStyle = color; ctx.lineWidth = 1.8; ctx.lineJoin = 'round';
-  ctx.beginPath();
-  let started = false, firstI = -1;
-  data.forEach((d,i) => {
-    if (!d.c) return;
-    if (firstI < 0) firstI = i;
-    const x = i * pw, y = volY * ((maxP - d.c) / (maxP - minP));
-    started ? ctx.lineTo(x, y) : (ctx.moveTo(x, y), started = true);
+
+  // ---- K线 ----
+  valid.forEach((d, i) => {
+    const x = (i + 0.5) * pw;
+    const isUp = d.c >= d.o;
+    const color = isUp ? UP_COLOR : DOWN_COLOR;
+
+    const scaleY = v => chartH * (1 - (v - chartMin) / (chartMax - chartMin));
+    const highY = scaleY(d.h), lowY = scaleY(d.l);
+    const openY = scaleY(d.o), closeY = scaleY(d.c);
+    const bodyTop = Math.min(openY, closeY);
+    const bodyHt = Math.max(Math.abs(closeY - openY), 0.5);
+
+    // 影线
+    ctx.strokeStyle = color; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, highY); ctx.lineTo(x, lowY); ctx.stroke();
+
+    // 实体
+    ctx.fillStyle = isUp ? UP_COLOR : '#fff';
+    ctx.strokeStyle = color; ctx.lineWidth = 1;
+    ctx.fillRect(x - bodyW/2, bodyTop, bodyW, bodyHt);
+    ctx.strokeRect(x - bodyW/2, bodyTop, bodyW, bodyHt);
   });
-  ctx.stroke();
-  if (firstI >= 0) {
-    ctx.lineTo((data.filter(d=>d.c).length-1)*pw, volY);
-    ctx.lineTo(firstI*pw, volY);
-    ctx.closePath();
-    const grad = ctx.createLinearGradient(0,0,0,volY);
-    grad.addColorStop(0, color+'30'); grad.addColorStop(1, color+'00');
-    ctx.fillStyle = grad; ctx.fill();
-  }
-  const last = data.filter(d=>d.c).pop(), lastI = data.lastIndexOf(last);
-  if (lastI >= 0) {
-    ctx.fillStyle = color; ctx.beginPath();
-    ctx.arc(lastI * pw, volY * ((maxP - last.c) / (maxP - minP)), 4, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#666'; ctx.font = '10px "Segoe UI","PingFang SC",sans-serif';
-    ctx.fillText(maxP.toFixed(3), 4, 14);
-    ctx.fillText(minP.toFixed(3), 4, volY - 4);
-    ctx.fillText(last.c.toFixed(3), Math.min(lastI * pw + 6, W - 50), 14);
-  }
+
+  // ---- 价格标签 ----
+  ctx.fillStyle = '#666'; ctx.font = '10px "Segoe UI","PingFang SC",sans-serif';
+  ctx.fillText(priceMax.toFixed(3), 4, 12);
+  ctx.fillText(priceMin.toFixed(3), 4, chartH - 2);
+
+  // 最新收盘价标注
+  const last = valid[n - 1];
+  const lx = (n - 0.5) * pw, ly = chartH * (1 - (last.c - chartMin) / (chartMax - chartMin));
+  ctx.fillStyle = accentColor || '#333';
+  ctx.font = 'bold 11px "Segoe UI","PingFang SC",sans-serif';
+  const label = last.c.toFixed(3);
+  ctx.fillText(label, Math.min(lx + 4, W - 56), ly - 4);
+  // 小圆点标记
+  ctx.fillStyle = accentColor || '#333'; ctx.beginPath();
+  ctx.arc(lx, ly, 3, 0, Math.PI*2); ctx.fill();
 }
 
 // ====== RENDER FUNCTIONS ======
