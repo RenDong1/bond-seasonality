@@ -125,13 +125,26 @@
 </head>
 <body>
 
+<!--NAV_START-->
+<style>
+.top-nav{display:flex;justify-content:space-between;align-items:center;padding:10px 30px;background:#12141d;border-bottom:1px solid #1e2130;position:sticky;top:0;z-index:200}
+.top-nav .brand{font-size:15px;font-weight:700;color:#e8eaed;text-decoration:none}
+.top-nav .brand span{color:#42a5f5}
+.top-nav .nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.top-nav .nav-links a{padding:5px 14px;border-radius:5px;font-size:12px;color:#787b86;text-decoration:none;transition:all 0.2s}
+.top-nav .nav-links a:hover{color:#e8eaed;background:rgba(255,255,255,0.05)}
+.top-nav .nav-links a.active{color:#e8eaed;background:rgba(66,165,245,0.15)}
+</style>
 <nav class="top-nav">
   <a href="index.html" class="brand">📊 债市<span>投资策略</span>平台</a>
   <div class="nav-links">
     <a href="bond-seasonality.html">📅 季节性复盘</a>
     <a href="treasury-futures.html" class="active">📈 国债期货</a>
+    <a href="yield-seasonality.html">📊 收益率·期限利差</a>
+    <a href="bond-flow-lead.html">📈 净买入·领先</a>
   </div>
 </nav>
+<!--NAV_END-->
 
 <div class="container">
 
