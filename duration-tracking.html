@@ -67,7 +67,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div style="max-height:380px;overflow-y:auto;">
 <table class="tbl"><thead><tr><th>日期</th><th>长债利率</th><th>长债利率金融</th><th>长债信用</th></tr></thead><tbody id="tbl-body"></tbody></table>
 </div>
-<p class="note">口径：利率债=1-10Y国债+1-10Y国开+30Y国债；金融债=政金债(国开1-10Y)+商金(1-5Y)+二永(1-5Y) 各1/3；普信债=1-5Y中票+城投。持仓来自天软基金债券配置（简化口径：利率=国债+地方债+央票，金融=金融债券含政金债，普信=其余；金融债券内政金/商金/二永按各1/3假设）。当|收益率变动|&lt;0.5bp 时该日留空（点测公式除近零值会失真）。商业银行永续债以二级资本债同等级近似。数据源：中债登本地库 + 天软，0 额度。</p>
+<p class="note">图中实线=5日移动平均，散点=单日点测。口径：利率债=1-10Y国债+1-10Y国开+30Y国债；金融债=政金债(国开1-10Y)+商金(1-5Y)+二永(1-5Y) 各1/3；普信债=1-5Y中票+城投。持仓来自天软基金债券配置（简化口径：利率=国债+地方债+央票，金融=金融债券含政金债，普信=其余；金融债券内政金/商金/二永按各1/3假设）。当|收益率变动|&lt;0.5bp 时该日留空（点测公式除近零值会失真）。商业银行永续债以二级资本债同等级近似。数据源：中债登本地库 + 天软，0 额度。</p>
 </div>
 </div>
 <script>
@@ -97,15 +97,27 @@ function fmt(v){return v==null?'—':v.toFixed(3);}
   }).join('');
 })();
 
-// 折线图
+// 折线图（实线=5日移动平均，散点=单日点测）
 (function(){
   var chart=echarts.init(document.getElementById('chart'));
   var dates=DATA.series.map(function(r){return r.date;});
-  var series=CATS.map(function(c){
-    return {name:c,type:'line',data:DATA.series.map(function(r){return r[c];}),
-      smooth:true,connectNulls:true,symbol:'circle',symbolSize:5,
+  function ma(data,w){
+    return data.map(function(_,i){
+      var s=0,c=0;
+      for(var j=Math.max(0,i-w+1);j<=i;j++){ if(data[j]!=null){ s+=data[j]; c++; } }
+      return c>0 ? +(s/c).toFixed(3) : null;
+    });
+  }
+  var series=[];
+  CATS.forEach(function(c){
+    var raw=DATA.series.map(function(r){return r[c];});
+    series.push({name:c,type:'line',data:ma(raw,5),
+      smooth:true,connectNulls:true,symbol:'none',
       lineStyle:{width:2.5,color:COLORS[c]},itemStyle:{color:COLORS[c]},
-      emphasis:{focus:'series'}};
+      emphasis:{focus:'series'}});
+    series.push({name:c+' 日点测',type:'scatter',data:raw,
+      symbolSize:4,itemStyle:{color:COLORS[c],opacity:0.30},
+      emphasis:{focus:'series'}});
   });
   chart.setOption({
     tooltip:{trigger:'axis',valueFormatter:function(v){return v==null?'—':v.toFixed(3)+' 年';}},
