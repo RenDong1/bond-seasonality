@@ -77,7 +77,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div style="max-height:380px;overflow-y:auto;">
 <table class="tbl"><thead><tr><th>日期</th><th>长债利率</th><th>长债利率金融</th><th>长债信用</th></tr></thead><tbody id="tbl-body"></tbody></table>
 </div>
-<p class="note">图中实线=5日移动平均，散点=单日点测；散点中「大实心点」=高可信度日（当日对应券种收益率变动极差≤2.5bp，各券走势一致），「小淡点」=普通日。口径：利率债=1-10Y国债+1-10Y国开+30Y国债；金融债=政金债(国开1-10Y)+商金(1-5Y)+二永(1-5Y) 各1/3；普信债=1-5Y中票+城投。持仓来自天软基金债券配置（简化口径：利率=国债+地方债+央票，金融=金融债券含政金债，普信=其余；金融债券内政金/商金/二永按各1/3假设）。当|收益率变动|&lt;0.5bp 时该日留空（点测公式除近零值会失真）。商业银行永续债以二级资本债同等级近似。数据源：中债登本地库 + 天软，0 额度。</p>
+<p class="note">图中实线=5日移动平均，散点=单日点测；散点中「大实心点」=高可信度日（当日对应券种收益率变动极差≤2.5bp，各券走势一致），「小淡点」=普通日；表中「●」=该类别当日高可信度（对应券种极差≤2.5bp），灰字=普通日。口径：利率债=1-10Y国债+1-10Y国开+30Y国债；金融债=政金债(国开1-10Y)+商金(1-5Y)+二永(1-5Y) 各1/3；普信债=1-5Y中票+城投。持仓来自天软基金债券配置（简化口径：利率=国债+地方债+央票，金融=金融债券含政金债，普信=其余；金融债券内政金/商金/二永按各1/3假设）。当|收益率变动|&lt;0.5bp 时该日留空（点测公式除近零值会失真）。商业银行永续债以二级资本债同等级近似。数据源：中债登本地库 + 天软，0 额度。</p>
 </div>
 </div>
 <script>
@@ -199,7 +199,11 @@ function fmt(v){return v==null?'—':v.toFixed(3);}
       if(prev&&prev[c]!=null&&v!=null)d=v-prev[c];
       var cls=d==null?'':(d>0?'up':(d<0?'down':''));
       var dtext=d==null?'':((d>0?' +':' ')+d.toFixed(2));
-      return '<td>'+fmt(v)+'<span class="'+cls+'" style="font-size:10px">'+dtext+'</span></td>';
+      var b=BOND_OF[c];
+      var rel=(r.chg && r.chg[b]) && (r.chg[b].range<=REL_RANGE_BP);
+      var mark=rel?'<span style="color:'+COLORS[c]+'">●</span> ':'';
+      var vstyle=rel?'font-weight:700':'color:#b6b6b6';
+      return '<td>'+mark+'<span style="'+vstyle+'">'+fmt(v)+'</span><span class="'+cls+'" style="font-size:10px">'+dtext+'</span></td>';
     }).join('')+'</tr>';
   }).join('');
 })();
