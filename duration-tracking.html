@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>久期跟踪</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa;color:#333}
+.header{background:linear-gradient(135deg,#1a237e 0%,#283593 100%);color:white;padding:22px 30px}
+.header h1{font-size:22px;margin-bottom:6px}
+.header p{font-size:12px;opacity:0.85;line-height:1.7}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.stats-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.stat-card{flex:1;min-width:220px;background:white;border-radius:12px;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.stat-card .label{font-size:12px;color:#666}
+.stat-card .value{font-size:30px;font-weight:700;margin-top:6px}
+.stat-card .unit{font-size:13px;color:#999;font-weight:400}
+.stat-card .delta{font-size:12px;margin-top:6px}
+.panel{background:white;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:16px}
+.panel h2{font-size:15px;margin-bottom:14px;color:#1a237e}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{background:#f8f9fa;padding:8px 10px;text-align:left;border-bottom:2px solid #e0e0e0;position:sticky;top:0}
+.tbl td{padding:7px 10px;border-bottom:1px solid #f0f0f0}
+.tbl tr:hover td{background:#e8eaf6}
+.tbl .date{font-weight:600}
+.up{color:#1b5e20;font-weight:600}
+.down{color:#b71c1c;font-weight:600}
+.note{font-size:11px;color:#999;line-height:1.8;margin-top:4px}
+</style>
+</head>
+<body>
+<!--NAV_START-->
+<style>
+.top-nav{display:flex;justify-content:space-between;align-items:center;padding:10px 30px;background:#12141d;border-bottom:1px solid #1e2130;position:sticky;top:0;z-index:200}
+.top-nav .brand{font-size:15px;font-weight:700;color:#e8eaed;text-decoration:none}
+.top-nav .brand span{color:#42a5f5}
+.top-nav .nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.top-nav .nav-links a{padding:5px 14px;border-radius:5px;font-size:12px;color:#787b86;text-decoration:none;transition:all 0.2s}
+.top-nav .nav-links a:hover{color:#e8eaed;background:rgba(255,255,255,0.05)}
+.top-nav .nav-links a.active{color:#e8eaed;background:rgba(66,165,245,0.15)}
+</style>
+<nav class="top-nav">
+  <a href="index.html" class="brand">📊 债市<span>投资策略</span>平台</a>
+  <div class="nav-links">
+    <a href="bond-seasonality.html">📅 季节性复盘</a>
+    <a href="treasury-futures.html">📈 国债期货</a>
+    <a href="yield-seasonality.html">📊 收益率·期限利差</a>
+    <a href="bond-flow-lead.html">📈 净买入·领先</a>
+    <a href="duration-tracking.html" class="active">⏱️ 久期跟踪</a>
+  </div>
+</nav>
+<!--NAV_END-->
+<div class="header">
+<h1>&#9201;&#65039; 久期跟踪</h1>
+<p id="data-info">数据范围：加载中... | 点测久期 = -T日复权净值增长率(%) ÷ 收益率变动(bp) × 100</p>
+</div>
+<div class="container">
+<div class="stats-row" id="stats"></div>
+<div class="panel">
+<h2>&#128200; 三类债基估算久期中位数走势</h2>
+<div id="chart" style="width:100%;height:430px;"></div>
+</div>
+<div class="panel">
+<h2>&#128197; 历史记录</h2>
+<div style="max-height:380px;overflow-y:auto;">
+<table class="tbl"><thead><tr><th>日期</th><th>长债利率</th><th>长债利率金融</th><th>长债信用</th></tr></thead><tbody id="tbl-body"></tbody></table>
+</div>
+<p class="note">口径：利率债=10-30Y国债+1-10Y国开债；金融债=1-5Y商金(×0.34)+二永(×0.66)；普信债=1-5Y中票+城投。持仓取最新季报披露比例。商业银行永续债以二级资本债同等级近似。数据源：中债登本地库 + 天软基金净值，0 额度。</p>
+</div>
+</div>
+<script>
+const DATA={"categories": ["长债利率", "长债利率金融", "长债信用"], "updated": "2026-10-15T12:01:32", "series": [{"date": "2025-05-29", "长债利率": 5.606, "长债利率金融": 3.66, "长债信用": 2.439}, {"date": "2025-05-30", "长债利率": 4.603, "长债利率金融": 3.743, "长债信用": 2.93}, {"date": "2025-06-06", "长债利率": 5.205, "长债利率金融": 4.091, "长债信用": 3.056}, {"date": "2025-07-10", "长债利率": 5.776, "长债利率金融": 4.545, "长债信用": 3.251}, {"date": "2025-07-21", "长债利率": 4.471, "长债利率金融": 3.663, "长债信用": 2.236}, {"date": "2025-07-24", "长债利率": 4.961, "长债利率金融": 3.809, "长债信用": 2.827}, {"date": "2025-07-29", "长债利率": 4.832, "长债利率金融": 4.19, "长债信用": 3.084}, {"date": "2025-07-31", "长债利率": 4.947, "长债利率金融": 3.624, "长债信用": 2.862}, {"date": "2025-08-12", "长债利率": 5.075, "长债利率金融": 4.411, "长债信用": 3.068}, {"date": "2025-08-18", "长债利率": 4.207, "长债利率金融": 3.528, "长债信用": 2.65}, {"date": "2025-09-09", "长债利率": 3.618, "长债利率金融": 2.917, "长债信用": 2.6}, {"date": "2026-06-25", "长债利率": 6.11, "长债利率金融": 4.937, "长债信用": 3.793}, {"date": "2026-10-14", "长债利率": 8.73, "长债利率金融": 8.431, "长债信用": 6.325}]};
+const CATS=DATA.categories;
+const COLORS={'长债利率':'#1a237e','长债利率金融':'#e53935','长债信用':'#fb8c00'};
+
+(function(){
+  var dr=[DATA.series[0].date, DATA.series[DATA.series.length-1].date];
+  document.getElementById('data-info').textContent='数据范围：'+dr[0]+' ~ '+dr[1]+' | 点测久期 = -T日复权净值增长率(%) ÷ 收益率变动(bp) × 100 | 更新于 '+DATA.updated;
+})();
+
+function fmt(v){return v==null?'—':v.toFixed(3);}
+
+// 统计卡
+(function(){
+  var box=document.getElementById('stats');
+  var last=DATA.series[DATA.series.length-1];
+  var prev=DATA.series.length>1?DATA.series[DATA.series.length-2]:null;
+  box.innerHTML=CATS.map(function(c){
+    var v=last[c];
+    var d=null;
+    if(prev && prev[c]!=null && v!=null) d=v-prev[c];
+    var dh=d==null?'':(d>0?'<div class="delta up">▲ +'+d.toFixed(2)+' 年</div>':(d<0?'<div class="delta down">▼ '+d.toFixed(2)+' 年</div>':'<div class="delta" style="color:#999">持平</div>'));
+    return '<div class="stat-card"><div class="label">'+c+' · 估算久期中位数</div>'+
+           '<div class="value" style="color:'+COLORS[c]+'">'+fmt(v)+'<span class="unit"> 年</span></div>'+dh+'</div>';
+  }).join('');
+})();
+
+// 折线图
+(function(){
+  var chart=echarts.init(document.getElementById('chart'));
+  var dates=DATA.series.map(function(r){return r.date;});
+  var series=CATS.map(function(c){
+    return {name:c,type:'line',data:DATA.series.map(function(r){return r[c];}),
+      smooth:true,connectNulls:true,symbol:'circle',symbolSize:5,
+      lineStyle:{width:2.5,color:COLORS[c]},itemStyle:{color:COLORS[c]},
+      emphasis:{focus:'series'}};
+  });
+  chart.setOption({
+    tooltip:{trigger:'axis',valueFormatter:function(v){return v==null?'—':v.toFixed(3)+' 年';}},
+    legend:{data:CATS,top:5},
+    grid:{left:55,right:20,top:45,bottom:45},
+    xAxis:{type:'category',data:dates,boundaryGap:false},
+    yAxis:{type:'value',name:'久期(年)',scale:true},
+    dataZoom:[{type:'inside'},{type:'slider',height:18,bottom:8}],
+    series:series
+  });
+  window.addEventListener('resize',function(){chart.resize();});
+})();
+
+// 历史表(倒序)
+(function(){
+  var body=document.getElementById('tbl-body');
+  var rows=DATA.series.slice().reverse();
+  body.innerHTML=rows.map(function(r){
+    var prev=null;
+    for(var i=0;i<DATA.series.length;i++){if(DATA.series[i].date===r.date){prev=i>0?DATA.series[i-1]:null;break;}}
+    return '<tr><td class="date">'+r.date+'</td>'+CATS.map(function(c){
+      var v=r[c],d=null;
+      if(prev&&prev[c]!=null&&v!=null)d=v-prev[c];
+      var cls=d==null?'':(d>0?'up':(d<0?'down':''));
+      var dtext=d==null?'':((d>0?' +':' ')+d.toFixed(2));
+      return '<td>'+fmt(v)+'<span class="'+cls+'" style="font-size:10px">'+dtext+'</span></td>';
+    }).join('')+'</tr>';
+  }).join('');
+})();
+</script>
+</body>
+</html>
