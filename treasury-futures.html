@@ -19522,7 +19522,6 @@ function buildKlineOption(data) {
 
   return {
     animation: false,
-    animationDurationUpdate: 0,
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
@@ -19687,8 +19686,9 @@ function renderKlines() {
   if (typeof echarts === 'undefined') return;
   const tRange = filterByRange(tData);
   const tlRange = filterByRange(tlData);
-  if (!klineCharts.klineT) klineCharts.klineT = echarts.init(document.getElementById('klineT'));
-  if (!klineCharts.klineTL) klineCharts.klineTL = echarts.init(document.getElementById('klineTL'));
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  if (!klineCharts.klineT) klineCharts.klineT = echarts.init(document.getElementById('klineT'), null, { devicePixelRatio: dpr });
+  if (!klineCharts.klineTL) klineCharts.klineTL = echarts.init(document.getElementById('klineTL'), null, { devicePixelRatio: dpr });
   klineCharts.klineT.setOption(buildKlineOption(tRange), true);
   klineCharts.klineTL.setOption(buildKlineOption(tlRange), true);
   renderOiEvents('klineEventsT', tRange);
