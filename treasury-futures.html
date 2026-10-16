@@ -19561,9 +19561,9 @@ function buildKlineOption(data) {
     series: [
       { name: 'K线', type: 'candlestick', data: data.map(d => [d.o, d.c, d.l, d.h]), xAxisIndex: 0, yAxisIndex: 0, itemStyle: { color: UP, color0: DOWN, borderColor: UP, borderColor0: DOWN } },
       { name: '增仓减仓', type: 'scatter', data: oiScatter, xAxisIndex: 0, yAxisIndex: 0, z: 3, tooltip: { trigger: 'item', formatter: function (p) { const it = p.data || {}; const up = it.delta >= 0; const dd = p.value ? p.value[0] : ''; return '<strong style="color:' + (up ? '#ff6d00' : '#0091ea') + '">' + (up ? '▲ 大幅增仓' : '▼ 大幅减仓') + '</strong><br/>' + (it.delta != null ? (up ? '+' : '') + fmtWan(it.delta) + '手' : '') + '<br/>' + dd; } } },
-      { name: 'MA5', type: 'line', data: ma5, xAxisIndex: 0, yAxisIndex: 0, smooth: true, showSymbol: false, lineStyle: { width: 1, color: '#f57c00' } },
-      { name: 'MA10', type: 'line', data: ma10, xAxisIndex: 0, yAxisIndex: 0, smooth: true, showSymbol: false, lineStyle: { width: 1, color: '#1976d2' } },
-      { name: 'MA20', type: 'line', data: ma20, xAxisIndex: 0, yAxisIndex: 0, smooth: true, showSymbol: false, lineStyle: { width: 1, color: '#8e24aa' } },
+      { name: 'MA5', type: 'line', data: ma5, xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1, color: '#f57c00' } },
+      { name: 'MA10', type: 'line', data: ma10, xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1, color: '#1976d2' } },
+      { name: 'MA20', type: 'line', data: ma20, xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1, color: '#8e24aa' } },
       { name: 'BOLL上轨', type: 'line', data: boll.upper, xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1, type: 'dashed', color: '#b0bec5' }, markLine: { symbol: 'none', silent: true, data: fibLines } },
       { name: 'BOLL中轨', type: 'line', data: boll.mid, xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1, color: '#90a4ae' } },
       { name: 'BOLL下轨', type: 'line', data: boll.lower, xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1, type: 'dashed', color: '#b0bec5' } },
@@ -19686,7 +19686,7 @@ function renderKlines() {
   if (typeof echarts === 'undefined') return;
   const tRange = filterByRange(tData);
   const tlRange = filterByRange(tlData);
-  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
   if (!klineCharts.klineT) klineCharts.klineT = echarts.init(document.getElementById('klineT'), null, { devicePixelRatio: dpr });
   if (!klineCharts.klineTL) klineCharts.klineTL = echarts.init(document.getElementById('klineTL'), null, { devicePixelRatio: dpr });
   const tOpt = buildKlineOption(tRange);
