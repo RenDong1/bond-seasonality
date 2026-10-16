@@ -19545,7 +19545,8 @@ function buildKlineOption(data) {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
-      axisPointer: { type: 'cross', crossStyle: { color: '#bbb' }, label: { backgroundColor: '#333', color: '#fff' } },
+      transitionDuration: 0,
+      axisPointer: { type: 'cross', animation: false, crossStyle: { color: '#bbb' }, label: { backgroundColor: '#333', color: '#fff' } },
       backgroundColor: 'rgba(255,255,255,0.97)',
       borderColor: '#e0e0e0',
       textStyle: { color: '#333' },
@@ -19575,7 +19576,7 @@ function buildKlineOption(data) {
     ],
     dataZoom: [
       { type: 'inside', xAxisIndex: [0, 1, 2], start: 0, end: 100 },
-      { type: 'slider', xAxisIndex: [0, 1, 2], start: 0, end: 100, bottom: 0, height: 24, borderColor: '#eee', fillerColor: 'rgba(26,35,126,0.08)', handleStyle: { color: '#1a237e' }, textStyle: { fontSize: 9 } }
+      { type: 'slider', xAxisIndex: [0, 1, 2], start: 0, end: 100, bottom: 0, height: 24, realtime: false, borderColor: '#eee', fillerColor: 'rgba(26,35,126,0.08)', handleStyle: { color: '#1a237e' }, textStyle: { fontSize: 9 } }
     ],
     series: [
       { name: 'K线', type: 'candlestick', data: data.map(d => [d.o, d.c, d.l, d.h]), xAxisIndex: 0, yAxisIndex: 0, itemStyle: { color: UP, color0: DOWN, borderColor: UP, borderColor0: DOWN } },
