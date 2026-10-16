@@ -127,6 +127,14 @@
   .kline-title .code{font-size:10px;color:var(--muted);background:#eee;padding:2px 8px;border-radius:4px;margin-left:6px}
   .kline-chart-wrap{width:100%;position:relative;background:#fafafa;border-radius:8px;border:1px solid #eee}
   .kline-chart-wrap canvas{width:100%;display:block}
+  .oi-legend{font-size:11px;font-weight:normal;color:var(--muted);margin-left:10px}
+  .oi-legend .oi-up{color:#ff6d00}
+  .oi-legend .oi-down{color:#0091ea}
+  .kline-events{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:11px}
+  .kline-events .oi-evt{background:#fff;border:1px solid #eee;border-radius:6px;padding:2px 8px;white-space:nowrap}
+  .kline-events .oi-evt.oi-up{color:#ff6d00;border-color:#ffd180}
+  .kline-events .oi-evt.oi-down{color:#0091ea;border-color:#81d4fa}
+  .kline-events .oi-evt-empty{color:var(--muted)}
   @media(max-width:900px){
     .main-grid{grid-template-columns:1fr}
     .signal-bar{grid-template-columns:1fr}
@@ -174,7 +182,7 @@
 
 <div class="full-panel">
   <div class="kline-header">
-    <h3>📈 K线走势</h3>
+    <h3>📈 K线走势<span class="oi-legend"><span class="oi-up">▲大幅增仓</span> · <span class="oi-down">▼大幅减仓</span>（单日增仓≥1万手）</span></h3>
     <div class="range-selector" id="rangeSelector">
       <button class="range-btn" data-range="5y">近5年</button>
       <button class="range-btn" data-range="3y">近3年</button>
@@ -189,10 +197,12 @@
   <div class="kline-item">
     <div class="kline-title">🔟 十年期国债期货<span class="code">TZL.CFE</span></div>
     <div class="kline-chart-wrap"><canvas id="klineT"></canvas></div>
+    <div class="kline-events" id="klineEventsT"></div>
   </div>
   <div class="kline-item">
     <div class="kline-title">🕐 三十年期国债期货<span class="code">TLZL2.CFE</span></div>
     <div class="kline-chart-wrap"><canvas id="klineTL"></canvas></div>
+    <div class="kline-events" id="klineEventsTL"></div>
   </div>
 </div>
 
@@ -19502,6 +19512,22 @@ function drawChart(canvasId, data, accentColor, height) {
     ctx.strokeRect(x - bodyW/2, bodyTop, bodyW, bodyHt);
   });
 
+  // ---- 持仓变动信号标记 (大幅增仓▲ / 大幅减仓▼) ----
+  for (let i = 1; i < n; i++) {
+    const d0 = valid[i-1], d1 = valid[i];
+    if (d0.oi == null || d1.oi == null) continue;
+    const delta = d1.oi - d0.oi;
+    if (delta < OI_SURGE_THRESHOLD && delta > -OI_SURGE_THRESHOLD) continue;
+    const up = delta > 0;
+    const x = (i + 0.5) * pw;
+    const y = up ? scaleY(d1.h) - 5 : scaleY(d1.l) + 5;
+    ctx.fillStyle = up ? '#ff6d00' : '#0091ea';
+    ctx.beginPath();
+    if (up) { ctx.moveTo(x, y - 6); ctx.lineTo(x - 4, y); ctx.lineTo(x + 4, y); }
+    else { ctx.moveTo(x, y + 6); ctx.lineTo(x - 4, y); ctx.lineTo(x + 4, y); }
+    ctx.closePath(); ctx.fill();
+  }
+
   // ---- 价格标签 ----
   ctx.fillStyle = '#666'; ctx.font = '10px "Segoe UI","PingFang SC",sans-serif';
   ctx.fillText(priceMax.toFixed(3), 4, 12);
@@ -19543,6 +19569,7 @@ function fmtDate(dateStr, spanDays) {
 
 // ====== K线日期区间选择 ======
 const RANGE_DAYS = { '5y': 365 * 5, '3y': 365 * 3, '1y': 365, '6m': 182 };
+const OI_SURGE_THRESHOLD = 10000; // 持仓变动信号: 单日增仓≥1万手=大幅增仓, ≤-1万手=大幅减仓
 let chartRange = '1y';
 let customStart = null, customEnd = null;
 
@@ -19567,9 +19594,37 @@ function filterByRange(data) {
   return data.filter(d => d.date >= cutoff);
 }
 
+function fmtWan(v) { return (Math.abs(v) / 10000).toFixed(2) + '万'; }
+
+// 计算区间内的大幅增仓/减仓事件（相邻两日持仓量差）
+function oiEvents(data) {
+  const ev = [];
+  for (let i = 1; i < data.length; i++) {
+    const d0 = data[i-1], d1 = data[i];
+    if (d0.oi == null || d1.oi == null) continue;
+    const delta = d1.oi - d0.oi;
+    if (delta >= OI_SURGE_THRESHOLD) ev.push({ date: d1.date, delta, up: true });
+    else if (delta <= -OI_SURGE_THRESHOLD) ev.push({ date: d1.date, delta, up: false });
+  }
+  return ev;
+}
+
+function renderOiEvents(elId, data) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const evs = oiEvents(data).slice(-10).reverse(); // 最近10条
+  if (!evs.length) { el.innerHTML = '<span class="oi-evt-empty">当前区间无大幅增仓/减仓</span>'; return; }
+  el.innerHTML = evs.map(e =>
+    `<span class="oi-evt ${e.up?'oi-up':'oi-down'}">${e.up?'增':'减'} ${fmtWan(e.delta)} · ${e.date}</span>`).join('');
+}
+
 function renderKlines() {
-  drawChart('klineT', filterByRange(tData), '#26a69a', 360);
-  drawChart('klineTL', filterByRange(tlData), '#ab47bc', 360);
+  const tRange = filterByRange(tData);
+  const tlRange = filterByRange(tlData);
+  drawChart('klineT', tRange, '#26a69a', 360);
+  drawChart('klineTL', tlRange, '#ab47bc', 360);
+  renderOiEvents('klineEventsT', tRange);
+  renderOiEvents('klineEventsTL', tlRange);
 }
 
 function setupRangeSelector() {
@@ -19643,6 +19698,7 @@ function renderAll() {
     const chgPct = prev ? ((last.c-prev.c)/prev.c*100) : 0;
     const chgDir = chgPct >= 0 ? 'red' : 'green';
     const chgArrow = chgPct >= 0 ? '▲' : '▼';
+    const oiDelta = (prev && last.oi != null && prev.oi != null) ? last.oi - prev.oi : null;
     const memberNet = ind.member_net;
     const netColor = memberNet > 0 ? 'var(--red)' : 'var(--green)';
     const netLabel = memberNet > 5000 ? '明显净多头' : (memberNet < -5000 ? '明显净空头' : (Math.abs(memberNet) < 500 ? '几乎完全对冲' : (memberNet > 0 ? '小幅净多' : '小幅净空')));
@@ -19657,6 +19713,7 @@ function renderAll() {
           <div class="ohlc-item"><span class="k">最低价</span><span class="v">${last.l||'—'}</span></div>
           <div class="ohlc-item"><span class="k">成交量</span><span class="v">${last.v?last.v.toLocaleString():'—'} 手</span></div>
           <div class="ohlc-item"><span class="k">持仓量</span><span class="v">${last.oi?last.oi.toLocaleString():'—'} 手</span></div>
+          <div class="ohlc-item"><span class="k">当日增仓</span><span class="v" style="color:${oiDelta==null?'var(--muted)':oiDelta>0?'var(--red)':oiDelta<0?'var(--green)':'var(--muted)'}">${oiDelta!=null?(oiDelta>0?'+':'')+oiDelta.toLocaleString()+' 手':'—'}</span></div>
           <div class="ohlc-item"><span class="k">涨跌幅</span><span class="v ${chgDir}">${chgPct.toFixed(4)}%</span></div>
           <div class="ohlc-item"><span class="k">保证金</span><span class="v">${D.quick_stats[code==='TZL.CFE'?'t_margin':'tl_margin']} 元/手</span></div>
         </div>
