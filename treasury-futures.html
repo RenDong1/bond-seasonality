@@ -127,9 +127,6 @@
   .kline-title .code{font-size:10px;color:var(--muted);background:#eee;padding:2px 8px;border-radius:4px;margin-left:6px}
   .kline-chart-wrap{width:100%;position:relative;background:#fafafa;border-radius:8px;border:1px solid #eee}
   .kline-chart-wrap canvas{width:100%;display:block}
-  .oi-legend{font-size:11px;font-weight:normal;color:var(--muted);margin-left:10px}
-  .oi-legend .oi-up{color:#ff6d00}
-  .oi-legend .oi-down{color:#0091ea}
   .kline-events{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:11px}
   .kline-events .oi-evt{background:#fff;border:1px solid #eee;border-radius:6px;padding:2px 8px;white-space:nowrap}
   .kline-events .oi-evt.oi-up{color:#ff6d00;border-color:#ffd180}
@@ -184,7 +181,7 @@
 
 <div class="full-panel">
   <div class="kline-header">
-    <h3>📈 K线走势<span class="oi-legend"><span class="oi-up">▲大幅增仓</span> · <span class="oi-down">▼大幅减仓</span>（单日增仓≥1万手）</span></h3>
+    <h3>📈 K线走势</h3>
     <div class="range-selector" id="rangeSelector">
       <button class="range-btn" data-range="5y">近5年</button>
       <button class="range-btn" data-range="3y">近3年</button>
@@ -19503,9 +19500,9 @@ function buildKlineOption(data) {
     if (d0.oi == null || d1.oi == null) continue;
     const delta = d1.oi - d0.oi;
     if (delta >= OI_SURGE_THRESHOLD)
-      oiScatter.push({ value: [d1.date, d1.h], symbol: 'triangle', symbolRotate: 0, symbolSize: 10, symbolOffset: [0, -10], itemStyle: { color: '#ff6d00' } });
+      oiScatter.push({ value: [d1.date, d1.h], delta: delta, symbol: 'triangle', symbolRotate: 0, symbolSize: 10, symbolOffset: [0, -10], itemStyle: { color: '#ff6d00' } });
     else if (delta <= -OI_SURGE_THRESHOLD)
-      oiScatter.push({ value: [d1.date, d1.l], symbol: 'triangle', symbolRotate: 180, symbolSize: 10, symbolOffset: [0, 10], itemStyle: { color: '#0091ea' } });
+      oiScatter.push({ value: [d1.date, d1.l], delta: delta, symbol: 'triangle', symbolRotate: 180, symbolSize: 10, symbolOffset: [0, 10], itemStyle: { color: '#0091ea' } });
   }
 
   // 斐波那契 markLine（挂在主图）
@@ -19582,7 +19579,7 @@ function buildKlineOption(data) {
     ],
     series: [
       { name: 'K线', type: 'candlestick', data: data.map(d => [d.o, d.c, d.l, d.h]), xAxisIndex: 0, yAxisIndex: 0, itemStyle: { color: UP, color0: DOWN, borderColor: UP, borderColor0: DOWN } },
-      { name: '增仓减仓', type: 'scatter', data: oiScatter, xAxisIndex: 0, yAxisIndex: 0, z: 3 },
+      { name: '增仓减仓', type: 'scatter', data: oiScatter, xAxisIndex: 0, yAxisIndex: 0, z: 3, tooltip: { trigger: 'item', formatter: function (p) { const it = p.data || {}; const up = it.delta >= 0; const dd = p.value ? p.value[0] : ''; return '<strong style="color:' + (up ? '#ff6d00' : '#0091ea') + '">' + (up ? '▲ 大幅增仓' : '▼ 大幅减仓') + '</strong><br/>' + (it.delta != null ? (up ? '+' : '') + fmtWan(it.delta) + '手' : '') + '<br/>' + dd; } } },
       { name: 'MA5', type: 'line', data: ma5, xAxisIndex: 0, yAxisIndex: 0, smooth: true, showSymbol: false, lineStyle: { width: 1, color: '#f57c00' } },
       { name: 'MA10', type: 'line', data: ma10, xAxisIndex: 0, yAxisIndex: 0, smooth: true, showSymbol: false, lineStyle: { width: 1, color: '#1976d2' } },
       { name: 'MA20', type: 'line', data: ma20, xAxisIndex: 0, yAxisIndex: 0, smooth: true, showSymbol: false, lineStyle: { width: 1, color: '#8e24aa' } },
@@ -19655,7 +19652,7 @@ function fmtDate(dateStr, spanDays) {
 
 // ====== K线日期区间选择 ======
 const RANGE_DAYS = { '5y': 365 * 5, '3y': 365 * 3, '1y': 365, '6m': 182 };
-const OI_SURGE_THRESHOLD = 10000; // 持仓变动信号: 单日增仓≥1万手=大幅增仓, ≤-1万手=大幅减仓
+const OI_SURGE_THRESHOLD = 15000; // 持仓变动信号: 单日增仓≥1.5万手=大幅增仓, ≤-1.5万手=大幅减仓
 let chartRange = '1y';
 let customStart = null, customEnd = null;
 
@@ -19810,7 +19807,7 @@ function renderAll() {
         </div>
         <div class="section-title">📊 技术指标</div>
         <div class="ind-row-5">
-          <div class="ind-card" style="border-color:#ffcc80"><div class="ind-label">增仓信号 (≥1万手)</div><div class="ind-value" style="color:${oiDelta==null?'var(--muted)':oiDelta>=OI_SURGE_THRESHOLD?'var(--red)':oiDelta<=-OI_SURGE_THRESHOLD?'var(--green)':'var(--muted)'}">${oiDelta!=null?(oiDelta>=0?'+':'')+fmtWan(oiDelta):'—'}</div><div class="ind-sub">${oiDelta==null?'—':oiDelta>=OI_SURGE_THRESHOLD?'⚠ 大幅增仓':oiDelta<=-OI_SURGE_THRESHOLD?'大幅减仓':'正常波动'}</div></div>
+          <div class="ind-card" style="border-color:#ffcc80"><div class="ind-label">增仓信号 (≥1.5万手)</div><div class="ind-value" style="color:${oiDelta==null?'var(--muted)':oiDelta>=OI_SURGE_THRESHOLD?'var(--red)':oiDelta<=-OI_SURGE_THRESHOLD?'var(--green)':'var(--muted)'}">${oiDelta!=null?(oiDelta>=0?'+':'')+fmtWan(oiDelta):'—'}</div><div class="ind-sub">${oiDelta==null?'—':oiDelta>=OI_SURGE_THRESHOLD?'⚠ 大幅增仓':oiDelta<=-OI_SURGE_THRESHOLD?'大幅减仓':'正常波动'}</div></div>
           <div class="ind-card"><div class="ind-label">MACD (DIFF)</div><div class="ind-value">${ind.macd_diff}</div><div class="ind-sub">${ind.macd_sub}</div></div>
           <div class="ind-card"><div class="ind-label">KDJ (K值)</div><div class="ind-value">${ind.kdj_k}</div><div class="ind-sub">${ind.kdj_sub}</div></div>
           <div class="ind-card"><div class="ind-label">RSI (6日)</div><div class="ind-value">${ind.rsi_6}</div><div class="ind-sub">${ind.rsi_sub}</div></div>
