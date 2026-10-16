@@ -135,6 +135,8 @@
   .kline-events .oi-evt.oi-up{color:#ff6d00;border-color:#ffd180}
   .kline-events .oi-evt.oi-down{color:#0091ea;border-color:#81d4fa}
   .kline-events .oi-evt-empty{color:var(--muted)}
+  .kline-analysis{margin-top:10px;padding:10px 14px;background:#fffde7;border:1px solid #fff59d;border-radius:8px;font-size:12px;color:#555;line-height:1.75}
+  .kline-analysis strong{color:#222}
   @media(max-width:900px){
     .main-grid{grid-template-columns:1fr}
     .signal-bar{grid-template-columns:1fr}
@@ -196,12 +198,14 @@
   </div>
   <div class="kline-item">
     <div class="kline-title">🔟 十年期国债期货<span class="code">TZL.CFE</span></div>
-    <div class="kline-chart-wrap"><canvas id="klineT"></canvas></div>
+    <div class="kline-chart-wrap"><div id="klineT" style="width:100%;height:580px"></div></div>
+    <div class="kline-analysis" id="analysisT"></div>
     <div class="kline-events" id="klineEventsT"></div>
   </div>
   <div class="kline-item">
     <div class="kline-title">🕐 三十年期国债期货<span class="code">TLZL2.CFE</span></div>
-    <div class="kline-chart-wrap"><canvas id="klineTL"></canvas></div>
+    <div class="kline-chart-wrap"><div id="klineTL" style="width:100%;height:580px"></div></div>
+    <div class="kline-analysis" id="analysisTL"></div>
     <div class="kline-events" id="klineEventsTL"></div>
   </div>
 </div>
@@ -220,6 +224,7 @@
 
 </div><!-- container -->
 
+<script src="echarts.min.js"></script>
 <script>
 // ====== DATA INJECTION ======
 const FUTURES_DATA = {
@@ -18828,12 +18833,19 @@ function computeMACD(closes, fast, slow, signal) {
   const emaFast = EMA(closes, fast);
   const emaSlow = EMA(closes, slow);
   const diffs = emaFast.map((v, i) => (v != null && emaSlow[i] != null) ? v - emaSlow[i] : null);
-  const valid = diffs.filter(v => v !== null);
-  const deaVals = EMA(valid, signal);
   const dea = new Array(diffs.length).fill(null);
-  let j = 0;
+  // DEA = EMA(signal, DIFF)，从第一个有效 diff 起顺序递推（前 signal 个 diff 取均值作种子）
+  const k = 2 / (signal + 1);
+  let prev = null, sum = 0, cnt = 0;
   for (let i = 0; i < diffs.length; i++) {
-    if (diffs[i] !== null && j < deaVals.length && deaVals[j] !== null) { dea[i] = deaVals[j]; j++; }
+    if (diffs[i] === null) continue;
+    if (prev === null) {
+      sum += diffs[i]; cnt++;
+      if (cnt === signal) { prev = sum / signal; dea[i] = prev; }
+    } else {
+      prev = diffs[i] * k + prev * (1 - k);
+      dea[i] = prev;
+    }
   }
   const bar = diffs.map((v, i) => (v !== null && dea[i] !== null) ? 2 * (v - dea[i]) : null);
   return { diff: diffs, dea, bar };
@@ -19449,115 +19461,187 @@ const tSignal = determineSignals(tData);
 const tlSignal = determineSignals(tlData);
 const risks = assessRisk(tSignal, tlSignal, tData, tlData);
 
-// ====== CHART DRAWING (日K线, 支持高度 + 日期轴) ======
-function drawChart(canvasId, data, accentColor, height) {
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.parentElement.getBoundingClientRect();
-  const W = rect.width, H = height || 320;
-  canvas.width = W * dpr; canvas.height = H * dpr;
-  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-  ctx.scale(dpr, dpr);
+// ====== CHART DRAWING (ECharts 交互式日K线: 主图 MA/BOLL/Fib + MACD/RSI 副图 + 增仓标记 + 十字光标) ======
+let klineCharts = {};
 
-  const valid = data.filter(d => d.o != null && d.h != null && d.l != null && d.c != null);
-  const n = valid.length;
-  if (n < 2) return;
+// 斐波那契回撤位（区间最高/最低为摆动区间，0 / 23.6 / 38.2 / 50 / 61.8 / 78.6 / 100%）
+function computeFib(data) {
+  const valid = data.filter(d => d.h != null && d.l != null);
+  if (valid.length < 2) return null;
+  const hi = Math.max(...valid.map(d => d.h));
+  const lo = Math.min(...valid.map(d => d.l));
+  const range = hi - lo;
+  if (range <= 0) return null;
+  const last = valid[valid.length - 1].c;
+  const up = last >= (hi + lo) / 2;   // 现价在区间上半部 → 上涨回撤，自低点向上；反之向下
+  const base = up ? lo : hi;
+  const ratios = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1];
+  const levels = ratios.map(r => base + (up ? 1 : -1) * range * r);
+  const labels = ratios.map(r => (r === 0 || r === 0.5 || r === 1) ? (r * 100) + '%' : (r * 100).toFixed(1) + '%');
+  return { hi, lo, up, levels, labels };
+}
 
-  const allH = valid.map(d => d.h), allL = valid.map(d => d.l), allV = valid.map(d => d.v);
-  const priceMin = Math.min(...allL), priceMax = Math.max(...allH);
-  const pRange = priceMax - priceMin || 0.01;
-  const pad = pRange * 0.1;
-  const chartMin = priceMin - pad, chartMax = priceMax + pad;
+function buildKlineOption(data) {
+  const closes = data.map(d => d.c);
+  const highs = data.map(d => d.h);
+  const lows = data.map(d => d.l);
+  const dates = data.map(d => d.date);
+  const ma5 = SMA(closes, 5);
+  const ma10 = SMA(closes, 10);
+  const ma20 = SMA(closes, 20);
+  const boll = computeBOLL(closes, 20, 2);
+  const macd = computeMACD(closes);
+  const rsi6 = computeRSI(closes, 6);
+  const rsi12 = computeRSI(closes, 12);
+  const UP = '#c62828', DOWN = '#2e7d32';
+  const maxV = Math.max(...data.map(d => d.v), 1);
 
-  const dateH = 18, volH = 36, gap = 8;
-  const chartH = H - volH - dateH - gap;
-  const maxV = Math.max(...allV) || 1;
-  const pw = W / (n + 0.5);
-  const bodyW = Math.max(1.5, pw * 0.65);
-  const UP_COLOR = '#c62828', DOWN_COLOR = '#2e7d32';
-  const scaleY = v => chartH * (1 - (v - chartMin) / (chartMax - chartMin));
-
-  // ---- 水平网格线 ----
-  ctx.strokeStyle = '#e8e8e8'; ctx.lineWidth = 0.5;
-  [0.25, 0.5, 0.75].forEach(ratio => {
-    const y = chartH * (1 - ratio);
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-  });
-
-  // ---- 成交量柱 ----
-  valid.forEach((d, i) => {
-    if (!d.v) return;
-    const x = (i + 0.5) * pw;
-    const bw = Math.max(1, pw * 0.6);
-    const bh = (d.v / maxV) * volH;
-    ctx.fillStyle = d.c >= d.o ? 'rgba(198,40,40,0.25)' : 'rgba(46,125,50,0.25)';
-    ctx.fillRect(x - bw/2, chartH + gap + (volH - bh), bw, Math.max(bh, 1));
-  });
-
-  // ---- K线 ----
-  valid.forEach((d, i) => {
-    const x = (i + 0.5) * pw;
-    const isUp = d.c >= d.o;
-    const color = isUp ? UP_COLOR : DOWN_COLOR;
-    const highY = scaleY(d.h), lowY = scaleY(d.l);
-    const openY = scaleY(d.o), closeY = scaleY(d.c);
-    const bodyTop = Math.min(openY, closeY);
-    const bodyHt = Math.max(Math.abs(closeY - openY), 0.5);
-    ctx.strokeStyle = color; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(x, highY); ctx.lineTo(x, lowY); ctx.stroke();
-    ctx.fillStyle = isUp ? UP_COLOR : '#fff';
-    ctx.fillRect(x - bodyW/2, bodyTop, bodyW, bodyHt);
-    ctx.strokeRect(x - bodyW/2, bodyTop, bodyW, bodyHt);
-  });
-
-  // ---- 持仓变动信号标记 (大幅增仓▲ / 大幅减仓▼) ----
-  for (let i = 1; i < n; i++) {
-    const d0 = valid[i-1], d1 = valid[i];
+  // 增仓/减仓 markPoint（▲大幅增仓 / ▼大幅减仓）
+  const oiPoints = [];
+  for (let i = 1; i < data.length; i++) {
+    const d0 = data[i-1], d1 = data[i];
     if (d0.oi == null || d1.oi == null) continue;
     const delta = d1.oi - d0.oi;
-    if (delta < OI_SURGE_THRESHOLD && delta > -OI_SURGE_THRESHOLD) continue;
-    const up = delta > 0;
-    const x = (i + 0.5) * pw;
-    const y = up ? scaleY(d1.h) - 5 : scaleY(d1.l) + 5;
-    ctx.fillStyle = up ? '#ff6d00' : '#0091ea';
-    ctx.beginPath();
-    if (up) { ctx.moveTo(x, y - 6); ctx.lineTo(x - 4, y); ctx.lineTo(x + 4, y); }
-    else { ctx.moveTo(x, y + 6); ctx.lineTo(x - 4, y); ctx.lineTo(x + 4, y); }
-    ctx.closePath(); ctx.fill();
+    if (delta >= OI_SURGE_THRESHOLD)
+      oiPoints.push({ coord: [i, d1.h], value: '增' + fmtWan(delta), symbol: 'triangle', symbolRotate: 0, symbolSize: 10, symbolOffset: [0, -10], itemStyle: { color: '#ff6d00' } });
+    else if (delta <= -OI_SURGE_THRESHOLD)
+      oiPoints.push({ coord: [i, d1.l], value: '减' + fmtWan(delta), symbol: 'triangle', symbolRotate: 180, symbolSize: 10, symbolOffset: [0, 10], itemStyle: { color: '#0091ea' } });
   }
 
-  // ---- 价格标签 ----
-  ctx.fillStyle = '#666'; ctx.font = '10px "Segoe UI","PingFang SC",sans-serif';
-  ctx.fillText(priceMax.toFixed(3), 4, 12);
-  ctx.fillText(priceMin.toFixed(3), 4, chartH - 2);
+  // 斐波那契 markLine（挂在主图）
+  const fib = computeFib(data);
+  const fibLines = fib ? fib.labels.map((lbl, k) => ({
+    yAxis: fib.levels[k],
+    label: { formatter: 'Fib ' + lbl, position: 'insideEndTop', color: '#e65100', fontSize: 10 },
+    lineStyle: { type: 'dashed', color: '#e65100', opacity: 0.45, width: 1 }
+  })) : [];
 
-  // 最新收盘价标注
-  const last = valid[n - 1];
-  const lx = (n - 0.5) * pw, ly = scaleY(last.c);
-  ctx.fillStyle = accentColor || '#333';
-  ctx.font = 'bold 11px "Segoe UI","PingFang SC",sans-serif';
-  const label = last.c.toFixed(3);
-  ctx.fillText(label, Math.min(lx + 4, W - 56), ly - 4);
-  ctx.fillStyle = accentColor || '#333'; ctx.beginPath();
-  ctx.arc(lx, ly, 3, 0, Math.PI*2); ctx.fill();
+  const tooltipFormatter = function (params) {
+    const p = Array.isArray(params) ? params : [params];
+    const idx = p[0] && p[0].dataIndex;
+    const d = data[idx];
+    if (!d) return '';
+    const up = d.c >= d.o;
+    const cc = up ? UP : DOWN;
+    const oiDelta = idx > 0 && d.oi != null && data[idx-1].oi != null ? d.oi - data[idx-1].oi : null;
+    const chg = idx > 0 ? ((d.c - data[idx-1].c) / data[idx-1].c * 100) : 0;
+    const row = (k, v, style) => `<tr><td style="color:#888;padding-right:10px">${k}</td><td style="text-align:right;${style||''}">${v}</td></tr>`;
+    let html = `<div style="font-weight:700;margin-bottom:4px">${d.date}</div><table style="font-size:11px;line-height:1.7">`;
+    html += row('开盘', d.o.toFixed(3));
+    html += row('收盘', d.c.toFixed(3), `color:${cc};font-weight:600`);
+    html += row('最高', d.h.toFixed(3));
+    html += row('最低', d.l.toFixed(3));
+    html += row('涨跌', (chg >= 0 ? '+' : '') + chg.toFixed(3) + '%', `color:${chg >= 0 ? UP : DOWN}`);
+    html += row('成交量', d.v.toLocaleString() + ' 手');
+    html += row('持仓', (d.oi != null ? d.oi.toLocaleString() : '—') + ' 手');
+    if (oiDelta != null) html += row('增仓', (oiDelta >= 0 ? '+' : '') + oiDelta.toLocaleString() + ' 手', `color:${oiDelta >= 0 ? UP : DOWN}`);
+    if (ma5[idx] != null) html += row('MA5/10/20', `${ma5[idx].toFixed(3)} / ${ma10[idx].toFixed(3)} / ${ma20[idx].toFixed(3)}`);
+    if (boll.upper[idx] != null) html += row('BOLL', `上${boll.upper[idx].toFixed(3)} 中${boll.mid[idx].toFixed(3)} 下${boll.lower[idx].toFixed(3)}`);
+    if (macd.diff[idx] != null) html += row('MACD', `DIFF ${macd.diff[idx].toFixed(3)} / DEA ${macd.dea[idx] != null ? macd.dea[idx].toFixed(3) : '—'}`);
+    if (rsi6[idx] != null) html += row('RSI(6/12)', `${rsi6[idx].toFixed(1)} / ${rsi12[idx].toFixed(1)}`);
+    html += '</table>';
+    return html;
+  };
 
-  // ---- 日期轴(稀疏标签) ----
-  let spanDays = 0;
-  try { spanDays = (new Date(valid[n-1].date) - new Date(valid[0].date)) / 86400000; } catch(e) {}
-  const tickCount = Math.max(2, Math.min(6, Math.floor(W / 120)));
-  ctx.fillStyle = '#999'; ctx.font = '9px "Segoe UI","PingFang SC",sans-serif';
-  for (let k = 0; k < tickCount; k++) {
-    const idx = Math.round(k * (n - 1) / (tickCount - 1));
-    const txt = fmtDate(valid[idx].date, spanDays);
-    const x = (idx + 0.5) * pw;
-    const tw = ctx.measureText(txt).width;
-    let tx = x - tw / 2;
-    if (k === 0) tx = 4;
-    if (k === tickCount - 1) tx = Math.min(tx, W - tw - 4);
-    ctx.fillText(txt, tx, chartH + gap + volH + 12);
+  return {
+    animation: false,
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross', crossStyle: { color: '#bbb' }, label: { backgroundColor: '#333', color: '#fff' } },
+      backgroundColor: 'rgba(255,255,255,0.97)',
+      borderColor: '#e0e0e0',
+      textStyle: { color: '#333' },
+      formatter: tooltipFormatter
+    },
+    axisPointer: { link: [{ xAxisIndex: 'all' }] },
+    legend: {
+      data: ['MA5', 'MA10', 'MA20', 'BOLL上轨', 'BOLL中轨', 'BOLL下轨', 'VOL', 'MACD', 'DIFF', 'DEA', 'RSI6', 'RSI12'],
+      top: 0, left: 0, type: 'scroll', textStyle: { fontSize: 10 }, itemWidth: 14, itemHeight: 8
+    },
+    grid: [
+      { left: 56, right: 20, top: 26, height: 300 },
+      { left: 56, right: 20, top: 352, height: 84 },
+      { left: 56, right: 20, top: 462, height: 88 }
+    ],
+    xAxis: [
+      { type: 'category', data: dates, boundaryGap: true, gridIndex: 0, axisLine: { lineStyle: { color: '#ddd' } }, axisLabel: { show: false }, axisTick: { show: false } },
+      { type: 'category', data: dates, boundaryGap: true, gridIndex: 1, axisLine: { lineStyle: { color: '#ddd' } }, axisLabel: { show: false }, axisTick: { show: false } },
+      { type: 'category', data: dates, boundaryGap: true, gridIndex: 2, axisLine: { lineStyle: { color: '#ddd' } }, axisLabel: { show: true, fontSize: 9, color: '#999' }, axisTick: { show: false } }
+    ],
+    yAxis: [
+      { scale: true, gridIndex: 0, position: 'left', axisLabel: { fontSize: 9, color: '#666' }, splitLine: { lineStyle: { color: '#f0f0f0' } } },
+      { scale: true, gridIndex: 1, position: 'left', axisLabel: { fontSize: 9, color: '#666' }, splitLine: { lineStyle: { color: '#f0f0f0' } } },
+      { min: 0, max: 100, gridIndex: 2, position: 'left', axisLabel: { fontSize: 9, color: '#666' }, splitLine: { lineStyle: { color: '#f0f0f0' } } },
+      { gridIndex: 0, position: 'right', min: 0, max: maxV * 4, show: false }
+    ],
+    dataZoom: [
+      { type: 'inside', xAxisIndex: [0, 1, 2], start: 0, end: 100 },
+      { type: 'slider', xAxisIndex: [0, 1, 2], start: 0, end: 100, bottom: 0, height: 24, borderColor: '#eee', fillerColor: 'rgba(26,35,126,0.08)', handleStyle: { color: '#1a237e' }, textStyle: { fontSize: 9 } }
+    ],
+    series: [
+      { name: 'K线', type: 'candlestick', data: data.map(d => [d.o, d.c, d.l, d.h]), xAxisIndex: 0, yAxisIndex: 0, itemStyle: { color: UP, color0: DOWN, borderColor: UP, borderColor0: DOWN }, markPoint: { data: oiPoints, symbolSize: 10, label: { show: false } } },
+      { name: 'MA5', type: 'line', data: ma5, xAxisIndex: 0, yAxisIndex: 0, smooth: true, showSymbol: false, lineStyle: { width: 1, color: '#f57c00' } },
+      { name: 'MA10', type: 'line', data: ma10, xAxisIndex: 0, yAxisIndex: 0, smooth: true, showSymbol: false, lineStyle: { width: 1, color: '#1976d2' } },
+      { name: 'MA20', type: 'line', data: ma20, xAxisIndex: 0, yAxisIndex: 0, smooth: true, showSymbol: false, lineStyle: { width: 1, color: '#8e24aa' } },
+      { name: 'BOLL上轨', type: 'line', data: boll.upper, xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1, type: 'dashed', color: '#b0bec5' }, markLine: { symbol: 'none', silent: true, data: fibLines } },
+      { name: 'BOLL中轨', type: 'line', data: boll.mid, xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1, color: '#90a4ae' } },
+      { name: 'BOLL下轨', type: 'line', data: boll.lower, xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1, type: 'dashed', color: '#b0bec5' } },
+      { name: 'VOL', type: 'bar', data: data.map(d => ({ value: d.v, itemStyle: { color: d.c >= d.o ? 'rgba(198,40,40,0.35)' : 'rgba(46,125,50,0.35)' } })), xAxisIndex: 0, yAxisIndex: 3, barWidth: '60%' },
+      { name: 'MACD', type: 'bar', data: macd.bar, xAxisIndex: 1, yAxisIndex: 1, barWidth: '60%', itemStyle: { color: function (p) { return p.value == null ? 'transparent' : (p.value >= 0 ? UP : DOWN); } } },
+      { name: 'DIFF', type: 'line', data: macd.diff, xAxisIndex: 1, yAxisIndex: 1, showSymbol: false, lineStyle: { width: 1, color: '#1976d2' } },
+      { name: 'DEA', type: 'line', data: macd.dea, xAxisIndex: 1, yAxisIndex: 1, showSymbol: false, lineStyle: { width: 1, color: '#f57c00' } },
+      { name: 'RSI6', type: 'line', data: rsi6, xAxisIndex: 2, yAxisIndex: 2, showSymbol: false, lineStyle: { width: 1, color: '#1976d2' } },
+      { name: 'RSI12', type: 'line', data: rsi12, xAxisIndex: 2, yAxisIndex: 2, showSymbol: false, lineStyle: { width: 1, color: '#f57c00' }, markLine: { symbol: 'none', silent: true, data: [{ yAxis: 70, label: { formatter: '70', position: 'insideEndTop', color: '#bbb' } }, { yAxis: 30, label: { formatter: '30', position: 'insideEndTop', color: '#bbb' } }], lineStyle: { type: 'dashed', color: '#bbb' } } }
+    ]
+  };
+}
+
+// ====== 盘面分析文本（基于本地自算指标自动生成） ======
+function generateAnalysis(data, name) {
+  const n = data.length;
+  if (n < 20) return '';
+  const closes = data.map(d => d.c);
+  const highs = data.map(d => d.h);
+  const lows = data.map(d => d.l);
+  const last = n - 1;
+  const ma5 = SMA(closes, 5)[last];
+  const ma20 = SMA(closes, 20)[last];
+  const boll = computeBOLL(closes, 20, 2);
+  const macd = computeMACD(closes);
+  const rsi = computeRSI(closes, 6)[last];
+  const chg = (closes[last] - closes[last-1]) / closes[last-1] * 100;
+  const oiDelta = (data[last].oi != null && data[last-1].oi != null) ? data[last].oi - data[last-1].oi : null;
+
+  const parts = [];
+  if (closes[last] > ma5 && ma5 > ma20) parts.push('价格站上MA5且MA5>MA20，短期趋势偏强');
+  else if (closes[last] < ma5 && ma5 < ma20) parts.push('价格跌破MA5且MA5<MA20，短期趋势偏弱');
+  else parts.push('价格围绕均线震荡，方向暂不明朗');
+  if (closes[last] > boll.upper[last]) parts.push('突破布林上轨，短线超买或存回落压力');
+  else if (closes[last] < boll.lower[last]) parts.push('跌破布林下轨，短线超卖或迎技术性反弹');
+  else if (closes[last] > boll.mid[last]) parts.push('运行于布林中轨上方，多头占优');
+  else parts.push('运行于布林中轨下方，空头占优');
+  if (macd.diff[last] != null && macd.dea[last] != null) {
+    if (macd.diff[last] > macd.dea[last] && macd.diff[last] > 0) parts.push('MACD金叉且零轴上方，动能偏多');
+    else if (macd.diff[last] < macd.dea[last] && macd.diff[last] < 0) parts.push('MACD死叉且零轴下方，动能偏空');
+    else parts.push('MACD动能柱收敛，多空胶着');
   }
+  if (rsi != null) {
+    if (rsi > 70) parts.push('RSI(6)=' + rsi.toFixed(0) + ' 进入超买区');
+    else if (rsi < 30) parts.push('RSI(6)=' + rsi.toFixed(0) + ' 进入超卖区');
+    else parts.push('RSI(6)=' + rsi.toFixed(0) + ' 处中性区间');
+  }
+  if (oiDelta != null && oiDelta >= OI_SURGE_THRESHOLD) parts.push('当日大幅增仓' + fmtWan(oiDelta) + '，多头资金主动进场');
+  else if (oiDelta != null && oiDelta <= -OI_SURGE_THRESHOLD) parts.push('当日大幅减仓' + fmtWan(oiDelta) + '，注意多头离场');
+  else if (oiDelta != null) parts.push('持仓' + (oiDelta >= 0 ? '小幅增加' : '小幅减少') + fmtWan(Math.abs(oiDelta)));
+  parts.push('当日收盘' + (chg >= 0 ? '上涨' : '下跌') + Math.abs(chg).toFixed(3) + '%');
+
+  return '<strong>' + name + '</strong>：' + parts.join('；') + '。';
+}
+
+function renderAnalysis(elId, data, name) {
+  const el = document.getElementById(elId);
+  if (el) el.innerHTML = generateAnalysis(data, name);
 }
 
 // 日期标签格式化：跨年显示 YYYY-MM，年内显示 MM-DD
@@ -19619,12 +19703,17 @@ function renderOiEvents(elId, data) {
 }
 
 function renderKlines() {
+  if (typeof echarts === 'undefined') return;
   const tRange = filterByRange(tData);
   const tlRange = filterByRange(tlData);
-  drawChart('klineT', tRange, '#26a69a', 360);
-  drawChart('klineTL', tlRange, '#ab47bc', 360);
+  if (!klineCharts.klineT) klineCharts.klineT = echarts.init(document.getElementById('klineT'));
+  if (!klineCharts.klineTL) klineCharts.klineTL = echarts.init(document.getElementById('klineTL'));
+  klineCharts.klineT.setOption(buildKlineOption(tRange), true);
+  klineCharts.klineTL.setOption(buildKlineOption(tlRange), true);
   renderOiEvents('klineEventsT', tRange);
   renderOiEvents('klineEventsTL', tlRange);
+  renderAnalysis('analysisT', tRange, '十年期国债期货');
+  renderAnalysis('analysisTL', tlRange, '三十年期国债期货');
 }
 
 function setupRangeSelector() {
@@ -19719,6 +19808,7 @@ function renderAll() {
         </div>
         <div class="section-title">📊 技术指标</div>
         <div class="ind-row-5">
+          <div class="ind-card" style="border-color:#ffcc80"><div class="ind-label">增仓信号 (≥1万手)</div><div class="ind-value" style="color:${oiDelta==null?'var(--muted)':oiDelta>=OI_SURGE_THRESHOLD?'var(--red)':oiDelta<=-OI_SURGE_THRESHOLD?'var(--green)':'var(--muted)'}">${oiDelta!=null?(oiDelta>=0?'+':'')+fmtWan(oiDelta):'—'}</div><div class="ind-sub">${oiDelta==null?'—':oiDelta>=OI_SURGE_THRESHOLD?'⚠ 大幅增仓':oiDelta<=-OI_SURGE_THRESHOLD?'大幅减仓':'正常波动'}</div></div>
           <div class="ind-card"><div class="ind-label">MACD (DIFF)</div><div class="ind-value">${ind.macd_diff}</div><div class="ind-sub">${ind.macd_sub}</div></div>
           <div class="ind-card"><div class="ind-label">KDJ (K值)</div><div class="ind-value">${ind.kdj_k}</div><div class="ind-sub">${ind.kdj_sub}</div></div>
           <div class="ind-card"><div class="ind-label">RSI (6日)</div><div class="ind-value">${ind.rsi_6}</div><div class="ind-sub">${ind.rsi_sub}</div></div>
@@ -19790,7 +19880,7 @@ function renderAll() {
 
 window.addEventListener('DOMContentLoaded', renderAll);
 window.addEventListener('resize', () => {
-  renderKlines();
+  Object.values(klineCharts).forEach(c => c && c.resize());
 });
 </script>
 </body>
