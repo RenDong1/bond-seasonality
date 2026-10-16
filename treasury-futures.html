@@ -19689,8 +19689,15 @@ function renderKlines() {
   const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
   if (!klineCharts.klineT) klineCharts.klineT = echarts.init(document.getElementById('klineT'), null, { devicePixelRatio: dpr });
   if (!klineCharts.klineTL) klineCharts.klineTL = echarts.init(document.getElementById('klineTL'), null, { devicePixelRatio: dpr });
-  klineCharts.klineT.setOption(buildKlineOption(tRange), true);
-  klineCharts.klineTL.setOption(buildKlineOption(tlRange), true);
+  const tOpt = buildKlineOption(tRange);
+  const tlOpt = buildKlineOption(tlRange);
+  // 保留当前图例选中状态：调整时间区间时不重置已开/关的指标
+  const tSel = (klineCharts.klineT.getOption().legend || [{}])[0].selected;
+  const tlSel = (klineCharts.klineTL.getOption().legend || [{}])[0].selected;
+  if (tSel) tOpt.legend.selected = tSel;
+  if (tlSel) tlOpt.legend.selected = tlSel;
+  klineCharts.klineT.setOption(tOpt, true);
+  klineCharts.klineTL.setOption(tlOpt, true);
   renderOiEvents('klineEventsT', tRange);
   renderOiEvents('klineEventsTL', tlRange);
   renderAnalysis('analysisT', tRange, '十年期国债期货');
