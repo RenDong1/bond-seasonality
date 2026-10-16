@@ -19496,16 +19496,16 @@ function buildKlineOption(data) {
   const UP = '#c62828', DOWN = '#2e7d32';
   const maxV = Math.max(...data.map(d => d.v), 1);
 
-  // 增仓/减仓 markPoint（▲大幅增仓 / ▼大幅减仓）
-  const oiPoints = [];
+  // 增仓/减仓标记（▲大幅增仓 / ▼大幅减仓，独立 legend 项可开关）
+  const oiScatter = [];
   for (let i = 1; i < data.length; i++) {
     const d0 = data[i-1], d1 = data[i];
     if (d0.oi == null || d1.oi == null) continue;
     const delta = d1.oi - d0.oi;
     if (delta >= OI_SURGE_THRESHOLD)
-      oiPoints.push({ coord: [i, d1.h], value: '增' + fmtWan(delta), symbol: 'triangle', symbolRotate: 0, symbolSize: 10, symbolOffset: [0, -10], itemStyle: { color: '#ff6d00' } });
+      oiScatter.push({ value: [d1.date, d1.h], symbol: 'triangle', symbolRotate: 0, symbolSize: 10, symbolOffset: [0, -10], itemStyle: { color: '#ff6d00' } });
     else if (delta <= -OI_SURGE_THRESHOLD)
-      oiPoints.push({ coord: [i, d1.l], value: '减' + fmtWan(delta), symbol: 'triangle', symbolRotate: 180, symbolSize: 10, symbolOffset: [0, 10], itemStyle: { color: '#0091ea' } });
+      oiScatter.push({ value: [d1.date, d1.l], symbol: 'triangle', symbolRotate: 180, symbolSize: 10, symbolOffset: [0, 10], itemStyle: { color: '#0091ea' } });
   }
 
   // 斐波那契 markLine（挂在主图）
@@ -19556,7 +19556,8 @@ function buildKlineOption(data) {
     },
     axisPointer: { link: [{ xAxisIndex: 'all' }] },
     legend: {
-      data: ['MA5', 'MA10', 'MA20', 'BOLL上轨', 'BOLL中轨', 'BOLL下轨', 'VOL', 'MACD', 'DIFF', 'DEA', 'RSI6', 'RSI12'],
+      data: ['增仓减仓', 'MA5', 'MA10', 'MA20', 'BOLL上轨', 'BOLL中轨', 'BOLL下轨', 'VOL', 'MACD', 'DIFF', 'DEA', 'RSI6', 'RSI12'],
+      selected: { '增仓减仓': false, 'MA5': false, 'MA10': false, 'MA20': false, 'BOLL上轨': false, 'BOLL中轨': false, 'BOLL下轨': false, 'VOL': false, 'MACD': false, 'DIFF': false, 'DEA': false, 'RSI6': false, 'RSI12': false },
       top: 0, left: 0, type: 'scroll', textStyle: { fontSize: 10 }, itemWidth: 14, itemHeight: 8
     },
     grid: [
@@ -19580,7 +19581,8 @@ function buildKlineOption(data) {
       { type: 'slider', xAxisIndex: [0, 1, 2], start: 0, end: 100, bottom: 0, height: 24, borderColor: '#eee', fillerColor: 'rgba(26,35,126,0.08)', handleStyle: { color: '#1a237e' }, textStyle: { fontSize: 9 } }
     ],
     series: [
-      { name: 'K线', type: 'candlestick', data: data.map(d => [d.o, d.c, d.l, d.h]), xAxisIndex: 0, yAxisIndex: 0, itemStyle: { color: UP, color0: DOWN, borderColor: UP, borderColor0: DOWN }, markPoint: { data: oiPoints, symbolSize: 10, label: { show: false } } },
+      { name: 'K线', type: 'candlestick', data: data.map(d => [d.o, d.c, d.l, d.h]), xAxisIndex: 0, yAxisIndex: 0, itemStyle: { color: UP, color0: DOWN, borderColor: UP, borderColor0: DOWN } },
+      { name: '增仓减仓', type: 'scatter', data: oiScatter, xAxisIndex: 0, yAxisIndex: 0, z: 3 },
       { name: 'MA5', type: 'line', data: ma5, xAxisIndex: 0, yAxisIndex: 0, smooth: true, showSymbol: false, lineStyle: { width: 1, color: '#f57c00' } },
       { name: 'MA10', type: 'line', data: ma10, xAxisIndex: 0, yAxisIndex: 0, smooth: true, showSymbol: false, lineStyle: { width: 1, color: '#1976d2' } },
       { name: 'MA20', type: 'line', data: ma20, xAxisIndex: 0, yAxisIndex: 0, smooth: true, showSymbol: false, lineStyle: { width: 1, color: '#8e24aa' } },
