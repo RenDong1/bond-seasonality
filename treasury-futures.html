@@ -19619,9 +19619,9 @@ function buildContractChart(prefix, name) {
         document.getElementById(it.panel).style.display = show ? '' : 'none';
         if (show) {
           // 容器从 display:none 恢复后，autoSize 的 ResizeObserver 需下一帧才完成重测；
-          // 立即 fitContent 会基于 0 宽算错可见范围，且副图前导 null 数据起点晚于 K 线，
-          // 导致时间轴与主图错位。这里延迟两帧后按「主图当前可见时间范围」强制对齐。
-          requestAnimationFrame(() => requestAnimationFrame(() => syncPanelsToMain()));
+          // 立即 fitContent 会基于 0 宽算错可见范围。这里延迟两帧后按主图当前可见时间
+          // 范围强制对齐（syncFrom 会同步其余三图，含刚显示的这张）。
+          requestAnimationFrame(() => requestAnimationFrame(() => syncFrom(cMain)));
         }
       } else if (it.fib) {
         fibOn = show;
@@ -19668,19 +19668,32 @@ function buildContractChart(prefix, name) {
     [cMain, cMacd, cRsi, cOi].forEach(ch => ch.timeScale().fitContent());
   }
 
-  // —— 时间轴同步：三个副图(隐藏态 0 宽)各自 fitContent 无法与主图对齐，
-  //    统一按「主图当前可见时间范围」同步（按 time 值对齐，绕开副图前导 null
-  //    导致的数据起点错位），保证副图横轴与 K 线一致 ——
-  function syncPanelsToMain() {
-    const vr = cMain.timeScale().getVisibleRange();
-    if (!vr) return;
+  // —— 四图时间轴双向联动：任一图（主图或副图）滚轮缩放/拖动平移，其余三图跟随
+  //    同一时间范围，横轴始终对齐（副图前导 null 已用空白点补齐，时间范围与主图一致）。
+  //    用 syncing 标志阻断 setVisibleRange 同步触发的 change 回调，避免 A→B、B→A 循环。 ——
+  let syncing = false;
+  const allPanels = [cMain, cMacd, cRsi, cOi];
+  const sameTime = (a, b) => a && b && a.year === b.year && a.month === b.month && a.day === b.day;
+
+  function syncFrom(source) {
+    if (syncing) return;
+    const vr = source.timeScale().getVisibleRange();
+    if (!vr) return;                 // 0 宽隐藏态无可见范围
     const r = { from: vr.from, to: vr.to };
-    [cMacd, cRsi, cOi].forEach(ch => {
-      try { ch.timeScale().setVisibleRange(r); } catch (e) { /* 隐藏态 0 宽可能抛错，忽略 */ }
-    });
+    syncing = true;
+    try {
+      allPanels.forEach(ch => {
+        if (ch === source) return;
+        const cur = ch.timeScale().getVisibleRange();
+        if (cur && sameTime(cur.from, r.from) && sameTime(cur.to, r.to)) return;
+        try { ch.timeScale().setVisibleRange(r); } catch (e) { /* 隐藏态可能抛错，忽略 */ }
+      });
+    } finally {
+      syncing = false;
+    }
   }
-  // 主图缩放/平移/自适应时同步副图（轻量库默认允许缩放，否则缩放后副图横轴又错位）
-  cMain.timeScale().subscribeVisibleLogicalRangeChange(() => syncPanelsToMain());
+
+  allPanels.forEach(ch => ch.timeScale().subscribeVisibleLogicalRangeChange(() => syncFrom(ch)));
 
   return { render };
 }
