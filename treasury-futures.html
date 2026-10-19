@@ -19633,6 +19633,7 @@ function buildContractChart(prefix, name) {
 
   function render(data) {
     lastData = data;
+    dataLen = data.length;
     const closes = data.map(d => d.c);
     const ma5v = SMA(closes, 5), ma10v = SMA(closes, 10), ma20v = SMA(closes, 20);
     const boll = computeBOLL(closes, 20, 2);
@@ -19668,25 +19669,36 @@ function buildContractChart(prefix, name) {
     [cMain, cMacd, cRsi, cOi].forEach(ch => ch.timeScale().fitContent());
   }
 
-  // —— 四图时间轴双向联动：任一图（主图或副图）滚轮缩放/拖动平移，其余三图跟随
-  //    同一时间范围，横轴始终对齐（副图前导 null 已用空白点补齐，时间范围与主图一致）。
-  //    用 syncing 标志阻断 setVisibleRange 同步触发的 change 回调，避免 A→B、B→A 循环。 ——
+  // —— 四图时间轴双向联动：任一图（主图或副图）滚轮缩放/拖动平移，其余三图跟随同一
+  //    时间范围。用 logical range（柱索引）而非 time range 同步：time range 在超出数据
+  //    时会 clamp 到边界、丢失留白信息，导致缩小/拖拽超出数据时副图不跟随；logical
+  //    range 能保留真实范围。同步时再把范围 clamp 回 [0, dataLen]，禁止留空——缩小或
+  //    拖拽超出数据时整体收回，四图都不显示空白。syncing 标志阻断 setVisibleLogicalRange
+  //    同步触发的 change 回调，避免 A→B、B→A 循环。 ——
   let syncing = false;
+  let dataLen = 0;
   const allPanels = [cMain, cMacd, cRsi, cOi];
-  const sameTime = (a, b) => a && b && a.year === b.year && a.month === b.month && a.day === b.day;
 
   function syncFrom(source) {
     if (syncing) return;
-    const vr = source.timeScale().getVisibleRange();
-    if (!vr) return;                 // 0 宽隐藏态无可见范围
-    const r = { from: vr.from, to: vr.to };
+    const lr = source.timeScale().getVisibleLogicalRange();
+    if (!lr) return;                 // 0 宽隐藏态无可见范围
+    const span = lr.to - lr.from;
+    let from = lr.from, to = lr.to;
+    if (dataLen > 0) {
+      if (span >= dataLen) { from = 0; to = dataLen; }
+      else {
+        if (from < 0) { from = 0; to = span; }
+        if (to > dataLen) { to = dataLen; from = dataLen - span; }
+      }
+    }
+    const r = { from, to };
     syncing = true;
     try {
       allPanels.forEach(ch => {
-        if (ch === source) return;
-        const cur = ch.timeScale().getVisibleRange();
-        if (cur && sameTime(cur.from, r.from) && sameTime(cur.to, r.to)) return;
-        try { ch.timeScale().setVisibleRange(r); } catch (e) { /* 隐藏态可能抛错，忽略 */ }
+        const cur = ch.timeScale().getVisibleLogicalRange();
+        if (cur && Math.abs(cur.from - from) < 0.5 && Math.abs(cur.to - to) < 0.5) return;
+        try { ch.timeScale().setVisibleLogicalRange(r); } catch (e) { /* 隐藏态可能抛错，忽略 */ }
       });
     } finally {
       syncing = false;
