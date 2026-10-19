@@ -19521,10 +19521,12 @@ function toBD(dateStr) {
   return { year: p[0], month: p[1], day: p[2] };
 }
 
-// 指标数组存在前导 null（SMA/MACD/RSI 初期无值），逐点跳过，避免把 null 传给图表
+// 指标数组存在前导 null（SMA/MACD/RSI 初期无值）。保留这些时间点（仅 time 的空数据，
+// 即「空白」），使指标序列的时间范围与 K 线一致，副图横轴才能与主图对齐；否则跳过前导
+// null 会让副图数据起点晚于 K 线，setVisibleRange 也无法把起点往前对齐。
 function lineData(times, values) {
   const out = [];
-  for (let i = 0; i < times.length; i++) if (values[i] != null) out.push({ time: times[i], value: values[i] });
+  for (let i = 0; i < times.length; i++) out.push(values[i] == null ? { time: times[i] } : { time: times[i], value: values[i] });
   return out;
 }
 
@@ -19615,7 +19617,12 @@ function buildContractChart(prefix, name) {
         cMain.priceScale('right').applyOptions({ scaleMargins: show ? { top: 0.08, bottom: 0.22 } : { top: 0.08, bottom: 0.08 } });
       } else if (it.panel) {
         document.getElementById(it.panel).style.display = show ? '' : 'none';
-        if (show) it.chart.timeScale().fitContent();  // 显示后按容器宽度重新适配
+        if (show) {
+          // 容器从 display:none 恢复后，autoSize 的 ResizeObserver 需下一帧才完成重测；
+          // 立即 fitContent 会基于 0 宽算错可见范围，且副图前导 null 数据起点晚于 K 线，
+          // 导致时间轴与主图错位。这里延迟两帧后按「主图当前可见时间范围」强制对齐。
+          requestAnimationFrame(() => requestAnimationFrame(() => syncPanelsToMain()));
+        }
       } else if (it.fib) {
         fibOn = show;
         if (lastData) drawFib(computeFib(lastData));
@@ -19644,7 +19651,7 @@ function buildContractChart(prefix, name) {
     bollL.setData(lineData(times, boll.lower));
 
     const macdBarData = [];
-    for (let i = 0; i < times.length; i++) if (macd.bar[i] != null) macdBarData.push({ time: times[i], value: macd.bar[i], color: macd.bar[i] >= 0 ? KUP : KDOWN });
+    for (let i = 0; i < times.length; i++) macdBarData.push(macd.bar[i] == null ? { time: times[i] } : { time: times[i], value: macd.bar[i], color: macd.bar[i] >= 0 ? KUP : KDOWN });
     macdBar.setData(macdBarData);
     macdDiff.setData(lineData(times, macd.diff));
     macdDea.setData(lineData(times, macd.dea));
@@ -19653,13 +19660,27 @@ function buildContractChart(prefix, name) {
     rsi12.setData(lineData(times, rsi12v));
 
     const oiData = [];
-    for (let i = 0; i < times.length; i++) if (oiDelta[i] != null) oiData.push({ time: times[i], value: oiDelta[i], color: oiDelta[i] >= 0 ? KUP : KDOWN });
+    for (let i = 0; i < times.length; i++) oiData.push(oiDelta[i] == null ? { time: times[i] } : { time: times[i], value: oiDelta[i], color: oiDelta[i] >= 0 ? KUP : KDOWN });
     oiBar.setData(oiData);
 
     drawFib(computeFib(data));
 
     [cMain, cMacd, cRsi, cOi].forEach(ch => ch.timeScale().fitContent());
   }
+
+  // —— 时间轴同步：三个副图(隐藏态 0 宽)各自 fitContent 无法与主图对齐，
+  //    统一按「主图当前可见时间范围」同步（按 time 值对齐，绕开副图前导 null
+  //    导致的数据起点错位），保证副图横轴与 K 线一致 ——
+  function syncPanelsToMain() {
+    const vr = cMain.timeScale().getVisibleRange();
+    if (!vr) return;
+    const r = { from: vr.from, to: vr.to };
+    [cMacd, cRsi, cOi].forEach(ch => {
+      try { ch.timeScale().setVisibleRange(r); } catch (e) { /* 隐藏态 0 宽可能抛错，忽略 */ }
+    });
+  }
+  // 主图缩放/平移/自适应时同步副图（轻量库默认允许缩放，否则缩放后副图横轴又错位）
+  cMain.timeScale().subscribeVisibleLogicalRangeChange(() => syncPanelsToMain());
 
   return { render };
 }
