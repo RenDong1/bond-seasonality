@@ -19555,7 +19555,7 @@ function buildKlineOption(data) {
     tooltip: {
       trigger: 'axis',
       transitionDuration: 0,
-      axisPointer: { type: 'cross', animation: false, crossStyle: { color: '#bbb' }, label: { backgroundColor: '#333', color: '#fff' } },
+      axisPointer: { type: 'line', snap: true, animation: false, lineStyle: { color: '#bbb', type: 'dashed' }, label: { backgroundColor: '#333', color: '#fff' } },
       backgroundColor: 'rgba(255,255,255,0.97)',
       borderColor: '#e0e0e0',
       textStyle: { color: '#333' },
