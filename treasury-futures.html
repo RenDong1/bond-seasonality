@@ -180,9 +180,9 @@
     <div class="kline-chart-wrap">
       <div class="kline-legend" id="legendT"></div>
       <div id="kT-main" style="width:100%;height:340px"></div>
-      <div id="kT-macd" style="width:100%;height:90px"></div>
-      <div id="kT-rsi" style="width:100%;height:90px"></div>
-      <div id="kT-oi" style="width:100%;height:90px"></div>
+      <div id="kT-macd" style="width:100%;height:90px;display:none"></div>
+      <div id="kT-rsi" style="width:100%;height:90px;display:none"></div>
+      <div id="kT-oi" style="width:100%;height:90px;display:none"></div>
     </div>
     <div class="kline-analysis" id="analysisT"></div>
     <div class="kline-events" id="klineEventsT"></div>
@@ -192,9 +192,9 @@
     <div class="kline-chart-wrap">
       <div class="kline-legend" id="legendTL"></div>
       <div id="kTL-main" style="width:100%;height:340px"></div>
-      <div id="kTL-macd" style="width:100%;height:90px"></div>
-      <div id="kTL-rsi" style="width:100%;height:90px"></div>
-      <div id="kTL-oi" style="width:100%;height:90px"></div>
+      <div id="kTL-macd" style="width:100%;height:90px;display:none"></div>
+      <div id="kTL-rsi" style="width:100%;height:90px;display:none"></div>
+      <div id="kTL-oi" style="width:100%;height:90px;display:none"></div>
     </div>
     <div class="kline-analysis" id="analysisTL"></div>
     <div class="kline-events" id="klineEventsTL"></div>
@@ -19526,65 +19526,92 @@ function buildContractChart(prefix, name) {
   const cRsi  = mkChart(document.getElementById(prefix + '-rsi'),  p => p.toFixed(1));
   const cOi   = mkChart(document.getElementById(prefix + '-oi'),   p => (Math.abs(p) >= 10000 ? (p / 10000).toFixed(1) + '万' : p.toFixed(0)));
 
-  // —— 主图：蜡烛 + VOL（独立量轴叠加） + MA + BOLL ——
+  // —— 主图：蜡烛（始终显示）+ VOL / MA / BOLL（默认隐藏，图例点选后显示） ——
   const candle = cMain.addCandlestickSeries({ upColor: KUP, downColor: KDOWN, borderUpColor: KUP, borderDownColor: KDOWN, wickUpColor: KUP, wickDownColor: KDOWN, priceFormat: { type: 'price', precision: 3, minMove: 0.001 } });
-  const vol = cMain.addHistogramSeries({ priceScaleId: 'vol', priceFormat: { type: 'volume' }, lastValueVisible: false, priceLineVisible: false, title: 'VOL' });
-  cMain.priceScale('vol').applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
-  const ma5  = cMain.addLineSeries({ color: '#f57c00', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'MA5' });
-  const ma10 = cMain.addLineSeries({ color: '#1976d2', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'MA10' });
-  const ma20 = cMain.addLineSeries({ color: '#8e24aa', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'MA20' });
-  const bollU = cMain.addLineSeries({ color: '#b0bec5', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false, lastValueVisible: false, title: 'BOLL上' });
-  const bollM = cMain.addLineSeries({ color: '#90a4ae', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'BOLL中' });
-  const bollL = cMain.addLineSeries({ color: '#b0bec5', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false, lastValueVisible: false, title: 'BOLL下' });
+  const vol = cMain.addHistogramSeries({ priceScaleId: 'vol', priceFormat: { type: 'volume' }, lastValueVisible: false, priceLineVisible: false, title: 'VOL', visible: false });
+  cMain.priceScale('vol').applyOptions({ scaleMargins: { top: 0.80, bottom: 0 } });
+  const ma5  = cMain.addLineSeries({ color: '#f57c00', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'MA5', visible: false });
+  const ma10 = cMain.addLineSeries({ color: '#1976d2', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'MA10', visible: false });
+  const ma20 = cMain.addLineSeries({ color: '#8e24aa', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'MA20', visible: false });
+  const bollU = cMain.addLineSeries({ color: '#b0bec5', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false, lastValueVisible: false, title: 'BOLL上', visible: false });
+  const bollM = cMain.addLineSeries({ color: '#90a4ae', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'BOLL中', visible: false });
+  const bollL = cMain.addLineSeries({ color: '#b0bec5', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false, lastValueVisible: false, title: 'BOLL下', visible: false });
 
-  // —— MACD 副图 ——
+  // —— MACD 副图（默认隐藏） ——
   const macdBar  = cMacd.addHistogramSeries({ priceLineVisible: false, lastValueVisible: false, title: 'MACD' });
   const macdDiff = cMacd.addLineSeries({ color: '#1976d2', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'DIFF' });
   const macdDea  = cMacd.addLineSeries({ color: '#f57c00', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'DEA' });
 
-  // —— RSI 副图 + 70/30 参考线 ——
+  // —— RSI 副图 + 70/30 参考线（默认隐藏） ——
   const rsi6  = cRsi.addLineSeries({ color: '#1976d2', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'RSI6' });
   const rsi12 = cRsi.addLineSeries({ color: '#f57c00', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'RSI12' });
   rsi6.createPriceLine({ price: 70, color: '#bbb', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: false, title: '' });
   rsi6.createPriceLine({ price: 30, color: '#bbb', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: false, title: '' });
 
-  // —— 增仓/减仓副图 ——
+  // —— 增仓/减仓副图（默认隐藏） ——
   const oiBar = cOi.addHistogramSeries({ priceLineVisible: false, lastValueVisible: false, title: '增仓' });
 
-  // —— 主图 overlay 图例（默认全开，点击切换显示） ——
+  // —— 图例（默认全「未选中」，点选后显示；K 线始终显示，不在此列） ——
   const legendEl = document.getElementById('legend' + (prefix === 'kT' ? 'T' : 'TL'));
   const legendItems = [
     { label: 'MA5', color: '#f57c00', series: ma5 },
     { label: 'MA10', color: '#1976d2', series: ma10 },
     { label: 'MA20', color: '#8e24aa', series: ma20 },
     { label: 'BOLL', color: '#90a4ae', series: [bollU, bollM, bollL] },
-    { label: 'VOL', color: '#9e9e9e', series: vol }
+    { label: 'VOL', color: '#9e9e9e', vol: true },
+    { label: 'MACD', color: '#00897b', panel: prefix + '-macd', chart: cMacd },
+    { label: 'RSI', color: '#7b1fa2', panel: prefix + '-rsi', chart: cRsi },
+    { label: '增仓', color: '#ef6c00', panel: prefix + '-oi', chart: cOi },
+    { label: '斐波那契', color: '#e65100', fib: true }
   ];
+
+  let fibLines = [];
+  let fibOn = false;
+  let lastData = null;
+
+  function drawFib(fib) {
+    fibLines.forEach(pl => candle.removePriceLine(pl));
+    fibLines = [];
+    if (fibOn && fib) fib.labels.forEach((lbl, k) => {
+      fibLines.push(candle.createPriceLine({ price: fib.levels[k], color: '#e65100', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'Fib ' + lbl }));
+    });
+  }
+
   legendEl.innerHTML = '';
   legendItems.forEach(it => {
     const chip = document.createElement('span');
-    chip.className = 'lg-chip';
+    chip.className = 'lg-chip off';   // 默认未选中
     chip.textContent = it.label;
     chip.style.borderColor = it.color;
     chip.style.color = it.color;
     chip.addEventListener('click', () => {
-      const nowOff = chip.classList.toggle('off');
-      const srs = Array.isArray(it.series) ? it.series : [it.series];
-      srs.forEach(s => s.applyOptions({ visible: !nowOff }));
+      const show = !chip.classList.toggle('off');
+      if (it.series) {
+        const srs = Array.isArray(it.series) ? it.series : [it.series];
+        srs.forEach(s => s.applyOptions({ visible: show }));
+      } else if (it.vol) {
+        vol.applyOptions({ visible: show });
+        // 关掉成交量时，把主图价格轴底部余量收回，让蜡烛占满整图
+        cMain.priceScale('right').applyOptions({ scaleMargins: show ? { top: 0.08, bottom: 0.22 } : { top: 0.08, bottom: 0.08 } });
+      } else if (it.panel) {
+        document.getElementById(it.panel).style.display = show ? '' : 'none';
+        if (show) it.chart.timeScale().fitContent();  // 显示后按容器宽度重新适配
+      } else if (it.fib) {
+        fibOn = show;
+        if (lastData) drawFib(computeFib(lastData));
+      }
     });
     legendEl.appendChild(chip);
   });
 
-  let fibLines = [];
-
   function render(data) {
+    lastData = data;
     const closes = data.map(d => d.c);
     const ma5v = SMA(closes, 5), ma10v = SMA(closes, 10), ma20v = SMA(closes, 20);
     const boll = computeBOLL(closes, 20, 2);
     const macd = computeMACD(closes);
     const rsi6v = computeRSI(closes, 6), rsi12v = computeRSI(closes, 12);
     const oiDelta = data.map((d, i) => (i === 0 || d.oi == null || data[i - 1].oi == null) ? null : d.oi - data[i - 1].oi);
-    const fib = computeFib(data);
     const times = data.map(d => toBD(d.date));
 
     candle.setData(data.map((d, i) => ({ time: times[i], open: d.o, high: d.h, low: d.l, close: d.c })));
@@ -19609,11 +19636,7 @@ function buildContractChart(prefix, name) {
     for (let i = 0; i < times.length; i++) if (oiDelta[i] != null) oiData.push({ time: times[i], value: oiDelta[i], color: oiDelta[i] >= 0 ? KUP : KDOWN });
     oiBar.setData(oiData);
 
-    fibLines.forEach(pl => candle.removePriceLine(pl));
-    fibLines = [];
-    if (fib) fib.labels.forEach((lbl, k) => {
-      fibLines.push(candle.createPriceLine({ price: fib.levels[k], color: '#e65100', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'Fib ' + lbl }));
-    });
+    drawFib(computeFib(data));
 
     [cMain, cMacd, cRsi, cOi].forEach(ch => ch.timeScale().fitContent());
   }
