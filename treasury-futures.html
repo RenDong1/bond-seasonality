@@ -19528,25 +19528,23 @@ function buildKlineOption(data) {
     const d = data[idx];
     if (!d) return '';
     const up = d.c >= d.o;
-    const cc = up ? UP : DOWN;
     const oiDelta = idx > 0 && d.oi != null && data[idx-1].oi != null ? d.oi - data[idx-1].oi : null;
     const chg = idx > 0 ? ((d.c - data[idx-1].c) / data[idx-1].c * 100) : 0;
-    const row = (k, v, style) => `<tr><td style="color:#888;padding-right:10px">${k}</td><td style="text-align:right;${style||''}">${v}</td></tr>`;
-    let html = `<div style="font-weight:700;margin-bottom:4px">${d.date}</div><table style="font-size:11px;line-height:1.7">`;
-    html += row('开盘', d.o.toFixed(3));
-    html += row('收盘', d.c.toFixed(3), `color:${cc};font-weight:600`);
-    html += row('最高', d.h.toFixed(3));
-    html += row('最低', d.l.toFixed(3));
-    html += row('涨跌', (chg >= 0 ? '+' : '') + chg.toFixed(3) + '%', `color:${chg >= 0 ? UP : DOWN}`);
-    html += row('成交量', d.v.toLocaleString() + ' 手');
-    html += row('持仓', (d.oi != null ? d.oi.toLocaleString() : '—') + ' 手');
-    if (oiDelta != null) html += row('增仓', (oiDelta >= 0 ? '+' : '') + oiDelta.toLocaleString() + ' 手', `color:${oiDelta >= 0 ? UP : DOWN}`);
-    if (ma5[idx] != null) html += row('MA5/10/20', `${ma5[idx].toFixed(3)} / ${ma10[idx].toFixed(3)} / ${ma20[idx].toFixed(3)}`);
-    if (boll.upper[idx] != null) html += row('BOLL', `上${boll.upper[idx].toFixed(3)} 中${boll.mid[idx].toFixed(3)} 下${boll.lower[idx].toFixed(3)}`);
-    if (macd.diff[idx] != null) html += row('MACD', `DIFF ${macd.diff[idx].toFixed(3)} / DEA ${macd.dea[idx] != null ? macd.dea[idx].toFixed(3) : '—'}`);
-    if (rsi6[idx] != null) html += row('RSI(6/12)', `${rsi6[idx].toFixed(1)} / ${rsi12[idx].toFixed(1)}`);
-    html += '</table>';
-    return html;
+    const L = [];
+    L.push('{t|' + d.date + '}');
+    L.push('开盘  {v|' + d.o.toFixed(3) + '}');
+    L.push('收盘  {' + (up ? 'r' : 'g') + '|' + d.c.toFixed(3) + '}');
+    L.push('最高  {v|' + d.h.toFixed(3) + '}');
+    L.push('最低  {v|' + d.l.toFixed(3) + '}');
+    L.push('涨跌  {' + (chg >= 0 ? 'r' : 'g') + '|' + (chg >= 0 ? '+' : '') + chg.toFixed(3) + '%}');
+    L.push('成交量  {v|' + d.v.toLocaleString() + ' 手}');
+    L.push('持仓  {v|' + (d.oi != null ? d.oi.toLocaleString() : '—') + ' 手}');
+    if (oiDelta != null) L.push('增仓  {' + (oiDelta >= 0 ? 'r' : 'g') + '|' + (oiDelta >= 0 ? '+' : '') + oiDelta.toLocaleString() + ' 手}');
+    if (ma5[idx] != null) L.push('MA5/10/20  {v|' + ma5[idx].toFixed(3) + ' / ' + ma10[idx].toFixed(3) + ' / ' + ma20[idx].toFixed(3) + '}');
+    if (boll.upper[idx] != null) L.push('BOLL  {v|上' + boll.upper[idx].toFixed(3) + ' 中' + boll.mid[idx].toFixed(3) + ' 下' + boll.lower[idx].toFixed(3) + '}');
+    if (macd.diff[idx] != null) L.push('MACD  {v|DIFF ' + macd.diff[idx].toFixed(3) + ' / DEA ' + (macd.dea[idx] != null ? macd.dea[idx].toFixed(3) : '—') + '}');
+    if (rsi6[idx] != null) L.push('RSI(6/12)  {v|' + rsi6[idx].toFixed(1) + ' / ' + rsi12[idx].toFixed(1) + '}');
+    return L.join('\n');
   };
 
   return {
@@ -19555,13 +19553,21 @@ function buildKlineOption(data) {
     tooltip: {
       trigger: 'axis',
       transitionDuration: 0,
-      axisPointer: { type: 'line', snap: true, animation: false, lineStyle: { color: '#bbb', type: 'dashed' }, label: { backgroundColor: '#333', color: '#fff' } },
+      renderMode: 'richText',
+      axisPointer: { type: 'none' },
       backgroundColor: 'rgba(255,255,255,0.97)',
       borderColor: '#e0e0e0',
-      textStyle: { color: '#333' },
+      textStyle: {
+        color: '#333',
+        rich: {
+          t: { fontWeight: 'bold', fontSize: 12, lineHeight: 22 },
+          v: { color: '#333' },
+          r: { color: UP, fontWeight: 'bold' },
+          g: { color: DOWN, fontWeight: 'bold' }
+        }
+      },
       formatter: tooltipFormatter
     },
-    axisPointer: { link: [{ xAxisIndex: 'all' }] },
     legend: {
       data: ['增仓减仓', 'MA5', 'MA10', 'MA20', 'BOLL上轨', 'BOLL中轨', 'BOLL下轨', 'VOL', 'MACD', 'DIFF', 'DEA', 'RSI6', 'RSI12'],
       selected: { '增仓减仓': false, 'MA5': false, 'MA10': false, 'MA20': false, 'BOLL上轨': false, 'BOLL中轨': false, 'BOLL下轨': false, 'VOL': false, 'MACD': false, 'DIFF': false, 'DEA': false, 'RSI6': false, 'RSI12': false },
