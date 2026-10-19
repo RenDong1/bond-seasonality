@@ -19729,9 +19729,11 @@ function renderKlines() {
   if (!klineCharts.klineTL) klineCharts.klineTL = echarts.init(document.getElementById('klineTL'), null, { devicePixelRatio: dpr });
   const tOpt = buildKlineOption(tRange);
   const tlOpt = buildKlineOption(tlRange);
-  // 保留当前图例选中状态：调整时间区间时不重置已开/关的指标
-  const tSel = (klineCharts.klineT.getOption().legend || [{}])[0].selected;
-  const tlSel = (klineCharts.klineTL.getOption().legend || [{}])[0].selected;
+  // 保留当前图例选中状态：调整时间区间时不重置已开/关的指标（首次渲染 getOption() 返回 undefined，先判空）
+  const tPrev = klineCharts.klineT.getOption();
+  const tlPrev = klineCharts.klineTL.getOption();
+  const tSel = (tPrev && tPrev.legend && tPrev.legend[0]) ? tPrev.legend[0].selected : null;
+  const tlSel = (tlPrev && tlPrev.legend && tlPrev.legend[0]) ? tlPrev.legend[0].selected : null;
   if (tSel) tOpt.legend.selected = tSel;
   if (tlSel) tlOpt.legend.selected = tlSel;
   klineCharts.klineT.setOption(tOpt, true);
