@@ -169,7 +169,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
   <div class="tbl-wrap">
     <table class="tbl">
       <thead><tr>
-        <th>触发日</th><th>SR20</th><th>TL 增仓</th><th>T 增仓</th>
+        <th>触发日</th><th>SR40</th><th>TL 增仓</th><th>T 增仓</th>
         <th>rel_oi</th><th>relret</th>
         <th>5日ΔS</th><th>10日ΔS</th><th>20日ΔS</th><th>40日ΔS</th><th>60日ΔS</th>
         <th>状态</th>
@@ -197,7 +197,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
   <div class="rule-list" id="rule-box"></div>
   <div class="boundary">
     <b>使用边界</b><br>
-    1. 信号的目标是 <b>20–60 日、数 bp 的曲线变平</b>，不是持续牛市；5–10 日没有稳定效果，不作为判断依据。<br>
+    1. 信号的目标仍是 <b>20–60 日、数 bp 的曲线变平</b>，不是持续牛市；5 日样本小、噪声大；10 日在 25–26 样本外为 8/9，但样本仅 9 个，仍不作为主判断依据。<br>
     2. 触发日的 TL 强势不能外推为后续领涨：事件后 TL−T 的中位收益不延续，利差压缩也可能来自现券补涨。<br>
     3. 持仓增速是持仓量的变化，不是净流入，不能区分多空方向；它只说明仓位在增加。<br>
     4. 历史统计为事件研究，样本量有限（当前事件数见上方），结果用于监测而非实盘交易指令。
@@ -337,7 +337,7 @@ $('stats').innerHTML = cards.map(function(c){
 // 条件清单
 // ------------------------------------------------------------------
 var condGapText = {
-  sr20: function(g){ return '还需下跌 ' + g.toFixed(2) + '%'; },
+  sr40: function(g){ return '还需下跌 ' + g.toFixed(2) + '%'; },
   g_tl: function(g){ return '还需多增 ' + g.toFixed(2) + '%'; },
   rel_oi: function(g){ return '还需高出 ' + g.toFixed(2) + 'pp'; },
   relret: function(g){ return '还需高出 ' + g.toFixed(2) + '%'; }
@@ -612,7 +612,7 @@ function condTooltip(ps){
     var v = num(p.value);
     out += '<br>' + p.marker + p.seriesName + '：' +
       (v === null ? '—' : v.toFixed(2) +
-        (p.seriesName.indexOf('SR20') >= 0 ||
+        (p.seriesName.indexOf('SR40') >= 0 ||
          p.seriesName.indexOf('relret') >= 0 ? '%' : ''));
   });
   return out;
@@ -628,14 +628,14 @@ condA.setOption({
     axisLabel: { fontSize: 9, color: '#999' }, axisLine: { lineStyle: { color: '#ddd' } }
   },
   yAxis: [
-    { type: 'value', name: 'SR20 (%)', nameTextStyle: { fontSize: 10, color: '#999' },
+    { type: 'value', name: 'SR40 (%)', nameTextStyle: { fontSize: 10, color: '#999' },
       axisLabel: { fontSize: 9, color: '#999' }, splitLine: { lineStyle: { color: '#f4f4f4' } } },
     { type: 'value', name: 'relret (%)', nameTextStyle: { fontSize: 10, color: '#999' },
       axisLabel: { fontSize: 9, color: '#999' }, splitLine: { show: false } }
   ],
   series: [
     {
-      name: 'SR20', type: 'line', data: histSlice(H.sr20), showSymbol: false,
+      name: 'SR40', type: 'line', data: histSlice(H.sr40), showSymbol: false,
       lineStyle: { color: '#5c6bc0', width: 1.6 }, itemStyle: { color: '#5c6bc0' },
       markLine: {
         symbol: 'none', silent: true,
@@ -721,7 +721,7 @@ $('event-tbody').innerHTML = evs.map(function(e){
     : '<span class="muted">已走完</span>';
   return '<tr' + (isActive ? ' class="current"' : '') + '>' +
     '<td class="date">' + e.date + '</td>' +
-    '<td class="' + cls(e.sr20) + '">' + fmt(e.sr20, 2) + '%</td>' +
+    '<td class="' + cls(e.sr40) + '">' + fmt(e.sr40, 2) + '%</td>' +
     '<td class="' + cls(e.g_tl) + '">' + fmt(e.g_tl, 2) + '%</td>' +
     '<td class="' + cls(e.g_t) + '">' + fmt(e.g_t, 2) + '%</td>' +
     '<td class="' + cls(e.rel_oi) + '">' + fmt(e.rel_oi, 2) + '</td>' +
@@ -767,7 +767,7 @@ if (extra !== null) {
   var base20 = (D.baseline || {})['20'] || {};
   $('verify-note').innerHTML =
     '当前 R3d 事件 ' + ((D.stats || {})['20'] || {}).n + ' 个有效样本，20 日利差中位 ' +
-    fmt((D.stats || {})['20'].median, 2) + 'bp；同样满足 SR20 ≤ −2% 但未触发的普通下跌日 ' +
+    fmt((D.stats || {})['20'].median, 2) + 'bp；同样满足 SR40 ≤ −2% 但未触发的普通下跌日 ' +
     base20.n + ' 个，中位 ' + fmt(base20.median, 2) + 'bp。' +
     'R3d 事件<b>多压缩 ' + Math.abs(extra).toFixed(2) + 'bp</b>。' +
     '负值 = 利差压缩、正值 = 走陡。';
@@ -779,7 +779,7 @@ if (extra !== null) {
 // 规则
 // ------------------------------------------------------------------
 $('rule-box').innerHTML =
-  '<div>① 股市状态：过去 20 个交易日沪深 300 累计收益 <code>SR20 ≤ −2%</code></div>' +
+  '<div>① 股市状态：过去 40 个交易日沪深 300 累计收益 <code>SR40 ≤ −2%</code></div>' +
   '<div>② TL 增仓：TL 全部在挂季度合约持仓合计的日环比增速 <code>&gt; 1%</code></div>' +
   '<div>③ 相对增仓：<code>rel_oi = TL 增速 − T 增速 &gt; 0</code></div>' +
   '<div>④ 相对强弱：<code>relret = r_TL − β × r_T &gt; 0.10%</code>，β 为 60 日滚动、滞后 1 日</div>' +
