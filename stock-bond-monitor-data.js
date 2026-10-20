@@ -1,7 +1,7 @@
 window.MONITOR_DATA = {
  "meta": {
   "as_of": "2026-10-19",
-  "generated_at": "2026-10-20 14:03:32",
+  "generated_at": "2026-10-20 14:07:05",
   "event_count": 18,
   "path_event_count": 15,
   "start": "2023-04-21",
