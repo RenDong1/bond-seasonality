@@ -65,14 +65,15 @@ tr.cur td{background:#f5f8ff;font-weight:600;}
 .revBox{position:relative;}
 .revChart{height:440px;}
 .evWrap{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;}
+.evSvg{position:absolute;top:0;left:0;pointer-events:none;}
 .evLbl{position:absolute;font-size:10px;line-height:1.35;color:#333;text-align:center;
-  white-space:normal;word-break:break-all;max-width:116px;
+  white-space:normal;word-break:break-all;max-width:126px;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-  padding:0 3px;border-radius:3px;background:rgba(255,255,255,.78);}
-/* 复盘面板：图 + 事件清单左右并排（窄屏自动上下） */
+  padding:0 3px;border-radius:3px;background:rgba(255,255,255,.9);}
+/* 复盘面板：图 + 事件清单左右并排（窄屏自动上下）；左侧图更宽、右侧清单收窄 */
 .revSplit{display:flex;gap:16px;align-items:stretch;flex-wrap:nowrap;height:580px;margin-bottom:16px;}
-.revSplit .revMain{flex:2 1 620px;min-width:0;margin-bottom:0;overflow:hidden;}
-.revSplit .evCard{flex:1 1 340px;min-width:300px;max-width:520px;margin-bottom:0;overflow:hidden;}
+.revSplit .revMain{flex:3 1 720px;min-width:0;margin-bottom:0;overflow:hidden;}
+.revSplit .evCard{flex:1 1 260px;min-width:250px;max-width:340px;margin-bottom:0;overflow:hidden;}
 .revSplit .cardhead{display:flex;align-items:baseline;gap:8px;flex-shrink:0;}
 .evCnt,.revCount{font-size:11.5px;color:var(--muted);}
 .evLegend{display:flex;gap:14px;align-items:center;font-size:11.5px;color:var(--muted);margin:2px 0 6px;flex-shrink:0;}
@@ -624,8 +625,9 @@ function makeReviewPanel(RV){
     R.rng.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.r === r));
   }
 
-  // 事件文字：贴在与事件点相同的坐标旁；优先同日多条，空间不足时省略（tooltip/清单仍可看）
+  // 事件文字：贴在与事件点相同的坐标旁，与点之间画连线；文字避让曲线与彼此，放不下则省略
   let lastAnchorY = new Map();
+  let lastCurves = [], lastValueAt = null;
   function layoutEventLabels(groups){
     const wrap = R.evWrap;
     wrap.innerHTML = '';
@@ -634,11 +636,54 @@ function makeReviewPanel(RV){
     const rect = cs.coordinateSystem.getRect();       // 绘图区像素 {x,y,width,height}
     const minX = rect.x, maxX = rect.x + rect.width;
     const minY = rect.y, maxY = rect.y + rect.height;
-    const maxW = 116;
+    const maxW = 126;
     // 时间戳 → 绘图区像素：x 轴 scale 的 extent 已反映 dataZoom 可视窗（缩放/平移后为当前可见范围）
     const ext = chart.getModel().getComponent('xAxis', 0).axis.scale.getExtent();
     const winSpan = (ext[1] - ext[0]) || 1;
     const toX = ts => rect.x + (ts - ext[0]) / winSpan * rect.width;
+    const yExt = chart.getModel().getComponent('yAxis', 0).axis.scale.getExtent();
+    const toY = v => rect.y + (yExt[1] - v) / ((yExt[1] - yExt[0]) || 1) * rect.height;
+    // 逐像素列预计算每条曲线的 y 像素（缩放时只算一次），避让判定按列精确扫描
+    const W = Math.max(1, Math.round(rect.width));
+    const colY = lastCurves.map(cv => {
+      const arr = new Array(W + 1);
+      for (let i = 0; i <= W; i++){
+        const ts = ext[0] + i / W * winSpan;
+        const v = lastValueAt ? lastValueAt(cv.vals, ts) : null;
+        arr[i] = (v == null) ? null : toY(v);
+      }
+      return arr;
+    });
+    // 文字矩形是否压到任一所选曲线（横跨的每一列都查，留 4px 余量）
+    const curveHit = r => {
+      const i0 = Math.max(0, Math.floor(r.l - rect.x)), i1 = Math.min(W, Math.ceil(r.r - rect.x));
+      for (const arr of colY){
+        for (let i = i0; i <= i1; i++){
+          const py = arr[i];
+          if (py != null && py >= r.t - 4 && py <= r.b + 4) return true;
+        }
+      }
+      return false;
+    };
+    // 该像素列上所选曲线的上下包络 → 文字优先放进曲线之外的空白带
+    const bandAt = px => {
+      const i = Math.max(0, Math.min(W, Math.round(px - rect.x)));
+      let top = Infinity, bot = -Infinity;
+      for (const arr of colY){
+        const py = arr[i];
+        if (py == null) continue;
+        if (py < top) top = py;
+        if (py > bot) bot = py;
+      }
+      return {top, bot};
+    };
+    // 连线层：文字与事件点之间的细线（在文字下层）
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'evSvg');
+    svg.setAttribute('width', wrap.clientWidth || 800);
+    svg.setAttribute('height', wrap.clientHeight || 440);
+    wrap.appendChild(svg);
     const items = groups.map(g => ({
       ts:g.ts, date:g.date, n:g.items.length,
       title:g.items.length >= 2 ? g.items[0].title + ' 等' + g.items.length + '条' : g.items[0].title,
@@ -672,33 +717,47 @@ function makeReviewPanel(RV){
     const hit = r => placed.some(p => r.l < p.r && r.r > p.l && r.t < p.b && r.b > p.t);
     const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
     vis.forEach(o => {
+      const bd = bandAt(o.x);
       const cand = [
-        [o.x + 8, o.y - o.h/2],                       // 右
-        [o.x - o.w - 8, o.y - o.h/2],                 // 左
-        [o.x - o.w/2, o.y - o.h - 7],                 // 上
-        [o.x - o.w/2, o.y + 7],                       // 下
-        [o.x + 8, o.y - o.h - 7],                     // 右上
-        [o.x + 8, o.y + 7],                           // 右下
-        [o.x - o.w - 8, o.y - o.h - 7],               // 左上
-        [o.x - o.w - 8, o.y + 7],                     // 左下
-        [o.x + 8, o.y - o.h - 22],                    // 更远的右上
-        [o.x + 8, o.y + 22],
-        [o.x - o.w - 8, o.y - o.h - 22],
-        [o.x - o.w - 8, o.y + 22],
-        [o.x - o.w/2, o.y - o.h - 22],
-        [o.x - o.w/2, o.y + 22]
+        [o.x - o.w/2, o.y - o.h - 9],                 // 正上（近）
+        [o.x - o.w/2, o.y + 9],                       // 正下（近）
+        [o.x - o.w/2, o.y - o.h - 26],                // 正上（远）
+        [o.x - o.w/2, o.y + 26],                      // 正下（远）
+        [o.x + 9, o.y - o.h - 9],                     // 右上
+        [o.x - o.w - 9, o.y - o.h - 9],               // 左上
+        [o.x + 9, o.y + 9],                           // 右下
+        [o.x - o.w - 9, o.y + 9],                     // 左下
+        [o.x + 9, o.y - o.h/2],                       // 右
+        [o.x - o.w - 9, o.y - o.h/2]                  // 左
       ];
+      // 曲线外的空白带：文字落在整组曲线包络的上方/下方，既不压线也靠近事件点
+      if (isFinite(bd.top)) cand.push([o.x - o.w/2, bd.top - o.h - 6]);
+      if (isFinite(bd.bot)) cand.push([o.x - o.w/2, bd.bot + 6]);
+      cand.push([o.x + 9, o.y - o.h - 26], [o.x - o.w - 9, o.y - o.h - 26],
+                [o.x + 9, o.y + 26], [o.x - o.w - 9, o.y + 26]);
       let box = null;
       for (const [l0,t0] of cand){
         const l = clamp(l0, minX, maxX - o.w);
         const t = clamp(t0, minY, maxY - o.h);
         const rr = {l, t, r:l + o.w, b:t + o.h};
-        if (!hit(rr)){ box = rr; break; }
+        if (!hit(rr) && !curveHit(rr)){ box = rr; break; }
       }
       if (!box){ o.el.remove(); return; }             // 放不下就省略，避免压住曲线/彼此重叠
       placed.push(box);
       o.el.style.left = box.l + 'px';
       o.el.style.top = box.t + 'px';
+      // 事件点 → 文字矩形最近边的连线
+      const ax = clamp(o.x, box.l, box.r), ay = clamp(o.y, box.t, box.b);
+      if (!(o.x > box.l && o.x < box.r && o.y > box.t && o.y < box.b)){
+        const ln = document.createElementNS(NS, 'line');
+        ln.setAttribute('x1', o.x); ln.setAttribute('y1', o.y);
+        ln.setAttribute('x2', ax); ln.setAttribute('y2', ay);
+        ln.setAttribute('stroke', o.col);
+        ln.setAttribute('stroke-width', '1.2');
+        ln.setAttribute('stroke-opacity', '.65');
+        ln.setAttribute('stroke-linecap', 'round');
+        svg.appendChild(ln);
+      }
     });
   }
 
@@ -746,6 +805,7 @@ function makeReviewPanel(RV){
     const rows = selectedRows();
     const groups = groupRows(rows);
     lastGroups = groups;
+    lastCurves = activeCurves; lastValueAt = valueAt;   // 供文字避让曲线 / 空白带定位
     // 文字锚点 = 事件点在第一条有值曲线上的收益率（与点的位置一致）
     lastAnchorY = new Map();
     groups.forEach(g => {
