@@ -66,14 +66,45 @@ tr.cur td{background:#f5f8ff;font-weight:600;}
 .revChart{height:440px;}
 .evWrap{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;}
 .evLbl{position:absolute;font-size:10px;line-height:1.35;color:#333;text-align:center;
-  white-space:normal;word-break:break-all;}
-.evCard{margin-top:0;}
-.evList{max-height:240px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-size:12.5px;}
-.ev{display:flex;gap:10px;padding:3px 2px;border-bottom:1px dashed var(--line);}
+  white-space:normal;word-break:break-all;max-width:116px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  padding:0 3px;border-radius:3px;background:rgba(255,255,255,.78);}
+/* 复盘面板：图 + 事件清单左右并排（窄屏自动上下） */
+.revSplit{display:flex;gap:16px;align-items:stretch;flex-wrap:nowrap;height:580px;margin-bottom:16px;}
+.revSplit .revMain{flex:2 1 620px;min-width:0;margin-bottom:0;overflow:hidden;}
+.revSplit .evCard{flex:1 1 340px;min-width:300px;max-width:520px;margin-bottom:0;overflow:hidden;}
+.revSplit .cardhead{display:flex;align-items:baseline;gap:8px;flex-shrink:0;}
+.evCnt,.revCount{font-size:11.5px;color:var(--muted);}
+.evLegend{display:flex;gap:14px;align-items:center;font-size:11.5px;color:var(--muted);margin:2px 0 6px;flex-shrink:0;}
+.evLegend i{display:inline-block;vertical-align:middle;margin-right:4px;}
+.evLegend .lnSolid{width:14px;height:0;border-top:2px solid #64748b;}
+.evLegend .lnDash{width:14px;height:0;border-top:2px dashed #64748b;}
+.evLegend .tk{width:2px;height:9px;background:#64748b;}
+.evLbl{pointer-events:auto;cursor:pointer;}
+.evLbl:hover{background:#fff;}
+.miniBtn{font-size:11.5px;line-height:1.5;padding:1px 8px;border:1px solid var(--line);border-radius:999px;
+  background:#fff;color:var(--muted);cursor:pointer;font-family:inherit;}
+.miniBtn:hover{border-color:var(--blue);color:var(--blue);}
+.catTools{display:inline-flex;gap:5px;}
+.chip .cnt{font-size:10.5px;color:var(--muted);margin-left:1px;}
+.revSplit .revBox{flex-shrink:0;}
+.evCard{display:flex;flex-direction:column;}
+.evList{flex:1;min-height:0;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-size:12.5px;}
+.evY{position:sticky;top:0;z-index:1;background:#fafbfc;color:var(--muted);font-size:11.5px;
+  font-weight:600;padding:4px 2px;border-bottom:1px solid var(--line);}
+.ev{display:flex;gap:8px;align-items:baseline;padding:3px 2px;border-bottom:1px dashed var(--line);cursor:pointer;min-width:0;}
+.ev:hover{background:#f5f8ff;}
+.ev.active{background:#eef4ff;}
 .ev:last-child{border-bottom:none;}
+.evDot{width:7px;height:7px;border-radius:50%;flex:none;margin-top:5px;}
 .evD{font-family:ui-monospace,Consolas,monospace;color:var(--blue);white-space:nowrap;min-width:86px;}
-.evT{color:var(--ink);}
+.evT{color:var(--ink);flex:1;min-width:0;word-break:break-all;}
 .evNote{color:var(--muted);padding:6px 2px;}
+@media (max-width:1000px){
+  .revSplit{height:auto;flex-wrap:wrap;}
+  .revSplit .revMain,.revSplit .evCard{flex:1 1 100%;width:100%;max-width:none;}
+  .revSplit .evCard{height:460px;}
+}
 </style>
 </head>
 <body>
@@ -488,31 +519,38 @@ function reviewPanelHTML(){
     <input type="date" class="startDate">
     <span class="fld">至</span>
     <input type="date" class="endDate">
+    <span class="seg rngBox"><button data-r="1">近1年</button><button data-r="3">近3年</button><button data-r="all" class="on">全区间</button></span>
     <span class="fld" style="margin-left:8px">事件复盘</span><span class="catBox"></span>
+    <span class="catTools"><button class="miniBtn allCats">全选</button><button class="miniBtn noCats">清空</button></span>
+    <label class="chip" title="叠加实施日（默认只显示公告/会议日）"><input type="checkbox" class="showImpl">显示实施日</label>
   </div>
-  <div class="card" style="margin-bottom:14px">
-    <div class="cardhead"><h2>债市复盘 · 真实时间序列</h2></div>
-    <div class="note">横轴 = 真实日期；可多选国债/国开收益率曲线（1Y~30Y）。事件复盘按所选类别在精确日期上竖线标注：实线 = 公告/会议日，虚线 = 实施日；事件文字横向自动换行、随缩放重排；悬停显示当日数值与事件。</div>
-    <div class="revBox">
-      <div class="chart revChart"></div>
-      <div class="evWrap"></div>
+  <div class="revSplit">
+    <div class="card revMain">
+      <div class="cardhead"><h2>债市复盘 · 真实时间序列</h2><span class="revCount"></span></div>
+      <div class="note">横轴 = 真实日期；可多选国债/国开收益率曲线（1Y~30Y）。事件线：同日 ≥2 条 = 全高竖线＋顶部文字（文字标条数），单条 = 底部短刻度；勾选「显示实施日」后叠加实施日。悬停显示当日数值与事件，点右侧清单或图中事件文字可定位。</div>
+      <div class="evLegend"><span><i class="lnSolid"></i>公告/会议</span><span><i class="lnDash"></i>实施日</span><span><i class="tk"></i>单条事件</span></div>
+      <div class="revBox">
+        <div class="chart revChart"></div>
+        <div class="evWrap"></div>
+      </div>
     </div>
-  </div>
-  <div class="card evCard">
-    <div class="cardhead"><h2>已选事件（精确到年月日）</h2></div>
-    <div class="evList"></div>
+    <div class="card evCard">
+      <div class="cardhead"><h2>事件清单</h2><span class="evCnt"></span></div>
+      <div class="evList"></div>
+    </div>
   </div>`;
 }
 
 function makeReviewPanel(RV){
   const host = document.createElement('div');
-  host.className = 'panel';
+  host.className = 'panel revPanel';
   host.innerHTML = reviewPanelHTML();
   document.getElementById('panels').appendChild(host);
 
   const $ = s => host.querySelector(s);
   const R = { curveBox:$('.curveBox'), catBox:$('.catBox'), startEl:$('.startDate'),
-              endEl:$('.endDate'), chartEl:$('.revChart'), evList:$('.evList'), evWrap:$('.evWrap') };
+              endEl:$('.endDate'), chartEl:$('.revChart'), evList:$('.evList'), evWrap:$('.evWrap'),
+              impl:$('.showImpl'), rng:$('.rngBox'), revCount:$('.revCount'), evCnt:$('.evCnt') };
   const chart = echarts.init(R.chartEl);
 
   const CURVES = [];
@@ -520,15 +558,27 @@ function makeReviewPanel(RV){
     CURVES.push({key:'国债'+t, brand:'国债', t, name:'国债'+t, color:GOV_COLORS[t]});
     CURVES.push({key:'国开'+t, brand:'国开', t, name:'国开'+t, color:CDB_COLORS[t]});
   });
-  const st = { curves:new Set(['国债10Y','国开10Y']), cats:new Set(),
-               start:RV.dates[0], end:RV.dates[RV.dates.length-1] };
 
-  const CAT_PALETTE = ['#d946ef','#e11d48','#f59e0b','#0891b2','#10b981','#6366f1',
-                       '#8b5cf6','#ec4899','#14b8a6','#f97316','#84cc16','#06b6d4'];
-  function catColor(cat){                                     // 已知类别用固定色，新类别按次序从调色板取
+  const firstD = RV.dates[0], lastD = RV.dates[RV.dates.length-1];
+  const catCounts = {};                                       // 类别条数（公告日口径）
+  RV.events.forEach(e => { catCounts[e.cat] = (catCounts[e.cat]||0)+1; });
+  const catOrder = [...RV.cats].sort((a,b) =>
+    (catCounts[b]||0) - (catCounts[a]||0) || a.localeCompare(b,'zh'));
+  const defaultCat = catOrder.includes('降准降息') ? '降准降息' : catOrder[0];
+
+  const st = { curves:new Set(['国债10Y','国开10Y']),
+               cats:new Set(defaultCat ? [defaultCat] : []),
+               start:firstD, end:lastD, showImpl:false,
+               zoom:{start:0,end:100}, focus:null };
+
+  // 9 个当前类别全部固定色；未来新增类别按名称哈希取色（顺序变化不漂移）
+  const CAT_COLORS = {'降准降息':'#d946ef','货币政策取向':'#2563eb','政治局会议':'#e11d48',
+                      '新闻发布会':'#0891b2','宽信用':'#10b981','金融街·陆家嘴论坛':'#6366f1',
+                      '官媒敲打':'#f59e0b','官方管控':'#4b5563','调控金融机构':'#84cc16'};
+  function nameHash(s){ let h=0; for (let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return h; }
+  function catColor(cat){
     if (CAT_COLORS[cat]) return CAT_COLORS[cat];
-    const i = RV.cats.indexOf(cat);
-    return CAT_PALETTE[(i >= 0 ? i : 0) % CAT_PALETTE.length];
+    return 'hsl(' + (nameHash(cat) % 360) + ',62%,42%)';
   }
 
   function buildChips(){
@@ -539,60 +589,100 @@ function makeReviewPanel(RV){
         `<label class="chip" title="${c.name}"><span class="sw" style="background:${c.color}"></span>`+
         `<input type="checkbox" data-key="${c.key}" ${st.curves.has(c.key)?'checked':''}>${c.t}</label>`
       ).join('')).join('');
-    R.catBox.innerHTML = RV.cats.map(cat =>
+    R.catBox.innerHTML = catOrder.map(cat =>
       `<label class="chip" title="${cat}"><span class="sw" style="background:${catColor(cat)}"></span>`+
-      `<input type="checkbox" data-cat="${cat}" ${st.cats.has(cat)?'checked':''}>${cat}</label>`
+      `<input type="checkbox" data-cat="${cat}" ${st.cats.has(cat)?'checked':''}>${cat}`+
+      `<span class="cnt">${catCounts[cat]||0}</span></label>`
     ).join('');
   }
 
-  // 事件文字：横向、自动换行、随缩放重排，贪心分行防重叠，并夹在绘图区内始终完整可见
-  function layoutEventLabels(){
+  // 当前选中类别、所选区间内的事件（公告 + 可选实施）
+  function selectedRows(){
+    const rows = [];
+    RV.events.forEach(e => {
+      if (!st.cats.has(e.cat)) return;
+      if (e.date >= st.start && e.date <= st.end)
+        rows.push({d:e.date, ts:new Date(e.date).getTime(), cat:e.cat, title:e.title, kind:'公告/会议'});
+      if (st.showImpl && e.date2 && e.date2 >= st.start && e.date2 <= st.end)
+        rows.push({d:e.date2, ts:new Date(e.date2).getTime(), cat:e.cat, title:e.title, kind:'实施'});
+    });
+    rows.sort((a,b) => a.ts-b.ts || a.cat.localeCompare(b.cat,'zh'));
+    return rows;
+  }
+
+  // 同日合并：一个日期一个「事件组」
+  function groupRows(rows){
+    const m = new Map();
+    rows.forEach(r => {
+      if (!m.has(r.d)) m.set(r.d, {date:r.d, ts:r.ts, items:[]});
+      m.get(r.d).items.push(r);
+    });
+    return [...m.values()].sort((a,b) => a.ts-b.ts);
+  }
+
+  function setRangeBtn(r){
+    R.rng.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.r === r));
+  }
+
+  // 事件文字：只标「同日 ≥2 条」的重点日，横向换行、贪心分行、随缩放重排
+  function layoutEventLabels(groups){
     const wrap = R.evWrap;
     wrap.innerHTML = '';
-    const s0 = st.start, s1 = st.end;
     const cs = chart.getModel().getComponent('grid', 0);
     if (!cs) return;
     const rect = cs.coordinateSystem.getRect();       // 绘图区像素 {x,y,width,height}
-    const W = 92, H = 36;                            // 标签估算宽/行高
+    const H = 34, maxW = 116;                         // 标签行高 / 最大宽度
     const minX = rect.x, maxX = rect.x + rect.width;
-    // 时间戳 → 绘图区像素：x 轴 scale 的 extent 已反映 dataZoom 可视窗（缩放/平移后为当前可见范围），直接映射即可
+    // 时间戳 → 绘图区像素：x 轴 scale 的 extent 已反映 dataZoom 可视窗（缩放/平移后为当前可见范围）
     const ext = chart.getModel().getComponent('xAxis', 0).axis.scale.getExtent();
     const winSpan = (ext[1] - ext[0]) || 1;
     const toX = ts => rect.x + (ts - ext[0]) / winSpan * rect.width;
-    const items = [];
-    RV.events.forEach(e => {
-      if (!st.cats.has(e.cat)) return;
-      const col = catColor(e.cat);
-      if (e.date>=s0 && e.date<=s1) items.push({ts:new Date(e.date).getTime(), title:e.title, col});
-      if (e.date2 && e.date2>=s0 && e.date2<=s1) items.push({ts:new Date(e.date2).getTime(), title:e.title+'·实施', col});
-    });
+    const items = groups.filter(g => g.items.length >= 2).map(g => ({
+      ts:g.ts, date:g.date, n:g.items.length,
+      title:g.items[0].title + ' 等' + g.items.length + '条',
+      full:g.items.map(x => x.d + ' [' + x.cat + '] ' + x.title + '（' + x.kind + '）').join('\n'),
+      col:catColor(g.items[0].cat)
+    }));
     const vis = items.map(o => { o.x = toX(o.ts); return o; })
                      .filter(o => o.x >= minX && o.x <= maxX)
                      .sort((a,b) => a.x - b.x);
-    const rowRight = [];                              // rowRight[r] = 第 r 行已占用右边界
-    const maxRows = Math.max(1, Math.floor((rect.height - 6) / H));  // 绘图区内最多容纳的行数
+    // 先建元素并量实际宽度（长标题最多 116px、2 行），再按真实宽度做避让
     vis.forEach(o => {
-      let left = o.x - W/2;
-      if (left < minX) left = minX;
-      if (left + W > maxX) left = maxX - W;
-      let r = 0;
-      while (r < rowRight.length && rowRight[r] > left) r++;   // 与本行末标签重叠 → 下一行
-      rowRight[r] = left + W;
-      const top = rect.y + 6 + (r % maxRows) * H;   // 行数超绘图区高度时折返顶部，标签始终完整在图内（宁可重叠也不裁掉）
       const el = document.createElement('div');
       el.className = 'evLbl';
-      el.style.left = left + 'px';
-      el.style.width = W + 'px';
-      el.style.top = top + 'px';
+      el.style.left = minX + 'px';
+      el.style.top = (rect.y + 6) + 'px';
       el.style.color = o.col;
       el.textContent = o.title;
+      el.title = o.full;
+      el.dataset.date = o.date;
       wrap.appendChild(el);
+      o.el = el;
+      o.w = Math.min(maxW, el.offsetWidth || maxW);
+    });
+    const rowRight = [];                              // rowRight[r] = 第 r 行已占用右边界
+    const maxRows = Math.max(1, Math.floor((rect.height - 6) / H));
+    vis.forEach(o => {
+      let left = o.x - o.w/2;
+      if (left < minX) left = minX;
+      if (left + o.w > maxX) left = maxX - o.w;
+      let r = 0;
+      while (r < rowRight.length && rowRight[r] > left) r++;   // 与本行末标签重叠 → 下一行
+      rowRight[r] = left + o.w;
+      const top = rect.y + 6 + (r % maxRows) * H;
+      o.el.style.left = left + 'px';
+      o.el.style.top = top + 'px';
     });
   }
 
-  function render(){
+  let lastGroups = [];
+
+  function render(resetZoom){
+    if (resetZoom) st.zoom = {start:0, end:100};
     const s0 = st.start, s1 = st.end;
     const series = [];
+    let dMin = Infinity, dMax = -Infinity;
+
     CURVES.forEach(c => {
       if (!st.curves.has(c.key)) return;
       const vals = RV.series[c.brand][c.t];
@@ -600,27 +690,53 @@ function makeReviewPanel(RV){
       for (let i=0;i<RV.dates.length;i++){
         const d = RV.dates[i];
         if (d<s0 || d>s1) continue;
-        data.push([d, vals[i]]);
+        const v = vals[i];
+        if (v != null){ dMin = Math.min(dMin, v); dMax = Math.max(dMax, v); }
+        data.push([d, v]);
       }
       series.push({name:c.name, type:'line', data, showSymbol:false, connectNulls:true,
         lineStyle:{width:1.8, color:c.color}, itemStyle:{color:c.color}, z:2});
     });
+    if (!isFinite(dMin)){ dMin = 0; dMax = 1; }
+    const pad = (dMax-dMin) * 0.06 || Math.abs(dMax || 1) * 0.01 || 0.1;
+    const yMin = dMin - pad, yMax = dMax + pad;
 
-    const markData = [], evRows = [];
-    RV.events.forEach(e => {
-      if (!st.cats.has(e.cat)) return;
-      const col = catColor(e.cat);
-      if (e.date>=s0 && e.date<=s1){
-        markData.push({xAxis:e.date, lineStyle:{color:col, type:'solid', width:1.2}});
-        evRows.push({d:e.date, cat:e.cat, title:e.title});
-      }
-      if (e.date2 && e.date2>=s0 && e.date2<=s1){
-        markData.push({xAxis:e.date2, lineStyle:{color:col, type:'dashed', width:1.2}});
-        evRows.push({d:e.date2, cat:e.cat, title:e.title+'（实施）'});
+    const rows = selectedRows();
+    const groups = groupRows(rows);
+    lastGroups = groups;
+
+    // 同日 ≥2 条 = 全高竖线（×N）；单条 = 底部 10px 短刻度
+    const markData = [], ticks = {};
+    groups.forEach(g => {
+      const col = catColor(g.items[0].cat);
+      const hasAnn = g.items.some(x => x.kind === '公告/会议');
+      if (g.items.length >= 2){
+        markData.push({xAxis:g.date,
+          lineStyle:{color:col, type:hasAnn?'solid':'dashed', width:1.3, opacity:.85}});
+      } else {
+        const cat = g.items[0].cat;
+        (ticks[cat] = ticks[cat] || []).push([g.ts, yMin]);
       }
     });
     series.push({name:'_ev', type:'line', data:[], silent:true, tooltip:{show:false}, z:5,
       markLine:{silent:true, symbol:'none', label:{show:false}, data:markData}});
+
+    if (st.focus && st.focus >= s0 && st.focus <= s1){
+      series.push({name:'_focus', type:'line', data:[], silent:true, tooltip:{show:false}, z:7,
+        markLine:{silent:true, symbol:'none', label:{show:false}, data:[{xAxis:st.focus,
+          lineStyle:{color:'#111827', type:'solid', width:2.2, opacity:.55}}]}});
+    }
+
+    Object.keys(ticks).forEach(cat => {
+      series.push({name:'_tk_' + cat, type:'custom', silent:true, tooltip:{show:false}, z:6,
+        itemStyle:{color:catColor(cat)},
+        renderItem(params, api){
+          const p = api.coord([api.value(0), api.value(1)]);
+          return {type:'rect', shape:{x:p[0]-0.75, y:p[1]-10, width:1.5, height:10},
+                  style:api.style()};
+        },
+        data:ticks[cat]});
+    });
 
     chart.clear();
     chart.setOption({
@@ -632,59 +748,141 @@ function makeReviewPanel(RV){
           if(!ps || !ps.length) return '';
           const ds = fmtDate(ps[0].value[0]);
           let html = '<b>'+ds+'</b><br>';
-          ps.filter(p => p.seriesName!=='_ev').forEach(p => {
-            html += p.marker+p.seriesName+': <b>'+(p.value[1]==null?'—':p.value[1].toFixed(3)+'%')+'</b><br>';
-          });
-          const evs = RV.events.filter(e => st.cats.has(e.cat) && (e.date===ds || e.date2===ds));
+          ps.filter(p => p.seriesName && p.seriesName.indexOf('_') !== 0 && p.value && p.value.length > 1)
+            .forEach(p => {
+              html += p.marker+p.seriesName+': <b>'+(p.value[1]==null?'—':p.value[1].toFixed(3)+'%')+'</b><br>';
+            });
+          const evs = rows.filter(e => e.d === ds);
           if (evs.length){
             html += '<div style="border-top:1px solid #ddd;margin-top:3px;padding-top:3px"></div>';
             evs.forEach(e => html += '<span style="color:'+catColor(e.cat)+'">■</span> '+
-              (e.date===ds?'公告/会议':'实施')+' · '+e.title+'<br>');
+              '['+e.cat+'] '+e.kind+' · '+e.title+'<br>');
           }
           return html;
         }},
       dataZoom:[
-        {type:'inside', xAxisIndex:0, start:0, end:100},
-        {type:'slider', xAxisIndex:0, start:0, end:100, bottom:4, height:22,
+        {type:'inside', xAxisIndex:0, start:st.zoom.start, end:st.zoom.end},
+        {type:'slider', xAxisIndex:0, start:st.zoom.start, end:st.zoom.end, bottom:4, height:22,
           borderColor:'#d7dde6', fillerColor:'rgba(29,78,216,.10)',
           labelFormatter:v => fmtDate(v), textStyle:{fontSize:10, color:'#8a94a3'}}
       ],
       grid:{left:66, right:74, top:46, bottom:80},
       xAxis:{type:'time', axisLabel:{formatter:v => fmtDate(v), hideOverlap:true},
         axisPointer:{label:{formatter:p => fmtDate(p.value)}}},
-      yAxis:{type:'value', scale:true, name:'收益率(%)', nameTextStyle:{padding:[0,0,0,-8]}},
+      yAxis:{type:'value', scale:true, min:yMin, max:yMax, name:'收益率(%)',
+        nameTextStyle:{padding:[0,0,0,-8]},
+        axisLabel:{showMinLabel:false, showMaxLabel:false}},
       series
     });
 
-    evRows.sort((a,b) => a.d<b.d ? -1 : a.d>b.d ? 1 : 0);
-    R.evList.innerHTML = evRows.length
-      ? evRows.map(r => `<div class="ev"><span class="evD">${r.d}</span><span class="evT">${r.title}</span></div>`).join('')
-      : '<div class="evNote">未选择事件类别，或所选时间段内无事件。</div>';
-    layoutEventLabels();
+    // 右侧清单：按年份分组、带类别色点、点击定位
+    let listHtml = '', lastYear = '';
+    rows.forEach(r => {
+      const y = r.d.slice(0,4);
+      if (y !== lastYear){ listHtml += `<div class="evY">${y}</div>`; lastYear = y; }
+      const active = (st.focus === r.d) ? ' active' : '';
+      listHtml += `<div class="ev${active}" data-date="${r.d}" data-cat="${r.cat}" title="${r.d} · ${r.cat} · ${r.kind}">`+
+        `<span class="evDot" style="background:${catColor(r.cat)}"></span>`+
+        `<span class="evD">${r.d}</span><span class="evT">${r.title}${r.kind==='实施'?'（实施）':''}</span></div>`;
+    });
+    R.evList.innerHTML = listHtml || '<div class="evNote">未选择事件类别，或所选时间段内无事件。</div>';
+    R.evCnt.textContent = rows.length ? rows.length + ' 条' : '';
+    R.revCount.textContent = groups.length ? `所选区间 ${groups.length} 个事件日 / ${rows.length} 条` : '';
+
+    layoutEventLabels(groups);
     chart.resize();
+  }
+
+  // 点击事件/清单 → 把横轴定位到该日期前后 120 天
+  function focusDate(d){
+    const t = new Date(d).getTime(), half = 120 * 864e5;
+    const lo = new Date(Math.max(new Date(firstD).getTime(), t - half));
+    const hi = new Date(Math.min(new Date(lastD).getTime(), t + half));
+    st.start = fmtDate(lo); st.end = fmtDate(hi);
+    R.startEl.value = st.start; R.endEl.value = st.end;
+    st.focus = d; setRangeBtn('');
+    render(true);
+    const row = R.evList.querySelector('.ev[data-date="'+d+'"]');
+    if (row) row.scrollIntoView({block:'nearest'});
   }
 
   R.curveBox.addEventListener('change', ev => {
     const cb = ev.target.closest('input[data-key]'); if (!cb) return;
     if (cb.checked) st.curves.add(cb.dataset.key); else st.curves.delete(cb.dataset.key);
-    render();
+    render(false);
   });
   R.catBox.addEventListener('change', ev => {
     const cb = ev.target.closest('input[data-cat]'); if (!cb) return;
     if (cb.checked) st.cats.add(cb.dataset.cat); else st.cats.delete(cb.dataset.cat);
-    render();
+    render(false);
   });
-  R.startEl.addEventListener('change', () => { st.start = R.startEl.value || RV.dates[0]; render(); });
-  R.endEl.addEventListener('change', () => { st.end = R.endEl.value || RV.dates[RV.dates.length-1]; render(); });
+  host.querySelector('.allCats').addEventListener('click', () => {
+    st.cats = new Set(catOrder); buildChips(); render(false);
+  });
+  host.querySelector('.noCats').addEventListener('click', () => {
+    st.cats = new Set(); buildChips(); render(false);
+  });
+  R.impl.addEventListener('change', () => { st.showImpl = R.impl.checked; render(false); });
 
-  chart.on('datazoom', layoutEventLabels);     // 缩放/平移横轴时事件文字跟着重排
-  chart.on('restore', layoutEventLabels);      // toolbox「还原」后重排
+  function onDateChange(){
+    let s = R.startEl.value, e = R.endEl.value;
+    if (!s || !e) return;
+    if (s < firstD) s = firstD;
+    if (e > lastD) e = lastD;
+    if (s > e){
+      if (document.activeElement === R.startEl) e = s; else s = e;
+    }
+    st.start = s; st.end = e;
+    R.startEl.value = s; R.endEl.value = e;
+    st.focus = null; setRangeBtn('');
+    render(true);
+  }
+  R.startEl.addEventListener('change', onDateChange);
+  R.endEl.addEventListener('change', onDateChange);
+
+  R.rng.addEventListener('click', ev => {
+    const b = ev.target.closest('button[data-r]'); if (!b) return;
+    const r = b.dataset.r;
+    st.end = lastD;
+    if (r === 'all') st.start = firstD;
+    else {
+      const d = new Date(lastD);
+      d.setFullYear(d.getFullYear() - Number(r));
+      const s = fmtDate(d);
+      st.start = s < firstD ? firstD : s;
+    }
+    R.startEl.value = st.start; R.endEl.value = st.end;
+    st.focus = null; setRangeBtn(r);
+    render(true);
+  });
+
+  R.evList.addEventListener('click', ev => {
+    const row = ev.target.closest('.ev[data-date]'); if (!row) return;
+    focusDate(row.dataset.date);
+  });
+  R.evWrap.addEventListener('click', ev => {
+    const lbl = ev.target.closest('.evLbl[data-date]'); if (!lbl) return;
+    focusDate(lbl.dataset.date);
+  });
+
+  chart.on('datazoom', () => {                  // 缩放/平移：记住窗口 + 事件文字重排
+    const dz = chart.getOption().dataZoom;
+    if (dz && dz[0]) st.zoom = {start:dz[0].start, end:dz[0].end};
+    layoutEventLabels(lastGroups);
+  });
+  chart.on('restore', () => {                   // toolbox「还原」：回到全区间
+    st.zoom = {start:0, end:100};
+    chart.dispatchAction({type:'dataZoom', start:0, end:100});
+    layoutEventLabels(lastGroups);
+  });
 
   R.startEl.value = st.start;
   R.endEl.value = st.end;
+  R.startEl.min = firstD; R.startEl.max = lastD;
+  R.endEl.min = firstD; R.endEl.max = lastD;
   buildChips();
-  render();
-  return { brand:'债市复盘', syncCardH:()=>{}, resize:() => { chart.resize(); layoutEventLabels(); } };
+  render(false);
+  return { brand:'债市复盘', syncCardH:()=>{}, resize:() => { chart.resize(); layoutEventLabels(lastGroups); } };
 }
 
 // ---- 建面板 + 页脚 + 全局 resize ----
