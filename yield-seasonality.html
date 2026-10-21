@@ -101,6 +101,28 @@ tr.cur td{background:#f5f8ff;font-weight:600;}
 .evD{font-family:ui-monospace,Consolas,monospace;color:var(--blue);white-space:nowrap;min-width:86px;}
 .evT{color:var(--ink);flex:1;min-width:0;word-break:break-all;}
 .evNote{color:var(--muted);padding:6px 2px;}
+/* ---- 事件效应统计（内嵌折叠表） ---- */
+.evStats{margin:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 16px;}
+.evStats summary{list-style:none;cursor:pointer;display:flex;align-items:baseline;gap:10px;
+  padding:10px 0;font-size:14px;font-weight:600;user-select:none;}
+.evStats summary::-webkit-details-marker{display:none;}
+.evStats summary::before{content:'▸';color:var(--muted);font-size:12px;transition:transform .15s;}
+.evStats[open] summary::before{content:'▾';}
+.evStatsSub{font-size:11.5px;color:var(--muted);font-weight:400;}
+.evStatsInner{padding:0 0 12px;}
+.evStatsBar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 6px;}
+.evStatsHint{font-size:11.5px;color:var(--muted);}
+.evStatsTable{overflow-x:auto;}
+.evStatsT{width:100%;min-width:760px;border-collapse:collapse;font-size:12.5px;margin-top:2px;}
+.evStatsT th,.evStatsT td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;}
+.evStatsT th{color:var(--muted);font-weight:600;background:#fafbfc;}
+.evStatsT th.l,.evStatsT td.l{text-align:left;}
+.evStatsT tr.dim td{color:#9aa3af;}
+.evSDot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:1px;}
+.evStatsT .sv{font-variant-numeric:tabular-nums;}
+.evStatsT .sr{color:var(--muted);font-size:11.5px;}
+.evStatsEmpty,.evStatsFoot{font-size:11.5px;color:var(--muted);line-height:1.5;}
+.evStatsFoot{margin-top:6px;}
 @media (max-width:1000px){
   .revSplit{height:auto;flex-wrap:wrap;}
   .revSplit .revMain,.revSplit .evCard{flex:1 1 100%;width:100%;max-width:none;}
@@ -539,7 +561,18 @@ function reviewPanelHTML(){
       <div class="cardhead"><h2>事件清单</h2><span class="evCnt"></span></div>
       <div class="evList"></div>
     </div>
-  </div>`;
+  </div>
+  <details class="evStats">
+    <summary>事件效应统计<span class="evStatsSub">10Y 国债 · 公告/会议日 / 实施日 · 均值 / 中位（胜率）</span></summary>
+    <div class="evStatsInner">
+      <div class="evStatsBar">
+        <span class="seg evStatsSeg"><button data-t="ann" class="on">公告/会议日</button><button data-t="impl">实施日</button></span>
+        <span class="evStatsHint"></span>
+      </div>
+      <div class="evStatsTable"></div>
+      <div class="evStatsFoot">统计描述，非策略回测：T+n 窗口可能重叠，2024 年后样本集中，未做多重检验校正；当日列受发布时点影响，优先看 T+5 / T+20。N 为同日同类去重后的观测数；全样本统计，不随上方时间区间变化。</div>
+    </div>
+  </details>`;
 }
 
 function makeReviewPanel(RV){
@@ -553,6 +586,8 @@ function makeReviewPanel(RV){
               endEl:$('.endDate'), chartEl:$('.revChart'), evList:$('.evList'), evWrap:$('.evWrap'),
               impl:$('.showImpl'), rng:$('.rngBox'), revCount:$('.revCount'), evCnt:$('.evCnt') };
   const chart = echarts.init(R.chartEl);
+  const STAT = RV.evStats || null;
+  let statMode = 'ann';
 
   const CURVES = [];
   RV.tenors.forEach(t => {
@@ -824,6 +859,53 @@ function makeReviewPanel(RV){
 
   let lastGroups = [];
 
+  // 事件效应统计：全样本、随上方类别勾选联动；公告/会议日与实施日切换
+  function fmtBp(v){
+    if (v == null) return '—';
+    if (Math.abs(v) < 0.05) return '0.0';
+    return (v > 0 ? '+' : '') + v.toFixed(1);
+  }
+  function pct(x){            // 与报告一致：.5 取偶（12.5→12、87.5→88）
+    const y = x * 100, f = Math.floor(y), d = y - f;
+    return Math.abs(d - 0.5) < 1e-9 ? (f % 2 ? f + 1 : f) : Math.round(y);
+  }
+  function renderStats(){
+    const box = $('.evStatsTable'), hint = $('.evStatsHint');
+    if (!box) return;
+    if (!STAT){ box.innerHTML = '<div class="evStatsEmpty">暂无统计数据。</div>'; return; }
+    const data = STAT[statMode] || {};
+    const cats = STAT.cats.filter(c => st.cats.has(c) && data[c]);
+    const seg = $('.evStatsSeg');
+    if (seg) seg.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === statMode));
+    if (!cats.length){
+      box.innerHTML = '<div class="evStatsEmpty">请在上方勾选事件类别。</div>';
+      if (hint) hint.textContent = statMode === 'impl' ? '实施日仅降准降息、调控金融机构有记录' : '';
+      return;
+    }
+    let h = '<table class="evStatsT"><thead><tr><th class="l">类别</th><th>N</th><th>方向</th>' +
+            STAT.horizons.map(x => '<th>' + x + '</th>').join('') + '</tr></thead><tbody>';
+    cats.forEach(cat => {
+      const row = data[cat], dir = STAT.dir[cat] || 0;
+      h += '<tr' + (row.n < 10 ? ' class="dim" title="N<10，仅参考"' : '') + '>' +
+           '<td class="l"><span class="evSDot" style="background:' + catColor(cat) + '"></span>' + cat + '</td>' +
+           '<td>' + row.n + '</td><td>' + (dir < 0 ? '↓' : dir > 0 ? '↑' : '不定') + '</td>';
+      row.cells.forEach(c => {
+        if (!c){ h += '<td>—</td>'; return; }
+        const rate = dir ? pct(c.hit) + '%' : '上' + pct(c.up) + '%';
+        h += '<td><span class="sv">' + fmtBp(c.mean) + ' / ' + fmtBp(c.med) + '</span> ' +
+             '<span class="sr">(' + rate + ')</span></td>';
+      });
+      h += '</tr>';
+    });
+    h += '</tbody></table>';
+    box.innerHTML = h;
+    if (hint){
+      const n = cats.reduce((a, c) => a + data[c].n, 0);
+      hint.textContent = (statMode === 'impl' ? '实施日' : '公告/会议日') + ' · ' +
+        cats.length + ' 类 / ' + n + ' 条观测';
+    }
+  }
+
   function render(resetZoom){
     if (resetZoom) st.zoom = {start:0, end:100};
     const s0 = st.start, s1 = st.end;
@@ -958,6 +1040,7 @@ function makeReviewPanel(RV){
     R.evCnt.textContent = rows.length ? rows.length + ' 条' : '';
     R.revCount.textContent = groups.length ? `所选区间 ${groups.length} 个事件日 / ${rows.length} 条` : '';
 
+    renderStats();
     layoutEventLabels(groups);
     chart.resize();
   }
@@ -992,6 +1075,11 @@ function makeReviewPanel(RV){
     st.cats = new Set(); buildChips(); render(false);
   });
   R.impl.addEventListener('change', () => { st.showImpl = R.impl.checked; render(false); });
+  host.querySelector('.evStatsSeg').addEventListener('click', ev => {
+    const b = ev.target.closest('button[data-t]'); if (!b) return;
+    statMode = b.dataset.t;
+    renderStats();
+  });
 
   function onDateChange(){
     let s = R.startEl.value, e = R.endEl.value;
@@ -1062,7 +1150,8 @@ panelApi.push(makeReviewPanel(REVIEW));
 const foot = document.getElementById('foot');
 foot.textContent = PANELS
   .map(p => `${p.brand}数据最新 ${p.latest} · 数据包更新 ${p.src_mtime}`)
-  .join('　｜　') + '　｜　债市复盘事件 ' + REVIEW.events.length + ' 条 · 数据最新 ' + REVIEW.latest
+  .join('　｜　') + '　｜　债市复盘事件 ' + REVIEW.events.length + ' 条（同日同类去重 ' +
+  (REVIEW.evStats ? REVIEW.evStats.nUnique : REVIEW.events.length) + '） · 数据最新 ' + REVIEW.latest
   + '　·　生成于 treasury-seasonality skill';
 
 window.addEventListener('resize', () => {
