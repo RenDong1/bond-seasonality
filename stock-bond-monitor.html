@@ -76,6 +76,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 .rule-list code{background:#f1f3f5;padding:1px 6px;border-radius:4px;font-size:12px}
 .boundary{font-size:12px;color:#666;line-height:1.9;margin-top:10px;padding:12px 14px;background:#fafafa;border-left:3px solid #c5cae9;border-radius:4px}
 .fatal{display:none;background:#fff5f5;border-left:4px solid #c62828;color:#b71c1c}
+.mode-bar{display:flex;gap:8px;margin-bottom:14px}
+.mode-btn{padding:8px 18px;border:1px solid #c5cae9;border-radius:20px;background:#fff;color:#3949ab;font-size:13px;cursor:pointer;font-family:inherit}
+.mode-btn.active{background:#1a237e;color:#fff;border-color:#1a237e}
+.mode-btn:disabled{opacity:.45;cursor:not-allowed}
 @media(max-width:820px){
   .cond{grid-template-columns:1.4fr .8fr .8fr .9fr}
   .cond .thr{display:none}
@@ -113,6 +117,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 </div>
 <div class="container">
 
+<div class="mode-bar" id="mode-bar">
+  <button class="mode-btn active" data-mode="compress">利差压缩（R3d）</button>
+  <button class="mode-btn" data-mode="widen">利差走扩（R3u-D）</button>
+</div>
+
 <div id="fatal" class="panel fatal">
   <b>数据未加载</b><br>
   未找到 <code>window.MONITOR_DATA</code>。请确认同目录下的 <code>stock-bond-monitor-data.js</code> 已生成并随页面一同发布。
@@ -129,7 +138,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 <div class="stats-row" id="stats"></div>
 
 <div class="panel">
-  <h2>触发条件 <span class="sub">四项同时满足，且距上次触发超过 10 个交易日</span></h2>
+  <h2>触发条件 <span class="sub" id="cond-sub">四项同时满足，且距上次触发超过 10 个交易日</span></h2>
   <div class="cond cond-head">
     <div>条件</div><div>当前值</div><div>阈值</div><div>距离</div><div style="text-align:right">状态</div>
   </div>
@@ -143,7 +152,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 </div>
 
 <div class="panel">
-  <h2>30Y–10Y 利差走势 <span class="sub">TL 上市以来；红点为 R3d 触发日</span></h2>
+  <h2>30Y–10Y 利差走势 <span class="sub" id="spread-sub">TL 上市以来；红点为 R3d 触发日</span></h2>
   <div class="seg-bar" id="range-seg">
     <span class="seg" data-range="1">近 1 年</span>
     <span class="seg" data-range="2">近 2 年</span>
@@ -165,7 +174,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 </div>
 
 <div class="panel">
-  <h2>事件明细 <span class="sub">按时间倒序；ΔS 为 30Y–10Y 利差变化（bp），负值为压缩</span></h2>
+  <h2>事件明细 <span class="sub" id="event-sub">按时间倒序；ΔS 为 30Y–10Y 利差变化（bp），负值为压缩</span></h2>
   <div class="tbl-wrap">
     <table class="tbl">
       <thead><tr>
@@ -181,21 +190,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 </div>
 
 <div class="panel">
-  <h2>历史验证 <span class="sub">全部事件等权；p 值为单侧符号检验（原假设：中位 ΔS ≥ 0）</span></h2>
+  <h2>历史验证 <span class="sub" id="kpi-sub">全部事件等权；p 值为单侧符号检验（原假设：中位 ΔS ≥ 0）</span></h2>
   <table class="kpi-table">
     <thead><tr>
-      <th>事件后交易日</th><th>有效样本</th><th>中位 ΔS</th><th>压缩比例</th>
-      <th>单侧 p</th><th>90% 区间</th><th>普通下跌日中位</th><th>相对基线（事件−基线）</th>
+      <th>事件后交易日</th><th>有效样本</th><th>中位 ΔS</th><th id="hit-head">压缩比例</th>
+      <th>单侧 p</th><th>90% 区间</th><th id="base-head">普通下跌日中位</th><th>相对基线（事件−基线）</th>
     </tr></thead>
     <tbody id="kpi-tbody"></tbody>
   </table>
   <p class="note" id="verify-note"></p>
+  <div id="split-wrap" style="display:none;margin-top:18px">
+    <h3 style="font-size:13px;color:#1a237e;margin-bottom:8px">分样本验证（23–24 训练 / 25–26 样本外）</h3>
+    <table class="kpi-table">
+      <thead><tr>
+        <th>事件后交易日</th><th>训练样本</th><th>训练走扩率</th><th>训练 p</th>
+        <th>样本外样本</th><th>样本外走扩率</th><th>样本外 p</th>
+        <th>仅股市上涨基线（样本外）</th><th>样本外增量</th>
+      </tr></thead>
+      <tbody id="split-tbody"></tbody>
+    </table>
+    <p class="note">样本外从 2025-01-01 起；事件结果日也必须落在样本外，避免用训练期结果验证。分样本基线为同一 SR40 条件下按 10 日去重的普通上涨日（不要求 rel_oi/relret）；上方 KPI 的基线为未去重的全部普通上涨日。</p>
+  </div>
 </div>
 
 <div class="panel">
   <h2>规则与使用边界</h2>
   <div class="rule-list" id="rule-box"></div>
-  <div class="boundary">
+  <div class="boundary" id="boundary-box">
     <b>使用边界</b><br>
     1. 信号的目标仍是 <b>20–60 日、数 bp 的曲线变平</b>，不是持续牛市；5 日样本小、噪声大；10 日在 25–26 样本外为 8/9，但样本仅 9 个，仍不作为主判断依据。<br>
     2. 触发日的 TL 强势不能外推为后续领涨：事件后 TL−T 的中位收益不延续，利差压缩也可能来自现券补涨。<br>
@@ -220,6 +241,8 @@ if (!D || !D.meta) {
 
 var H = D.history || {};
 var dates = H.dates || [];
+var MODES = { compress: D, widen: D.widening || null };
+var mode = (location.hash === '#widen' && MODES.widen) ? 'widen' : 'compress';
 var charts = [];
 
 function $(id){ return document.getElementById(id); }
@@ -240,6 +263,14 @@ function fmtPct(v, d){
   var x = num(v);
   return x === null ? '—' : (x * 100).toFixed(d) + '%';
 }
+function signLabel(v, d){
+  var x = num(v);
+  if (x === null) return '—';
+  if (d === undefined) d = 2;
+  if (x > 0) return '+' + x.toFixed(d);
+  if (x < 0) return '−' + Math.abs(x).toFixed(d);
+  return x.toFixed(d);
+}
 function cls(v){ var x = num(v); return x === null ? 'muted' : (x < 0 ? 'neg' : 'pos'); }
 function tooltipNum(v, unit, d){
   var x = num(v);
@@ -251,547 +282,620 @@ function isoMinusDays(iso, days){
   var t = Date.UTC(p[0], p[1] - 1, p[2]) - days * 86400000;
   return new Date(t).toISOString().slice(0, 10);
 }
-
-// ------------------------------------------------------------------
-// 顶部状态
-// ------------------------------------------------------------------
-var meta = D.meta;
-var cur = D.current || {};
-var last = D.last_event;
-
-$('data-info').textContent =
-  '数据截至 ' + meta.as_of + '（T-1 收盘） · 样本自 ' + meta.start +
-  ' · 共 ' + meta.event_count + ' 次事件 · 生成于 ' + meta.generated_at;
-
-var statusMap = {
-  '最新交易日触发': ['trigger', '● 最新交易日触发'],
-  '事件进行中': ['active', '● 事件进行中'],
-  '最近事件已结束': ['done', '● 最近事件已结束'],
-  '未触发': ['idle', '○ 未触发']
-};
-var st = statusMap[meta.status] || ['idle', meta.status];
-var badge = $('status-badge');
-badge.className = 'badge ' + st[0];
-badge.textContent = st[1];
-
-var asofHtml = '最新交易日 <b>' + meta.as_of + '</b>';
-if (last) {
-  asofHtml += ' · 最近触发 <b>' + last.date + '</b>';
-  asofHtml += last.active
-    ? '（已过 ' + last.elapsed + ' 个交易日）'
-    : '（事件已结束）';
+function hitFrac(s){
+  if (!s || num(s.hit) === null || !s.n) return '—';
+  return Math.round(s.hit * s.n) + '/' + s.n + '=' + (s.hit * 100).toFixed(1) + '%';
 }
-if (meta.roll_day) {
-  asofHtml += ' · <span style="color:#ff9800">最新交易日为换月日</span>';
-}
-$('asof-box').innerHTML = asofHtml;
-$('gen-box').innerHTML =
-  '事件数 <b>' + meta.event_count + '</b> · 已走完 60 日 <b>' + meta.path_event_count + '</b><br>' +
-  '<span style="font-size:11px;color:#999">生成时间 ' + meta.generated_at + '</span>';
-
-// ------------------------------------------------------------------
-// 四张指标卡
-// ------------------------------------------------------------------
-var prevSpread = dates.length > 1 ? H.spread[dates.length - 2] : null;
-var spreadDelta = (num(cur.spread) !== null && num(prevSpread) !== null)
-  ? cur.spread - prevSpread : null;
-var spreadDeltaTxt = spreadDelta === null ? '较前一日 —'
-  : ('较前一日 ' + fmt(spreadDelta, 2) + 'bp');
-
-var cards = [
-  {
-    label: '30Y–10Y 利差',
-    value: fmtPlain(cur.spread, 2), unit: 'bp',
-    sub: spreadDeltaTxt,
-    color: ''
-  },
-  {
-    label: 'TL 全合约持仓日增',
-    value: fmt(cur.g_tl, 2), unit: '%',
-    sub: 'T 增仓 ' + fmt(cur.g_t, 2) + '%',
-    color: cls(cur.g_tl)
-  },
-  {
-    label: 'TL−T 相对增仓',
-    value: fmt(cur.rel_oi, 2), unit: 'pp',
-    sub: '阈值 > 0 pp',
-    color: cls(cur.rel_oi)
-  },
-  {
-    label: 'TL 对 T 的 DV01 中性收益',
-    value: meta.roll_day ? '换月' : fmt(cur.relret, 3),
-    unit: meta.roll_day ? '—' : '%',
-    sub: meta.roll_day ? '换月日不计算' : ('β = ' + fmtPlain(cur.beta, 2)),
-    color: meta.roll_day ? 'muted' : cls(cur.relret)
-  }
-];
-$('stats').innerHTML = cards.map(function(c){
-  return '<div class="stat-card' + (c.label.indexOf('利差') >= 0 ? ' hit' : '') + '">' +
-    '<div class="label">' + c.label + '</div>' +
-    '<div class="value ' + c.color + '">' + c.value +
-      '<span class="unit">' + c.unit + '</span></div>' +
-    '<div class="delta">' + c.sub + '</div></div>';
-}).join('');
-
-// ------------------------------------------------------------------
-// 条件清单
-// ------------------------------------------------------------------
-var condGapText = {
-  sr40: function(g){ return '还需下跌 ' + g.toFixed(2) + '%'; },
-  g_tl: function(g){ return '还需多增 ' + g.toFixed(2) + '%'; },
-  rel_oi: function(g){ return '还需高出 ' + g.toFixed(2) + 'pp'; },
-  relret: function(g){ return '还需高出 ' + g.toFixed(2) + '%'; }
-};
-$('conds').innerHTML = (D.conditions || []).map(function(c){
-  var v = num(c.value);
-  var isNa = (v === null);
-  var flag, flagCls;
-  if (isNa) { flag = '换月/—'; flagCls = 'na'; }
-  else if (c.pass) { flag = '✓ 满足'; flagCls = 'ok'; }
-  else { flag = '✗ 未满足'; flagCls = 'no'; }
-  var thr = (c.op === '<=' ? '≤ ' : '> ') + c.threshold + c.unit;
-  var gapTxt;
-  if (isNa) gapTxt = '换月日不计算';
-  else if (c.pass) gapTxt = '已满足';
-  else if (c.gap !== null && c.gap !== undefined) gapTxt = condGapText[c.key](c.gap);
-  else gapTxt = '—';
-  return '<div class="cond">' +
-    '<div class="name">' + c.label + '</div>' +
-    '<div class="val ' + (isNa ? 'muted' : '') + '">' +
-      (isNa ? '—' : fmtPlain(v, c.key === 'relret' ? 3 : 2) + c.unit) + '</div>' +
-    '<div class="thr">' + thr + '</div>' +
-    '<div class="gap">' + gapTxt + '</div>' +
-    '<div class="flag ' + flagCls + '">' + flag + '</div>' +
-    '</div>';
-}).join('');
-
-// ------------------------------------------------------------------
-// 事件跟踪
-// ------------------------------------------------------------------
-function eventBox(){
-  if (!last) {
-    return '<div class="empty">尚未出现 R3d 触发事件。</div>';
-  }
-  var active = last.active;
-  var title = active
-    ? '活跃事件：<b>' + last.date + '</b> 触发'
-    : '最近事件：<b>' + last.date + '</b>（已结束）';
-  var elapsed = last.elapsed;
-  var progress = Math.min(1, elapsed / 20) * 100;
-  var html = '<div style="font-size:14px;margin-bottom:4px">' + title + '</div>' +
-    '<div style="font-size:12px;color:#666">' +
-      (active
-        ? '已过 <b>' + elapsed + '</b> 个交易日 · 20 日主窗口进度 ' +
-          Math.min(elapsed, 20) + '/20'
-        : '距触发已 ' + elapsed + ' 个交易日，主窗口与延展窗口均已走完') +
-    '</div>' +
-    '<div class="progress"><i style="width:' + progress + '%"></i></div>' +
-    '<div class="event-grid">' +
-      '<div class="cell"><div class="k">当前 ΔS（30Y−10Y）</div>' +
-        '<div class="v ' + cls(last.dS) + '">' + fmt(last.dS, 2) +
-        '<span class="u">bp</span></div></div>' +
-      '<div class="cell"><div class="k">Δy30</div>' +
-        '<div class="v ' + cls(last.dy30) + '">' + fmt(last.dy30, 2) +
-        '<span class="u">bp</span></div></div>' +
-      '<div class="cell"><div class="k">Δy10</div>' +
-        '<div class="v ' + cls(last.dy10) + '">' + fmt(last.dy10, 2) +
-        '<span class="u">bp</span></div></div>' +
-      '<div class="cell"><div class="k">已过交易日</div>' +
-        '<div class="v">' + elapsed + '<span class="u">日</span></div></div>' +
-    '</div>' +
-    '<p class="note">主窗口为触发后 20 个交易日，其次 40/60 日；5–10 日仅作观察。' +
-    'ΔS 为负表示利差压缩。' +
-    (active ? '当前路径见下方「事件后利差路径」橙线。' : '') + '</p>';
-  return html;
-}
-$('event-box').innerHTML = eventBox();
-
-// ------------------------------------------------------------------
-// 图表：利差走势
-// ------------------------------------------------------------------
-var spreadChart = echarts.init($('spread-chart'));
-charts.push(spreadChart);
-var range = 0;
-
-function rangeStart(rs){
-  if (!rs) return 0;
-  var cutoff = isoMinusDays(meta.as_of, rs * 365);
-  for (var i = 0; i < dates.length; i++) {
-    if (dates[i] >= cutoff) return i;
-  }
-  return 0;
-}
-
-function spreadOption(rs){
-  var start = rangeStart(rs);
-  var x = dates.slice(start);
-  var y = H.spread.slice(start);
-  var trig = [];
-  for (var i = start; i < dates.length; i++) {
-    trig.push(H.trigger[i] ? H.spread[i] : null);
-  }
-  var markArea = { silent: true, itemStyle: { color: 'rgba(255,152,0,0.10)' }, data: [] };
-  if (last && last.active) {
-    var ei = dates.indexOf(last.date);
-    if (ei >= 0) {
-      var ej = Math.min(dates.length - 1, ei + 60);
-      markArea.data.push([
-        { xAxis: dates[Math.max(ei, start)] },
-        { xAxis: dates[ej] }
-      ]);
-    }
-  }
-  return {
-    animation: false,
-    grid: { left: 58, right: 24, top: 26, bottom: 58 },
-    tooltip: {
-      trigger: 'axis',
-      formatter: function(ps){
-        var i = ps[0].dataIndex;
-        var out = '<b>' + x[i] + '</b><br>利差：' + tooltipNum(y[i], ' bp', 2);
-        var gi = start + i;
-        if (H.trigger[gi]) out += '<br><span style="color:#c62828">● R3d 触发</span>';
-        return out;
-      }
-    },
-    xAxis: {
-      type: 'category', data: x, boundaryGap: false,
-      axisLabel: { fontSize: 10, color: '#888' },
-      axisLine: { lineStyle: { color: '#ddd' } }
-    },
-    yAxis: {
-      type: 'value', name: 'bp', nameTextStyle: { fontSize: 11, color: '#999' },
-      scale: true, axisLabel: { fontSize: 10, color: '#888' },
-      splitLine: { lineStyle: { color: '#f0f0f0' } }
-    },
-    dataZoom: [
-      { type: 'inside', start: 0, end: 100 },
-      { type: 'slider', height: 18, bottom: 12, borderColor: '#e0e0e0',
-        fillerColor: 'rgba(26,35,126,0.08)', handleSize: '80%',
-        textStyle: { fontSize: 9, color: '#999' } }
-    ],
-    series: [
-      {
-        name: '30Y–10Y', type: 'line', data: y, showSymbol: false,
-        lineStyle: { color: '#1a237e', width: 1.6 },
-        areaStyle: { color: 'rgba(26,35,126,0.05)' },
-        markArea: markArea
-      },
-      {
-        name: 'R3d 触发', type: 'scatter', data: trig,
-        symbolSize: 9, itemStyle: { color: '#c62828' },
-        tooltip: { show: false }, z: 6
-      }
-    ]
-  };
-}
-
-spreadChart.setOption(spreadOption(range), true);
-
-$('range-seg').addEventListener('click', function(e){
-  var t = e.target;
-  if (!t.classList.contains('seg')) return;
-  var segs = $('range-seg').querySelectorAll('.seg');
-  for (var i = 0; i < segs.length; i++) segs[i].classList.remove('active');
-  t.classList.add('active');
-  range = Number(t.getAttribute('data-range'));
-  spreadChart.setOption(spreadOption(range), true);
-});
-
-// ------------------------------------------------------------------
-// 图表：事件后路径
-// ------------------------------------------------------------------
-var path = D.path || [];
-var activePath = D.active_path || [];
-var offsets = path.map(function(r){ return String(r.offset); });
-var q25 = path.map(function(r){ return num(r.q25); });
-var q75 = path.map(function(r){ return num(r.q75); });
-var med = path.map(function(r){ return num(r.median); });
-var band = path.map(function(r){
-  var a = num(r.q25), b = num(r.q75);
-  return (a === null || b === null) ? null : b - a;
-});
-var activeMap = {};
-activePath.forEach(function(r){ activeMap[r.offset] = r.dS; });
-var activeLine = path.map(function(r){
-  return activeMap.hasOwnProperty(r.offset) ? activeMap[r.offset] : null;
-});
-
-var pathChart = echarts.init($('path-chart'));
-charts.push(pathChart);
-pathChart.setOption({
-  animation: false,
-  grid: { left: 58, right: 24, top: 28, bottom: 46 },
-  legend: {
-    top: 0, right: 10, itemWidth: 14, itemHeight: 8,
-    textStyle: { fontSize: 11, color: '#666' },
-    data: ['25–75% 区间', '历史中位', '当前事件']
-  },
-  tooltip: {
-    trigger: 'axis',
-    formatter: function(ps){
-      var i = ps[0].dataIndex;
-      var r = path[i];
-      var out = '<b>事件后 ' + (r.offset > 0 ? '+' : '') + r.offset + ' 日</b><br>' +
-        '中位 ΔS：' + tooltipNum(r.median, ' bp', 2) + '<br>' +
-        '25–75%：' + tooltipNum(r.q25, '', 2) + ' ~ ' + tooltipNum(r.q75, '', 2) + '<br>' +
-        '样本：' + r.n;
-      if (activeLine[i] !== null) out += '<br><span style="color:#ef6c00">当前事件：' +
-        tooltipNum(activeLine[i], ' bp', 2) + '</span>';
-      return out;
-    }
-  },
-  xAxis: {
-    type: 'category', data: offsets, boundaryGap: false,
-    axisLabel: {
-      fontSize: 10, color: '#888',
-      formatter: function(v){ return v === '0' ? '触发日' : v; }
-    },
-    axisLine: { lineStyle: { color: '#ddd' } }
-  },
-  yAxis: {
-    type: 'value', name: 'ΔS (bp)', nameTextStyle: { fontSize: 11, color: '#999' },
-    axisLabel: { fontSize: 10, color: '#888' },
-    splitLine: { lineStyle: { color: '#f0f0f0' } }
-  },
-  series: [
-    {
-      name: 'band-base', type: 'line', data: q25, stack: 'band',
-      stackStrategy: 'all', symbol: 'none', lineStyle: { opacity: 0 },
-      areaStyle: { color: 'transparent' }, silent: true, tooltip: { show: false }
-    },
-    {
-      name: '25–75% 区间', type: 'line', data: band, stack: 'band',
-      stackStrategy: 'all', symbol: 'none', lineStyle: { opacity: 0 },
-      areaStyle: { color: 'rgba(66,165,245,0.20)' },
-      itemStyle: { color: '#64b5f6' },
-      silent: true, tooltip: { show: false }
-    },
-    {
-      name: '历史中位', type: 'line', data: med, symbol: 'none',
-      lineStyle: { color: '#1565c0', width: 2.4 },
-      itemStyle: { color: '#1565c0' }, z: 5,
-      markLine: {
-        symbol: 'none', silent: true,
-        lineStyle: { color: '#bbb', type: 'dashed', width: 1 },
-        data: [{ yAxis: 0 }]
-      }
-    },
-    {
-      name: '当前事件', type: 'line', data: activeLine,
-      symbol: 'circle', symbolSize: 5, connectNulls: false,
-      lineStyle: { color: '#ef6c00', width: 2.2 }, itemStyle: { color: '#ef6c00' },
-      z: 7
-    }
-  ]
-}, true);
-
-$('path-note').textContent = path.length
-  ? ('历史路径使用已走完 60 个交易日的 ' + meta.path_event_count +
-     ' 次事件，各时点样本一致；左端 −20 日为事件前走势。当前事件进度见上方。')
-  : '当前没有已走完 60 个交易日的事件，历史路径暂不可用。';
-
-// ------------------------------------------------------------------
-// 图表：条件历史
-// ------------------------------------------------------------------
-var N = 120;
-var hStart = Math.max(0, dates.length - N);
-var hDates = dates.slice(hStart);
-
-function histSlice(arr){ return arr.slice(hStart); }
-
-var condA = echarts.init($('cond-chart-a'));
-var condB = echarts.init($('cond-chart-b'));
-charts.push(condA, condB);
-
-function condTooltip(ps){
-  var i = ps[0].dataIndex;
-  var out = '<b>' + hDates[i] + '</b>';
-  ps.forEach(function(p){
-    if (p.seriesName === 'band') return;
-    var v = num(p.value);
-    out += '<br>' + p.marker + p.seriesName + '：' +
-      (v === null ? '—' : v.toFixed(2) +
-        (p.seriesName.indexOf('SR40') >= 0 ||
-         p.seriesName.indexOf('relret') >= 0 ? '%' : ''));
-  });
-  return out;
-}
-
-condA.setOption({
-  animation: false,
-  grid: { left: 52, right: 58, top: 30, bottom: 40 },
-  legend: { top: 0, left: 'center', itemWidth: 14, itemHeight: 8, itemGap: 16, textStyle: { fontSize: 10, color: '#666' } },
-  tooltip: { trigger: 'axis', formatter: condTooltip },
-  xAxis: {
-    type: 'category', data: hDates, boundaryGap: false,
-    axisLabel: { fontSize: 9, color: '#999' }, axisLine: { lineStyle: { color: '#ddd' } }
-  },
-  yAxis: [
-    { type: 'value', name: 'SR40 (%)', nameTextStyle: { fontSize: 10, color: '#999' },
-      axisLabel: { fontSize: 9, color: '#999' }, splitLine: { lineStyle: { color: '#f4f4f4' } } },
-    { type: 'value', name: 'relret (%)', nameTextStyle: { fontSize: 10, color: '#999' },
-      axisLabel: { fontSize: 9, color: '#999' }, splitLine: { show: false } }
-  ],
-  series: [
-    {
-      name: 'SR40', type: 'line', data: histSlice(H.sr40), showSymbol: false,
-      lineStyle: { color: '#5c6bc0', width: 1.6 }, itemStyle: { color: '#5c6bc0' },
-      markLine: {
-        symbol: 'none', silent: true,
-        lineStyle: { color: '#c62828', type: 'dashed', width: 1 },
-        label: { formatter: '−2%', position: 'insideStartTop', fontSize: 9, backgroundColor: 'rgba(255,255,255,0.85)', padding: [1, 3], color: '#c62828' },
-        data: [{ yAxis: -2 }]
-      }
-    },
-    {
-      name: 'relret', type: 'line', yAxisIndex: 1, data: histSlice(H.relret),
-      showSymbol: false, connectNulls: false,
-      lineStyle: { color: '#ef6c00', width: 1.4 }, itemStyle: { color: '#ef6c00' },
-      markLine: {
-        symbol: 'none', silent: true,
-        lineStyle: { color: '#ff9800', type: 'dashed', width: 1 },
-        label: { formatter: '0.10%', position: 'insideStartTop', fontSize: 9, backgroundColor: 'rgba(255,255,255,0.85)', padding: [1, 3], color: '#ff9800' },
-        data: [{ yAxis: 0.10 }]
-      }
-    }
-  ]
-}, true);
-
-condB.setOption({
-  animation: false,
-  grid: { left: 52, right: 30, top: 30, bottom: 40 },
-  legend: { top: 0, left: 'center', itemWidth: 14, itemHeight: 8, itemGap: 16, textStyle: { fontSize: 10, color: '#666' } },
-  tooltip: {
-    trigger: 'axis',
-    formatter: function(ps){
-      var i = ps[0].dataIndex;
-      var out = '<b>' + hDates[i] + '</b>';
-      ps.forEach(function(p){
-        var v = num(p.value);
-        out += '<br>' + p.marker + p.seriesName + '：' +
-          (v === null ? '—' : v.toFixed(2));
-      });
-      return out;
-    }
-  },
-  xAxis: {
-    type: 'category', data: hDates, boundaryGap: false,
-    axisLabel: { fontSize: 9, color: '#999' }, axisLine: { lineStyle: { color: '#ddd' } }
-  },
-  yAxis: {
-    type: 'value', name: '% / pp', nameTextStyle: { fontSize: 10, color: '#999' },
-    axisLabel: { fontSize: 9, color: '#999' }, splitLine: { lineStyle: { color: '#f4f4f4' } }
-  },
-  series: [
-    {
-      name: 'TL 增仓', type: 'line', data: histSlice(H.g_tl), showSymbol: false,
-      lineStyle: { color: '#1565c0', width: 1.6 }, itemStyle: { color: '#1565c0' },
-      markLine: {
-        symbol: 'none', silent: true,
-        lineStyle: { color: '#1565c0', type: 'dashed', width: 1 },
-        label: { formatter: '1%', position: 'insideStartTop', fontSize: 9, backgroundColor: 'rgba(255,255,255,0.85)', padding: [1, 3], color: '#1565c0' },
-        data: [{ yAxis: 1 }]
-      }
-    },
-    {
-      name: 'rel_oi', type: 'line', data: histSlice(H.rel_oi), showSymbol: false,
-      lineStyle: { color: '#26a69a', width: 1.4 }, itemStyle: { color: '#26a69a' },
-      markLine: {
-        symbol: 'none', silent: true,
-        lineStyle: { color: '#26a69a', type: 'dashed', width: 1 },
-        label: { formatter: '0', position: 'insideStartTop', fontSize: 9, backgroundColor: 'rgba(255,255,255,0.85)', padding: [1, 3], color: '#26a69a' },
-        data: [{ yAxis: 0 }]
-      }
-    }
-  ]
-}, true);
-
-// ------------------------------------------------------------------
-// 事件明细表
-// ------------------------------------------------------------------
-var evs = (D.events || []).slice().reverse();
-if (!evs.length) {
-  $('event-empty').style.display = 'block';
-}
-$('event-tbody').innerHTML = evs.map(function(e){
-  var isActive = (last && e.date === last.date && e.status === 'active');
-  var status = e.status === 'active'
-    ? '<span style="color:#1565c0">进行中 · 第 ' + e.elapsed + ' 日</span>'
-    : '<span class="muted">已走完</span>';
-  return '<tr' + (isActive ? ' class="current"' : '') + '>' +
-    '<td class="date">' + e.date + '</td>' +
-    '<td class="' + cls(e.sr40) + '">' + fmt(e.sr40, 2) + '%</td>' +
-    '<td class="' + cls(e.g_tl) + '">' + fmt(e.g_tl, 2) + '%</td>' +
-    '<td class="' + cls(e.g_t) + '">' + fmt(e.g_t, 2) + '%</td>' +
-    '<td class="' + cls(e.rel_oi) + '">' + fmt(e.rel_oi, 2) + '</td>' +
-    '<td class="' + cls(e.relret) + '">' + fmt(e.relret, 3) + '%</td>' +
-    '<td class="' + cls(e.dS5) + '">' + fmt(e.dS5, 2) + '</td>' +
-    '<td class="' + cls(e.dS10) + '">' + fmt(e.dS10, 2) + '</td>' +
-    '<td class="' + cls(e.dS20) + '">' + fmt(e.dS20, 2) + '</td>' +
-    '<td class="' + cls(e.dS40) + '">' + fmt(e.dS40, 2) + '</td>' +
-    '<td class="' + cls(e.dS60) + '">' + fmt(e.dS60, 2) + '</td>' +
-    '<td>' + status + '</td>' +
-    '</tr>';
-}).join('');
-
-// ------------------------------------------------------------------
-// 历史验证
-// ------------------------------------------------------------------
-var horizons = [5, 10, 20, 40, 60];
 function pText(p){
   var x = num(p);
   if (x === null) return '—';
   return x < 0.001 ? '<0.001' : x.toFixed(3);
 }
-$('kpi-tbody').innerHTML = horizons.map(function(h){
-  var s = (D.stats || {})[String(h)] || {};
-  var b = (D.baseline || {})[String(h)] || {};
-  var key = (h === 20 || h === 40 || h === 60) ? ' class="key"' : '';
-  var inc = (num(s.median) !== null && num(b.median) !== null)
-    ? (s.median - b.median) : null;
-  return '<tr' + key + '>' +
-    '<td>' + h + ' 日</td>' +
-    '<td>' + (s.n === undefined ? '—' : s.n) + '</td>' +
-    '<td class="' + cls(s.median) + '">' + fmt(s.median, 2) + ' bp</td>' +
-    '<td>' + fmtPct(s.hit) + '</td>' +
-    '<td>' + pText(s.p) + '</td>' +
-    '<td>[' + fmtPlain(s.ci_lo, 2) + ', ' + fmtPlain(s.ci_hi, 2) + ']</td>' +
-    '<td>' + fmt(b.median, 2) + ' bp</td>' +
-    '<td class="' + cls(inc) + '">' + (inc === null ? '—' : fmt(inc, 2) + ' bp') + '</td>' +
-    '</tr>';
-}).join('');
-
-var extra = num(D.extra20);
-if (extra !== null) {
-  var base20 = (D.baseline || {})['20'] || {};
-  $('verify-note').innerHTML =
-    '当前 R3d 事件 ' + ((D.stats || {})['20'] || {}).n + ' 个有效样本，20 日利差中位 ' +
-    fmt((D.stats || {})['20'].median, 2) + 'bp；同样满足 SR40 ≤ −2% 但未触发的普通下跌日 ' +
-    base20.n + ' 个，中位 ' + fmt(base20.median, 2) + 'bp。' +
-    'R3d 事件<b>多压缩 ' + Math.abs(extra).toFixed(2) + 'bp</b>。' +
-    '负值 = 利差压缩、正值 = 走陡。';
-} else {
-  $('verify-note').textContent = '样本不足，暂无法计算相对普通下跌日的增量压缩。';
+function initChart(id){
+  var el = $(id);
+  var old = echarts.getInstanceByDom(el);
+  if (old) old.dispose();
+  var c = echarts.init(el);
+  charts.push(c);
+  return c;
+}
+function markLine(value, label, color){
+  if (value === null) return null;
+  return {
+    symbol: 'none', silent: true,
+    lineStyle: { color: color, type: 'dashed', width: 1 },
+    label: {
+      formatter: label, position: 'insideStartTop', fontSize: 9,
+      backgroundColor: 'rgba(255,255,255,0.85)', padding: [1, 3], color: color
+    },
+    data: [{ yAxis: value }]
+  };
 }
 
-// ------------------------------------------------------------------
-// 规则
-// ------------------------------------------------------------------
-$('rule-box').innerHTML =
-  '<div>① 股市状态：过去 40 个交易日沪深 300 累计收益 <code>SR40 ≤ −2%</code></div>' +
-  '<div>② TL 增仓：TL 全部在挂季度合约持仓合计的日环比增速 <code>&gt; 1%</code></div>' +
-  '<div>③ 相对增仓：<code>rel_oi = TL 增速 − T 增速 &gt; 0</code></div>' +
-  '<div>④ 相对强弱：<code>relret = r_TL − β × r_T &gt; 0.10%</code>，β 为 60 日滚动、滞后 1 日</div>' +
-  '<div>⑤ 去重：同一规则 10 个交易日内只记第一次触发</div>' +
-  '<div style="margin-top:6px;color:#999">全合约持仓 = 当日所有在挂季度合约的持仓量相加，避免主连换月造成的假增仓。</div>';
+function render(){
+  var P = MODES[mode];
+  if (!P) return;
+  charts = [];
+  var meta = P.meta || {};
+  var cur = P.current || {};
+  var last = P.last_event;
+  var isWiden = meta.direction === 'widen';
+  var trigArr = isWiden ? (H.trigger_widen || []) : (H.trigger || []);
+  var keyHs = meta.key_horizons || (isWiden ? [10, 40, 60] : [20, 40, 60]);
 
-// ------------------------------------------------------------------
-// 自适应
-// ------------------------------------------------------------------
+  // 顶部切换
+  var btns = $('mode-bar').querySelectorAll('.mode-btn');
+  for (var bi = 0; bi < btns.length; bi++) {
+    var bm = btns[bi].getAttribute('data-mode');
+    btns[bi].classList.toggle('active', bm === mode);
+    btns[bi].disabled = !MODES[bm];
+  }
+
+  $('data-info').textContent =
+    (isWiden ? '30Y–10Y 走扩 R3u-D' : '30Y–10Y 压缩 R3d') +
+    ' · 数据截至 ' + meta.as_of + '（T-1 收盘） · 样本自 ' + meta.start +
+    ' · 共 ' + meta.event_count + ' 次事件 · 生成于 ' + meta.generated_at;
+
+  var statusMap = {
+    '最新交易日触发': ['trigger', '● 最新交易日触发'],
+    '事件进行中': ['active', '● 事件进行中'],
+    '最近事件已结束': ['done', '● 最近事件已结束'],
+    '未触发': ['idle', '○ 未触发']
+  };
+  var st = statusMap[meta.status] || ['idle', meta.status];
+  var badge = $('status-badge');
+  badge.className = 'badge ' + st[0];
+  badge.textContent = st[1];
+
+  var asofHtml = '最新交易日 <b>' + meta.as_of + '</b>';
+  if (last) {
+    asofHtml += ' · 最近触发 <b>' + last.date + '</b>';
+    asofHtml += last.active
+      ? '（已过 ' + last.elapsed + ' 个交易日）'
+      : '（事件已结束）';
+  }
+  if (meta.roll_day) {
+    asofHtml += ' · <span style="color:#ff9800">最新交易日为换月日</span>';
+  }
+  $('asof-box').innerHTML = asofHtml;
+  $('gen-box').innerHTML =
+    '事件数 <b>' + meta.event_count + '</b> · 已走完 60 日 <b>' + meta.path_event_count + '</b><br>' +
+    '<span style="font-size:11px;color:#999">生成时间 ' + meta.generated_at + '</span>';
+
+  // 四张指标卡
+  var prevSpread = dates.length > 1 ? H.spread[dates.length - 2] : null;
+  var spreadDelta = (num(cur.spread) !== null && num(prevSpread) !== null)
+    ? cur.spread - prevSpread : null;
+  var spreadDeltaTxt = spreadDelta === null ? '较前一日 —'
+    : ('较前一日 ' + fmt(spreadDelta, 2) + 'bp');
+  var cards = [
+    { label: '30Y–10Y 利差', value: fmtPlain(cur.spread, 2), unit: 'bp',
+      sub: spreadDeltaTxt, color: '' },
+    { label: 'TL 全合约持仓日增', value: fmt(cur.g_tl, 2), unit: '%',
+      sub: 'T 增仓 ' + fmt(cur.g_t, 2) + '%', color: cls(cur.g_tl) },
+    { label: 'TL−T 相对增仓', value: fmt(cur.rel_oi, 2), unit: 'pp',
+      sub: isWiden ? '阈值 < 0 pp' : '阈值 > 0 pp', color: cls(cur.rel_oi) },
+    { label: 'TL 对 T 的 DV01 中性收益',
+      value: meta.roll_day ? '换月' : fmt(cur.relret, 3),
+      unit: meta.roll_day ? '—' : '%',
+      sub: meta.roll_day ? '换月日不计算' : ('β = ' + fmtPlain(cur.beta, 2)),
+      color: meta.roll_day ? 'muted' : cls(cur.relret) }
+  ];
+  $('stats').innerHTML = cards.map(function(c){
+    return '<div class="stat-card' + (c.label.indexOf('利差') >= 0 ? ' hit' : '') + '">' +
+      '<div class="label">' + c.label + '</div>' +
+      '<div class="value ' + c.color + '">' + c.value +
+        '<span class="unit">' + c.unit + '</span></div>' +
+      '<div class="delta">' + c.sub + '</div></div>';
+  }).join('');
+
+  // 条件清单
+  var opMap = { '<=': '≤ ', '>=': '≥ ', '>': '> ', '<': '< ' };
+  var gapPrefix = { '<=': '还需下跌 ', '>=': '还需上涨 ', '>': '还需高出 ', '<': '还需低出 ' };
+  $('cond-sub').textContent = (isWiden ? '三项' : '四项') +
+    '同时满足，且距上次触发超过 10 个交易日';
+  $('conds').innerHTML = (P.conditions || []).map(function(c){
+    var v = num(c.value);
+    var isNa = (v === null);
+    var flag, flagCls;
+    if (isNa) { flag = '换月/—'; flagCls = 'na'; }
+    else if (c.pass) { flag = '✓ 满足'; flagCls = 'ok'; }
+    else { flag = '✗ 未满足'; flagCls = 'no'; }
+    var thrDigits = (c.key === 'sr40') ? 0 : 2;
+    var thr = (opMap[c.op] || '') + signLabel(c.threshold, thrDigits) + c.unit;
+    var gapTxt;
+    if (isNa) gapTxt = '换月日不计算';
+    else if (c.pass) gapTxt = '已满足';
+    else if (c.gap !== null && c.gap !== undefined) {
+      gapTxt = (gapPrefix[c.op] || '距阈值 ') + num(c.gap).toFixed(2) + c.unit;
+    } else gapTxt = '—';
+    return '<div class="cond">' +
+      '<div class="name">' + c.label + '</div>' +
+      '<div class="val ' + (isNa ? 'muted' : '') + '">' +
+        (isNa ? '—' : fmtPlain(v, c.key === 'relret' ? 3 : 2) + c.unit) + '</div>' +
+      '<div class="thr">' + thr + '</div>' +
+      '<div class="gap">' + gapTxt + '</div>' +
+      '<div class="flag ' + flagCls + '">' + flag + '</div>' +
+      '</div>';
+  }).join('');
+
+  // 事件跟踪
+  $('event-box').innerHTML = (function(){
+    if (!last) {
+      return '<div class="empty">尚未出现 ' +
+        (isWiden ? 'R3u-D' : 'R3d') + ' 触发事件。</div>';
+    }
+    var active = last.active;
+    var title = active
+      ? '活跃事件：<b>' + last.date + '</b> 触发'
+      : '最近事件：<b>' + last.date + '</b>（已结束）';
+    var elapsed = last.elapsed;
+    var win = num(meta.main_window) || (isWiden ? 10 : 20);
+    var progress = Math.min(1, elapsed / win) * 100;
+    var note = isWiden
+      ? '主窗口为触发后 10 个交易日，其次 40/60 日；20 日样本外弱于仅股市上涨基线，仅作观察。ΔS 为正表示利差走扩。'
+      : '主窗口为触发后 20 个交易日，其次 40/60 日；5–10 日仅作观察。ΔS 为负表示利差压缩。';
+    return '<div style="font-size:14px;margin-bottom:4px">' + title + '</div>' +
+      '<div style="font-size:12px;color:#666">' +
+        (active
+          ? '已过 <b>' + elapsed + '</b> 个交易日 · ' + win + ' 日主窗口进度 ' +
+            Math.min(elapsed, win) + '/' + win
+          : '距触发已 ' + elapsed + ' 个交易日，主窗口与延展窗口均已走完') +
+      '</div>' +
+      '<div class="progress"><i style="width:' + progress + '%"></i></div>' +
+      '<div class="event-grid">' +
+        '<div class="cell"><div class="k">' + (active ? '当前' : '事件后') +
+          ' ΔS（30Y−10Y）</div>' +
+          '<div class="v ' + cls(last.dS) + '">' + fmt(last.dS, 2) +
+          '<span class="u">bp</span></div></div>' +
+        '<div class="cell"><div class="k">Δy30</div>' +
+          '<div class="v ' + cls(last.dy30) + '">' + fmt(last.dy30, 2) +
+          '<span class="u">bp</span></div></div>' +
+        '<div class="cell"><div class="k">Δy10</div>' +
+          '<div class="v ' + cls(last.dy10) + '">' + fmt(last.dy10, 2) +
+          '<span class="u">bp</span></div></div>' +
+        '<div class="cell"><div class="k">已过交易日</div>' +
+          '<div class="v">' + elapsed + '<span class="u">日</span></div></div>' +
+      '</div>' +
+      '<p class="note">' + note +
+      (active ? '当前路径见下方「事件后利差路径」橙线。' : '') + '</p>';
+  })();
+
+  // 利差走势
+  $('spread-sub').textContent =
+    'TL 上市以来；红点为 ' + (isWiden ? 'R3u-D' : 'R3d') + ' 触发日';
+  var spreadChart = initChart('spread-chart');
+  var range = 0;
+  function rangeStart(rs){
+    if (!rs) return 0;
+    var cutoff = isoMinusDays(meta.as_of, rs * 365);
+    for (var i = 0; i < dates.length; i++) {
+      if (dates[i] >= cutoff) return i;
+    }
+    return 0;
+  }
+  function spreadOption(rs){
+    var start = rangeStart(rs);
+    var x = dates.slice(start);
+    var y = H.spread.slice(start);
+    var trig = [];
+    for (var i = start; i < dates.length; i++) {
+      trig.push(trigArr[i] ? H.spread[i] : null);
+    }
+    var markArea = { silent: true, itemStyle: { color: 'rgba(255,152,0,0.10)' }, data: [] };
+    if (last && last.active) {
+      var ei = dates.indexOf(last.date);
+      if (ei >= 0) {
+        var ej = Math.min(dates.length - 1, ei + 60);
+        markArea.data.push([
+          { xAxis: dates[Math.max(ei, start)] },
+          { xAxis: dates[ej] }
+        ]);
+      }
+    }
+    return {
+      animation: false,
+      grid: { left: 58, right: 24, top: 26, bottom: 58 },
+      tooltip: {
+        trigger: 'axis',
+        formatter: function(ps){
+          var i = ps[0].dataIndex;
+          var out = '<b>' + x[i] + '</b><br>利差：' + tooltipNum(y[i], ' bp', 2);
+          var gi = start + i;
+          if (trigArr[gi]) {
+            out += '<br><span style="color:#c62828">● ' +
+              (isWiden ? 'R3u-D' : 'R3d') + ' 触发</span>';
+          }
+          return out;
+        }
+      },
+      xAxis: {
+        type: 'category', data: x, boundaryGap: false,
+        axisLabel: { fontSize: 10, color: '#888' },
+        axisLine: { lineStyle: { color: '#ddd' } }
+      },
+      yAxis: {
+        type: 'value', name: 'bp', nameTextStyle: { fontSize: 11, color: '#999' },
+        scale: true, axisLabel: { fontSize: 10, color: '#888' },
+        splitLine: { lineStyle: { color: '#f0f0f0' } }
+      },
+      dataZoom: [
+        { type: 'inside', start: 0, end: 100 },
+        { type: 'slider', height: 18, bottom: 12, borderColor: '#e0e0e0',
+          fillerColor: 'rgba(26,35,126,0.08)', handleSize: '80%',
+          textStyle: { fontSize: 9, color: '#999' } }
+      ],
+      series: [
+        {
+          name: '30Y–10Y', type: 'line', data: y, showSymbol: false,
+          lineStyle: { color: '#1a237e', width: 1.6 },
+          areaStyle: { color: 'rgba(26,35,126,0.05)' },
+          markArea: markArea
+        },
+        {
+          name: (isWiden ? 'R3u-D 触发' : 'R3d 触发'), type: 'scatter', data: trig,
+          symbolSize: 9, itemStyle: { color: '#c62828' },
+          tooltip: { show: false }, z: 6
+        }
+      ]
+    };
+  }
+  spreadChart.setOption(spreadOption(range), true);
+  $('range-seg').onclick = function(e){
+    var t = e.target;
+    if (!t.classList.contains('seg')) return;
+    var segs = $('range-seg').querySelectorAll('.seg');
+    for (var i = 0; i < segs.length; i++) segs[i].classList.remove('active');
+    t.classList.add('active');
+    range = Number(t.getAttribute('data-range'));
+    spreadChart.setOption(spreadOption(range), true);
+  };
+
+  // 事件后路径
+  var path = P.path || [];
+  var activePath = P.active_path || [];
+  var offsets = path.map(function(r){ return String(r.offset); });
+  var q25 = path.map(function(r){ return num(r.q25); });
+  var q75 = path.map(function(r){ return num(r.q75); });
+  var med = path.map(function(r){ return num(r.median); });
+  var band = path.map(function(r){
+    var a = num(r.q25), b = num(r.q75);
+    return (a === null || b === null) ? null : b - a;
+  });
+  var activeMap = {};
+  activePath.forEach(function(r){ activeMap[r.offset] = r.dS; });
+  var activeLine = path.map(function(r){
+    return activeMap.hasOwnProperty(r.offset) ? activeMap[r.offset] : null;
+  });
+  var pathChart = initChart('path-chart');
+  pathChart.setOption({
+    animation: false,
+    grid: { left: 58, right: 24, top: 28, bottom: 46 },
+    legend: {
+      top: 0, right: 10, itemWidth: 14, itemHeight: 8,
+      textStyle: { fontSize: 11, color: '#666' },
+      data: ['25–75% 区间', '历史中位', '当前事件']
+    },
+    tooltip: {
+      trigger: 'axis',
+      formatter: function(ps){
+        var i = ps[0].dataIndex;
+        var r = path[i];
+        var out = '<b>事件后 ' + (r.offset > 0 ? '+' : '') + r.offset + ' 日</b><br>' +
+          '中位 ΔS：' + tooltipNum(r.median, ' bp', 2) + '<br>' +
+          '25–75%：' + tooltipNum(r.q25, '', 2) + ' ~ ' + tooltipNum(r.q75, '', 2) + '<br>' +
+          '样本：' + r.n;
+        if (activeLine[i] !== null) {
+          out += '<br><span style="color:#ef6c00">当前事件：' +
+            tooltipNum(activeLine[i], ' bp', 2) + '</span>';
+        }
+        return out;
+      }
+    },
+    xAxis: {
+      type: 'category', data: offsets, boundaryGap: false,
+      axisLabel: {
+        fontSize: 10, color: '#888',
+        formatter: function(v){ return v === '0' ? '触发日' : v; }
+      },
+      axisLine: { lineStyle: { color: '#ddd' } }
+    },
+    yAxis: {
+      type: 'value', name: 'ΔS (bp)', nameTextStyle: { fontSize: 11, color: '#999' },
+      axisLabel: { fontSize: 10, color: '#888' },
+      splitLine: { lineStyle: { color: '#f0f0f0' } }
+    },
+    series: [
+      {
+        name: 'band-base', type: 'line', data: q25, stack: 'band',
+        stackStrategy: 'all', symbol: 'none', lineStyle: { opacity: 0 },
+        areaStyle: { color: 'transparent' }, silent: true, tooltip: { show: false }
+      },
+      {
+        name: '25–75% 区间', type: 'line', data: band, stack: 'band',
+        stackStrategy: 'all', symbol: 'none', lineStyle: { opacity: 0 },
+        areaStyle: { color: 'rgba(66,165,245,0.20)' },
+        itemStyle: { color: '#64b5f6' },
+        silent: true, tooltip: { show: false }
+      },
+      {
+        name: '历史中位', type: 'line', data: med, symbol: 'none',
+        lineStyle: { color: '#1565c0', width: 2.4 },
+        itemStyle: { color: '#1565c0' }, z: 5,
+        markLine: {
+          symbol: 'none', silent: true,
+          lineStyle: { color: '#bbb', type: 'dashed', width: 1 },
+          data: [{ yAxis: 0 }]
+        }
+      },
+      {
+        name: '当前事件', type: 'line', data: activeLine,
+        symbol: 'circle', symbolSize: 5, connectNulls: false,
+        lineStyle: { color: '#ef6c00', width: 2.2 }, itemStyle: { color: '#ef6c00' },
+        z: 7
+      }
+    ]
+  }, true);
+  $('path-note').textContent = path.length
+    ? ('历史路径使用已走完 60 个交易日的 ' + meta.path_event_count +
+       ' 次事件，各时点样本一致；左端 −20 日为事件前走势。' +
+       (isWiden ? '纵轴正值为走扩。' : '纵轴负值为压缩。') +
+       '当前事件进度见上方。')
+    : '当前没有已走完 60 个交易日的事件，历史路径暂不可用。';
+
+  // 条件历史
+  var N = 120;
+  var hStart = Math.max(0, dates.length - N);
+  var hDates = dates.slice(hStart);
+  function histSlice(arr){ return arr.slice(hStart); }
+  var condA = initChart('cond-chart-a');
+  var condB = initChart('cond-chart-b');
+  function condTooltip(ps){
+    var i = ps[0].dataIndex;
+    var out = '<b>' + hDates[i] + '</b>';
+    ps.forEach(function(p){
+      if (p.seriesName === 'band') return;
+      var v = num(p.value);
+      out += '<br>' + p.marker + p.seriesName + '：' +
+        (v === null ? '—' : v.toFixed(2) +
+          (p.seriesName.indexOf('SR40') >= 0 ||
+           p.seriesName.indexOf('relret') >= 0 ? '%' : ''));
+    });
+    return out;
+  }
+  var rule = P.rule || {};
+  var srThr = num(rule.decl_thr);
+  var relThr = num(rule.rel_thr);
+  var tlThr = num(rule.tl_oi_thr);
+  var relOiThr = num(rule.rel_oi_thr);
+  var srLine = markLine(srThr, signLabel(srThr, 0) + '%', '#c62828');
+  var relLine = markLine(relThr, signLabel(relThr, 2) + '%', '#ff9800');
+  var tlLine = markLine(tlThr === null ? 0 : tlThr,
+    rule.tl_oi_required ? (signLabel(tlThr, 0) + '%') : '0（参考）', '#1565c0');
+  var relOiLine = markLine(relOiThr,
+    (relOiThr === 0 ? '0' : signLabel(relOiThr, 2)), '#26a69a');
+
+  var srSeries = {
+    name: 'SR40', type: 'line', data: histSlice(H.sr40), showSymbol: false,
+    lineStyle: { color: '#5c6bc0', width: 1.6 }, itemStyle: { color: '#5c6bc0' }
+  };
+  if (srLine) srSeries.markLine = srLine;
+  var rrSeries = {
+    name: 'relret', type: 'line', yAxisIndex: 1, data: histSlice(H.relret),
+    showSymbol: false, connectNulls: false,
+    lineStyle: { color: '#ef6c00', width: 1.4 }, itemStyle: { color: '#ef6c00' }
+  };
+  if (relLine) rrSeries.markLine = relLine;
+
+  condA.setOption({
+    animation: false,
+    grid: { left: 52, right: 58, top: 30, bottom: 40 },
+    legend: { top: 0, left: 'center', itemWidth: 14, itemHeight: 8, itemGap: 16, textStyle: { fontSize: 10, color: '#666' } },
+    tooltip: { trigger: 'axis', formatter: condTooltip },
+    xAxis: {
+      type: 'category', data: hDates, boundaryGap: false,
+      axisLabel: { fontSize: 9, color: '#999' }, axisLine: { lineStyle: { color: '#ddd' } }
+    },
+    yAxis: [
+      { type: 'value', name: 'SR40 (%)', nameTextStyle: { fontSize: 10, color: '#999' },
+        axisLabel: { fontSize: 9, color: '#999' }, splitLine: { lineStyle: { color: '#f4f4f4' } } },
+      { type: 'value', name: 'relret (%)', nameTextStyle: { fontSize: 10, color: '#999' },
+        axisLabel: { fontSize: 9, color: '#999' }, splitLine: { show: false } }
+    ],
+    series: [srSeries, rrSeries]
+  }, true);
+
+  var tlSeries = {
+    name: 'TL 增仓', type: 'line', data: histSlice(H.g_tl), showSymbol: false,
+    lineStyle: { color: '#1565c0', width: 1.6 }, itemStyle: { color: '#1565c0' }
+  };
+  if (tlLine) tlSeries.markLine = tlLine;
+  var oiSeries = {
+    name: 'rel_oi', type: 'line', data: histSlice(H.rel_oi), showSymbol: false,
+    lineStyle: { color: '#26a69a', width: 1.4 }, itemStyle: { color: '#26a69a' }
+  };
+  if (relOiLine) oiSeries.markLine = relOiLine;
+
+  condB.setOption({
+    animation: false,
+    grid: { left: 52, right: 30, top: 30, bottom: 40 },
+    legend: { top: 0, left: 'center', itemWidth: 14, itemHeight: 8, itemGap: 16, textStyle: { fontSize: 10, color: '#666' } },
+    tooltip: {
+      trigger: 'axis',
+      formatter: function(ps){
+        var i = ps[0].dataIndex;
+        var out = '<b>' + hDates[i] + '</b>';
+        ps.forEach(function(p){
+          var v = num(p.value);
+          out += '<br>' + p.marker + p.seriesName + '：' +
+            (v === null ? '—' : v.toFixed(2));
+        });
+        return out;
+      }
+    },
+    xAxis: {
+      type: 'category', data: hDates, boundaryGap: false,
+      axisLabel: { fontSize: 9, color: '#999' }, axisLine: { lineStyle: { color: '#ddd' } }
+    },
+    yAxis: {
+      type: 'value', name: '% / pp', nameTextStyle: { fontSize: 10, color: '#999' },
+      axisLabel: { fontSize: 9, color: '#999' }, splitLine: { lineStyle: { color: '#f4f4f4' } }
+    },
+    series: [tlSeries, oiSeries]
+  }, true);
+
+  // 事件明细
+  $('event-sub').textContent = '按时间倒序；ΔS 为 30Y–10Y 利差变化（bp），' +
+    (isWiden ? '正值为走扩' : '负值为压缩');
+  var evs = (P.events || []).slice().reverse();
+  $('event-empty').style.display = evs.length ? 'none' : 'block';
+  $('event-tbody').innerHTML = evs.map(function(e){
+    var isActive = (last && e.date === last.date && e.status === 'active');
+    var status = e.status === 'active'
+      ? '<span style="color:#1565c0">进行中 · 第 ' + e.elapsed + ' 日</span>'
+      : '<span class="muted">已走完</span>';
+    return '<tr' + (isActive ? ' class="current"' : '') + '>' +
+      '<td class="date">' + e.date + '</td>' +
+      '<td class="' + cls(e.sr40) + '">' + fmt(e.sr40, 2) + '%</td>' +
+      '<td class="' + cls(e.g_tl) + '">' + fmt(e.g_tl, 2) + '%</td>' +
+      '<td class="' + cls(e.g_t) + '">' + fmt(e.g_t, 2) + '%</td>' +
+      '<td class="' + cls(e.rel_oi) + '">' + fmt(e.rel_oi, 2) + '</td>' +
+      '<td class="' + cls(e.relret) + '">' + fmt(e.relret, 3) + '%</td>' +
+      '<td class="' + cls(e.dS5) + '">' + fmt(e.dS5, 2) + '</td>' +
+      '<td class="' + cls(e.dS10) + '">' + fmt(e.dS10, 2) + '</td>' +
+      '<td class="' + cls(e.dS20) + '">' + fmt(e.dS20, 2) + '</td>' +
+      '<td class="' + cls(e.dS40) + '">' + fmt(e.dS40, 2) + '</td>' +
+      '<td class="' + cls(e.dS60) + '">' + fmt(e.dS60, 2) + '</td>' +
+      '<td>' + status + '</td>' +
+      '</tr>';
+  }).join('');
+
+  // 历史验证
+  var horizons = [5, 10, 20, 40, 60];
+  $('kpi-sub').textContent = '全部事件等权；p 值为单侧符号检验（原假设：中位 ΔS ' +
+    (isWiden ? '≤ 0' : '≥ 0') + '）';
+  $('hit-head').textContent = isWiden ? '走扩比例' : '压缩比例';
+  $('base-head').textContent = isWiden ? '普通上涨日中位' : '普通下跌日中位';
+  $('kpi-tbody').innerHTML = horizons.map(function(h){
+    var s = (P.stats || {})[String(h)] || {};
+    var b = (P.baseline || {})[String(h)] || {};
+    var key = keyHs.indexOf(h) >= 0 ? ' class="key"' : '';
+    var inc = (num(s.median) !== null && num(b.median) !== null)
+      ? (s.median - b.median) : null;
+    return '<tr' + key + '>' +
+      '<td>' + h + ' 日</td>' +
+      '<td>' + (s.n === undefined ? '—' : s.n) + '</td>' +
+      '<td class="' + cls(s.median) + '">' + fmt(s.median, 2) + ' bp</td>' +
+      '<td>' + fmtPct(s.hit) + '</td>' +
+      '<td>' + pText(s.p) + '</td>' +
+      '<td>[' + fmtPlain(s.ci_lo, 2) + ', ' + fmtPlain(s.ci_hi, 2) + ']</td>' +
+      '<td>' + fmt(b.median, 2) + ' bp</td>' +
+      '<td class="' + cls(inc) + '">' + (inc === null ? '—' : fmt(inc, 2) + ' bp') + '</td>' +
+      '</tr>';
+  }).join('');
+
+  if (isWiden && P.split) {
+    var oos = P.split.oos || {};
+    var so = (P.split.stock_only || {}).oos || {};
+    var tr = P.split.train || {};
+    $('verify-note').innerHTML =
+      '训练 23–24：10 日走扩 ' + hitFrac(tr['10']) +
+      '；样本外 25–26：10 日 ' + hitFrac(oos['10']) +
+      '（仅股市上涨基线 ' + hitFrac(so['10']) + '），20 日 ' + hitFrac(oos['20']) +
+      '（低于基线 ' + hitFrac(so['20']) + '，不作主窗口），40 日 ' + hitFrac(oos['40']) +
+      '、60 日 ' + hitFrac(oos['60']) + '。';
+  } else {
+    var extra = num(P.extra20);
+    if (extra !== null) {
+      var base20 = (P.baseline || {})['20'] || {};
+      var s20 = (P.stats || {})['20'] || {};
+      $('verify-note').innerHTML =
+        '当前 R3d 事件 ' + s20.n + ' 个有效样本，20 日利差中位 ' +
+        fmt(s20.median, 2) + 'bp；同样满足 SR40 ≤ −2% 但未触发的普通下跌日 ' +
+        base20.n + ' 个，中位 ' + fmt(base20.median, 2) + 'bp。' +
+        'R3d 事件<b>多压缩 ' + Math.abs(extra).toFixed(2) + 'bp</b>。' +
+        '负值 = 利差压缩、正值 = 走陡。';
+    } else {
+      $('verify-note').textContent = '样本不足，暂无法计算相对普通下跌日的增量压缩。';
+    }
+  }
+
+  if (isWiden && P.split) {
+    $('split-wrap').style.display = 'block';
+    $('split-tbody').innerHTML = horizons.map(function(h){
+      var t = (P.split.train || {})[String(h)] || {};
+      var o = (P.split.oos || {})[String(h)] || {};
+      var b = ((P.split.stock_only || {}).oos || {})[String(h)] || {};
+      var inc = (num(o.hit) !== null && num(b.hit) !== null)
+        ? (o.hit - b.hit) * 100 : null;
+      var key = keyHs.indexOf(h) >= 0 ? ' class="key"' : '';
+      return '<tr' + key + '>' +
+        '<td>' + h + ' 日</td>' +
+        '<td>' + (t.n === undefined ? '—' : t.n) + '</td>' +
+        '<td>' + fmtPct(t.hit) + '</td>' +
+        '<td>' + pText(t.p) + '</td>' +
+        '<td>' + (o.n === undefined ? '—' : o.n) + '</td>' +
+        '<td>' + fmtPct(o.hit) + '</td>' +
+        '<td>' + pText(o.p) + '</td>' +
+        '<td>' + fmtPct(b.hit) + '</td>' +
+        '<td class="' + cls(inc) + '">' +
+          (inc === null ? '—' : fmt(inc, 1) + 'pp') + '</td>' +
+        '</tr>';
+    }).join('');
+  } else {
+    $('split-wrap').style.display = 'none';
+  }
+
+  // 规则与边界
+  if (isWiden) {
+    $('rule-box').innerHTML =
+      '<div>① 股市状态：过去 40 个交易日沪深 300 累计收益 <code>SR40 ≥ +2%</code></div>' +
+      '<div>② 相对减仓：<code>rel_oi = TL 增速 − T 增速 &lt; 0</code></div>' +
+      '<div>③ 相对弱势：<code>relret = r_TL − β × r_T &lt; −0.10%</code>，β 为 60 日滚动、滞后 1 日</div>' +
+      '<div>④ 去重：同一规则 10 个交易日内只记第一次触发</div>' +
+      '<div style="margin-top:6px;color:#999">本规则不要求 TL 绝对减仓；rel_oi &lt; 0 表示 TL 持仓增速低于 T。全合约持仓口径同上。</div>';
+    $('boundary-box').innerHTML =
+      '<b>使用边界</b><br>' +
+      '1. 目标窗口是 <b>10 日与 40–60 日</b>的曲线走扩；20 日样本外仅 8/13，低于仅股市上涨基线，5 日边际，均不作主判断。<br>' +
+      '2. rel_oi 是相对持仓增速，不是净流入；它只说明 TL 相对 T 的仓位变化，不能区分多空。<br>' +
+      '3. 走扩可能来自 30Y 上行或 10Y 下行，事件后应结合 Δy30/Δy10 分解，不能直接外推为熊陡。<br>' +
+      '4. 样本量有限（20 次事件，训练 7 / 样本外 13），结果用于监测而非实盘交易指令。';
+  } else {
+    $('rule-box').innerHTML =
+      '<div>① 股市状态：过去 40 个交易日沪深 300 累计收益 <code>SR40 ≤ −2%</code></div>' +
+      '<div>② TL 增仓：TL 全部在挂季度合约持仓合计的日环比增速 <code>&gt; 1%</code></div>' +
+      '<div>③ 相对增仓：<code>rel_oi = TL 增速 − T 增速 &gt; 0</code></div>' +
+      '<div>④ 相对强弱：<code>relret = r_TL − β × r_T &gt; 0.10%</code>，β 为 60 日滚动、滞后 1 日</div>' +
+      '<div>⑤ 去重：同一规则 10 个交易日内只记第一次触发</div>' +
+      '<div style="margin-top:6px;color:#999">全合约持仓 = 当日所有在挂季度合约的持仓量相加，避免主连换月造成的假增仓。</div>';
+    $('boundary-box').innerHTML =
+      '<b>使用边界</b><br>' +
+      '1. 信号的目标仍是 <b>20–60 日、数 bp 的曲线变平</b>，不是持续牛市；5 日样本小、噪声大；10 日在 25–26 样本外为 8/9，但样本仅 9 个，仍不作为主判断依据。<br>' +
+      '2. 触发日的 TL 强势不能外推为后续领涨：事件后 TL−T 的中位收益不延续，利差压缩也可能来自现券补涨。<br>' +
+      '3. 持仓增速是持仓量的变化，不是净流入，不能区分多空方向；它只说明仓位在增加。<br>' +
+      '4. 历史统计为事件研究，样本量有限（当前事件数见上方），结果用于监测而非实盘交易指令。';
+  }
+}
+
+$('mode-bar').addEventListener('click', function(e){
+  var t = e.target;
+  if (!t.classList.contains('mode-btn')) return;
+  var m = t.getAttribute('data-mode');
+  if (!MODES[m] || m === mode) return;
+  mode = m;
+  try {
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', m === 'widen' ? '#widen' : '#compress');
+    }
+  } catch (err) { /* file:// 下个别浏览器禁止改 hash，忽略 */ }
+  render();
+});
+
 window.addEventListener('resize', function(){
   charts.forEach(function(c){ c.resize(); });
 });
+
+render();
 
 })();
 </script>
