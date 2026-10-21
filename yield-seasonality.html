@@ -527,7 +527,7 @@ function reviewPanelHTML(){
   <div class="revSplit">
     <div class="card revMain">
       <div class="cardhead"><h2>债市复盘 · 真实时间序列</h2><span class="revCount"></span></div>
-      <div class="note">横轴 = 真实日期；可多选国债/国开收益率曲线（1Y~30Y）。事件点标在已选曲线上（点越大 = 同日事件越多；同日 ≥2 条另在顶部标文字），勾选「显示实施日」后叠加实施日。悬停显示当日数值与事件，点右侧清单或图中事件文字可定位。</div>
+      <div class="note">横轴 = 真实日期；可多选国债/国开收益率曲线（1Y~30Y）。事件点标在已选曲线上（点越大 = 同日事件越多），文字贴在事件点旁（拥挤时省略，悬停看全部），勾选「显示实施日」后叠加实施日。悬停显示当日数值与事件，点右侧清单或图中事件文字可定位。</div>
       <div class="evLegend"><span><i class="evDotSm"></i>公告/会议（点越大 = 同日事件越多）</span><span><i class="evDotSm hollow"></i>实施日（由上方开关控制）</span></div>
       <div class="revBox">
         <div class="chart revChart"></div>
@@ -624,55 +624,81 @@ function makeReviewPanel(RV){
     R.rng.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.r === r));
   }
 
-  // 事件文字：只标「同日 ≥2 条」的重点日，横向换行、贪心分行、随缩放重排
+  // 事件文字：贴在与事件点相同的坐标旁；优先同日多条，空间不足时省略（tooltip/清单仍可看）
+  let lastAnchorY = new Map();
   function layoutEventLabels(groups){
     const wrap = R.evWrap;
     wrap.innerHTML = '';
     const cs = chart.getModel().getComponent('grid', 0);
     if (!cs) return;
     const rect = cs.coordinateSystem.getRect();       // 绘图区像素 {x,y,width,height}
-    const H = 34, maxW = 116;                         // 标签行高 / 最大宽度
     const minX = rect.x, maxX = rect.x + rect.width;
+    const minY = rect.y, maxY = rect.y + rect.height;
+    const maxW = 116;
     // 时间戳 → 绘图区像素：x 轴 scale 的 extent 已反映 dataZoom 可视窗（缩放/平移后为当前可见范围）
     const ext = chart.getModel().getComponent('xAxis', 0).axis.scale.getExtent();
     const winSpan = (ext[1] - ext[0]) || 1;
     const toX = ts => rect.x + (ts - ext[0]) / winSpan * rect.width;
-    const items = groups.filter(g => g.items.length >= 2).map(g => ({
+    const items = groups.map(g => ({
       ts:g.ts, date:g.date, n:g.items.length,
-      title:g.items[0].title + ' 等' + g.items.length + '条',
+      title:g.items.length >= 2 ? g.items[0].title + ' 等' + g.items.length + '条' : g.items[0].title,
       full:g.items.map(x => x.d + ' [' + x.cat + '] ' + x.title + '（' + x.kind + '）').join('\n'),
       col:catColor(g.items[0].cat)
     }));
-    const vis = items.map(o => { o.x = toX(o.ts); return o; })
-                     .filter(o => o.x >= minX && o.x <= maxX)
-                     .sort((a,b) => a.x - b.x);
-    // 先建元素并量实际宽度（长标题最多 116px、2 行），再按真实宽度做避让
-    vis.forEach(o => {
+    const vis = [];
+    items.forEach(o => {
+      const yv = lastAnchorY.get(o.date);
+      if (yv == null) return;
+      const x = toX(o.ts);
+      if (x < minX || x > maxX) return;
+      const yp = chart.convertToPixel({yAxisIndex:0}, yv);
+      if (yp == null || isNaN(yp)) return;
       const el = document.createElement('div');
       el.className = 'evLbl';
       el.style.left = minX + 'px';
-      el.style.top = (rect.y + 6) + 'px';
+      el.style.top = minY + 'px';
       el.style.color = o.col;
       el.textContent = o.title;
       el.title = o.full;
       el.dataset.date = o.date;
       wrap.appendChild(el);
-      o.el = el;
+      o.el = el; o.x = x; o.y = yp;
       o.w = Math.min(maxW, el.offsetWidth || maxW);
+      o.h = el.offsetHeight || 14;
+      vis.push(o);
     });
-    const rowRight = [];                              // rowRight[r] = 第 r 行已占用右边界
-    const maxRows = Math.min(5, Math.max(1, Math.floor((rect.height - 6) / H)));
+    vis.sort((a,b) => (b.n - a.n) || (a.x - b.x));    // 同日多条优先占位
+    const placed = [];
+    const hit = r => placed.some(p => r.l < p.r && r.r > p.l && r.t < p.b && r.b > p.t);
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
     vis.forEach(o => {
-      let left = o.x - o.w/2;
-      if (left < minX) left = minX;
-      if (left + o.w > maxX) left = maxX - o.w;
-      let r = 0;
-      while (r < rowRight.length && rowRight[r] > left) r++;   // 与本行末标签重叠 → 下一行
-      if (r >= maxRows){ o.el.remove(); return; }               // 顶部最多 5 行，避免压到曲线
-      rowRight[r] = left + o.w;
-      const top = rect.y + 6 + r * H;
-      o.el.style.left = left + 'px';
-      o.el.style.top = top + 'px';
+      const cand = [
+        [o.x + 8, o.y - o.h/2],                       // 右
+        [o.x - o.w - 8, o.y - o.h/2],                 // 左
+        [o.x - o.w/2, o.y - o.h - 7],                 // 上
+        [o.x - o.w/2, o.y + 7],                       // 下
+        [o.x + 8, o.y - o.h - 7],                     // 右上
+        [o.x + 8, o.y + 7],                           // 右下
+        [o.x - o.w - 8, o.y - o.h - 7],               // 左上
+        [o.x - o.w - 8, o.y + 7],                     // 左下
+        [o.x + 8, o.y - o.h - 22],                    // 更远的右上
+        [o.x + 8, o.y + 22],
+        [o.x - o.w - 8, o.y - o.h - 22],
+        [o.x - o.w - 8, o.y + 22],
+        [o.x - o.w/2, o.y - o.h - 22],
+        [o.x - o.w/2, o.y + 22]
+      ];
+      let box = null;
+      for (const [l0,t0] of cand){
+        const l = clamp(l0, minX, maxX - o.w);
+        const t = clamp(t0, minY, maxY - o.h);
+        const rr = {l, t, r:l + o.w, b:t + o.h};
+        if (!hit(rr)){ box = rr; break; }
+      }
+      if (!box){ o.el.remove(); return; }             // 放不下就省略，避免压住曲线/彼此重叠
+      placed.push(box);
+      o.el.style.left = box.l + 'px';
+      o.el.style.top = box.t + 'px';
     });
   }
 
@@ -720,6 +746,15 @@ function makeReviewPanel(RV){
     const rows = selectedRows();
     const groups = groupRows(rows);
     lastGroups = groups;
+    // 文字锚点 = 事件点在第一条有值曲线上的收益率（与点的位置一致）
+    lastAnchorY = new Map();
+    groups.forEach(g => {
+      const ts = Date.parse(g.date);
+      for (const cv of activeCurves){
+        const y = valueAt(cv.vals, ts);
+        if (y != null){ lastAnchorY.set(g.date, y); break; }
+      }
+    });
 
     // 事件点：直接落在当天已选曲线上，点越大 = 同日事件越多
     const dotData = [];
