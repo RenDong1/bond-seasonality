@@ -627,7 +627,7 @@ function makeReviewPanel(RV){
 
   // 事件文字：贴在与事件点相同的坐标旁，与点之间画连线；文字避让曲线与彼此，放不下则省略
   let lastAnchorY = new Map();
-  let lastCurves = [], lastValueAt = null;
+  let lastCurves = [];
   function layoutEventLabels(groups){
     const wrap = R.evWrap;
     wrap.innerHTML = '';
@@ -643,37 +643,66 @@ function makeReviewPanel(RV){
     const toX = ts => rect.x + (ts - ext[0]) / winSpan * rect.width;
     const yExt = chart.getModel().getComponent('yAxis', 0).axis.scale.getExtent();
     const toY = v => rect.y + (yExt[1] - v) / ((yExt[1] - yExt[0]) || 1) * rect.height;
-    // 逐像素列预计算每条曲线的 y 像素（缩放时只算一次），避让判定按列精确扫描
-    const W = Math.max(1, Math.round(rect.width));
-    const colY = lastCurves.map(cv => {
-      const arr = new Array(W + 1);
-      for (let i = 0; i <= W; i++){
-        const ts = ext[0] + i / W * winSpan;
-        const v = lastValueAt ? lastValueAt(cv.vals, ts) : null;
-        arr[i] = (v == null) ? null : toY(v);
+    // 每条曲线的像素折线（非空点）。整段全区间看 1px≈2~5 天，陡变会落在两个整数像素列之间，
+    // 只按列采样会漏掉日内高点，故直接用折线几何做避让。
+    const poly = lastCurves.map(cv => {
+      const xs = [], ys = [];
+      for (let i = 0; i < RV.dates.length; i++){
+        const v = cv.vals[i];
+        if (v == null) continue;
+        xs.push(toX(Date.parse(RV.dates[i])));
+        ys.push(toY(v));
       }
-      return arr;
+      return {xs, ys};
     });
-    // 文字矩形是否压到任一所选曲线（横跨的每一列都查，留 4px 余量）
+    const lowerIdx = (xs, v) => {
+      let lo = 0, hi = xs.length;
+      while (lo < hi){ const m = (lo + hi) >> 1; if (xs[m] < v) lo = m + 1; else hi = m; }
+      return lo;
+    };
+    // 文字矩形是否压到任一所选曲线：折线线段与矩形（上下各留 4px）相交即算
     const curveHit = r => {
-      const i0 = Math.max(0, Math.floor(r.l - rect.x)), i1 = Math.min(W, Math.ceil(r.r - rect.x));
-      for (const arr of colY){
-        for (let i = i0; i <= i1; i++){
-          const py = arr[i];
-          if (py != null && py >= r.t - 4 && py <= r.b + 4) return true;
+      const l = r.l, rr = r.r, t = r.t - 4, b = r.b + 4;
+      for (const {xs, ys} of poly){
+        const n = xs.length; if (!n) continue;
+        const i0 = lowerIdx(xs, l), i1 = lowerIdx(xs, rr + 0.5);
+        for (let i = Math.max(0, i0 - 1); i <= Math.min(n - 2, i1); i++){
+          const x1 = xs[i], y1 = ys[i], x2 = xs[i+1], y2 = ys[i+1];
+          if (Math.max(x1, x2) < l || Math.min(x1, x2) > rr) continue;
+          const xa = Math.max(l, Math.min(x1, x2)), xb = Math.min(rr, Math.max(x1, x2));
+          const ya = y1 + (y2 - y1) * (xa - x1) / ((x2 - x1) || 1);
+          const yb = y1 + (y2 - y1) * (xb - x1) / ((x2 - x1) || 1);
+          if (Math.max(ya, yb) >= t && Math.min(ya, yb) <= b) return true;
         }
+        if (n === 1 && ys[0] >= t && ys[0] <= b && xs[0] >= l && xs[0] <= rr) return true;
       }
       return false;
     };
-    // 该像素列上所选曲线的上下包络 → 文字优先放进曲线之外的空白带
-    const bandAt = px => {
-      const i = Math.max(0, Math.min(W, Math.round(px - rect.x)));
+    // 文字横向跨度内所选曲线的上下包络（含窗口两端插值）→ 文字放进整段都不压线的空白带
+    const bandSpan = (l, w) => {
+      const rr = l + w;
       let top = Infinity, bot = -Infinity;
-      for (const arr of colY){
-        const py = arr[i];
-        if (py == null) continue;
-        if (py < top) top = py;
-        if (py > bot) bot = py;
+      const acc = y => { if (y < top) top = y; if (y > bot) bot = y; };
+      for (const {xs, ys} of poly){
+        const n = xs.length; if (!n) continue;
+        const i0 = lowerIdx(xs, l), i1 = lowerIdx(xs, rr + 0.5);
+        for (let i = i0; i < i1; i++) acc(ys[i]);
+        // 两端若落在两点之间，补上插值点（点可能都在窗口外）
+        const y1At = (x1, y1, x2, y2, x) => y1 + (y2 - y1) * (x - x1) / ((x2 - x1) || 1);
+        const at = x => {
+          const k = lowerIdx(xs, x);
+          if (k <= 0) return xs[0] <= x ? ys[0] : null;
+          if (k >= n) return xs[n-1] >= x ? ys[n-1] : null;
+          return y1At(xs[k-1], ys[k-1], xs[k], ys[k], x);
+        };
+        if (i0 === i1){
+          const v = at(l), v2 = at(rr);
+          if (v != null) acc(v);
+          if (v2 != null) acc(v2);
+        } else {
+          if (i0 > 0 && xs[i0] > l) acc(at(l));
+          if (i1 < n && xs[i1-1] < rr) acc(at(rr));
+        }
       }
       return {top, bot};
     };
@@ -717,24 +746,34 @@ function makeReviewPanel(RV){
     const hit = r => placed.some(p => r.l < p.r && r.r > p.l && r.t < p.b && r.b > p.t);
     const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
     vis.forEach(o => {
-      const bd = bandAt(o.x);
+      const step = o.h + 4;
+      // 横向候选：居中 / 左右错位 / 更远错位（贴边 clamp 后仍能彼此错开）
+      const xs = [o.x - o.w/2,
+                  o.x - o.w/2 - (o.w/2 + 6), o.x - o.w/2 + (o.w/2 + 6),
+                  o.x - o.w/2 - (o.w + 10), o.x - o.w/2 + (o.w + 10)];
+      // 以文字实际（居中并 clamp 后）的横向跨度算空白带，避免曲线在跨度内抬起时压到文字
+      const lc = clamp(o.x - o.w/2, minX, maxX - o.w);
+      const bd = bandSpan(lc, o.w);
       const cand = [
-        [o.x - o.w/2, o.y - o.h - 9],                 // 正上（近）
-        [o.x - o.w/2, o.y + 9],                       // 正下（近）
-        [o.x - o.w/2, o.y - o.h - 26],                // 正上（远）
-        [o.x - o.w/2, o.y + 26],                      // 正下（远）
-        [o.x + 9, o.y - o.h - 9],                     // 右上
-        [o.x - o.w - 9, o.y - o.h - 9],               // 左上
-        [o.x + 9, o.y + 9],                           // 右下
-        [o.x - o.w - 9, o.y + 9],                     // 左下
-        [o.x + 9, o.y - o.h/2],                       // 右
-        [o.x - o.w - 9, o.y - o.h/2]                  // 左
+        [o.x - o.w/2, o.y - o.h - 9],                 // 紧贴：上/下/右上/左上/右下/左下
+        [o.x - o.w/2, o.y + 9],
+        [o.x + 9, o.y - o.h - 9],
+        [o.x - o.w - 9, o.y - o.h - 9],
+        [o.x + 9, o.y + 9],
+        [o.x - o.w - 9, o.y + 9]
       ];
-      // 曲线外的空白带：文字落在整组曲线包络的上方/下方，既不压线也靠近事件点
-      if (isFinite(bd.top)) cand.push([o.x - o.w/2, bd.top - o.h - 6]);
-      if (isFinite(bd.bot)) cand.push([o.x - o.w/2, bd.bot + 6]);
-      cand.push([o.x + 9, o.y - o.h - 26], [o.x - o.w - 9, o.y - o.h - 26],
-                [o.x + 9, o.y + 26], [o.x - o.w - 9, o.y + 26]);
+      // 曲线外空白带：先只试「居中、逐行上下堆叠」，全部居中位都用满才允许左右错位
+      //（避免先到的标签横向漂移、抢占图两端留给最新事件的空间）
+      const addRows = arr => {
+        for (let k = 0; k < 14; k++){
+          const tb = bd.top - o.h - 6 - k * step;
+          if (isFinite(tb) && tb >= minY) arr.forEach(x => cand.push([x, tb]));
+          const ta = bd.bot + 6 + k * step;
+          if (isFinite(ta) && ta + o.h <= maxY) arr.forEach(x => cand.push([x, ta]));
+        }
+      };
+      addRows([o.x - o.w/2]);
+      addRows(xs.slice(1));
       let box = null;
       for (const [l0,t0] of cand){
         const l = clamp(l0, minX, maxX - o.w);
@@ -742,7 +781,29 @@ function makeReviewPanel(RV){
         const rr = {l, t, r:l + o.w, b:t + o.h};
         if (!hit(rr) && !curveHit(rr)){ box = rr; break; }
       }
-      if (!box){ o.el.remove(); return; }             // 放不下就省略，避免压住曲线/彼此重叠
+      if (!box){
+        // 兜底：锚点周围被占满时，横向全局扫描找最近的曲线外空白位（连线指示归属）
+        let bestD = Infinity;
+        for (let l = minX; l <= maxX - o.w; l += 6){
+          const bs = bandSpan(l, o.w);
+          for (const up of [true, false]){
+            const base = up ? bs.top - o.h - 6 : bs.bot + 6;
+            if (!isFinite(base)) continue;
+            for (let k = 0; k < 10; k++){
+              const t = up ? base - k * step : base + k * step;
+              if (t < minY || t + o.h > maxY) break;
+              const rr = {l, t, r:l + o.w, b:t + o.h};
+              if (hit(rr) || curveHit(rr)) continue;
+              const dx = Math.max(l - o.x, 0, o.x - (l + o.w));
+              const dy = Math.max(t - o.y, 0, o.y - (t + o.h));
+              const d = dx + dy * 0.6;
+              if (d < bestD - 0.5){ bestD = d; box = rr; }
+              break;
+            }
+          }
+        }
+      }
+      if (!box){ o.el.remove(); return; }             // 全图无空位才省略
       placed.push(box);
       o.el.style.left = box.l + 'px';
       o.el.style.top = box.t + 'px';
@@ -805,7 +866,7 @@ function makeReviewPanel(RV){
     const rows = selectedRows();
     const groups = groupRows(rows);
     lastGroups = groups;
-    lastCurves = activeCurves; lastValueAt = valueAt;   // 供文字避让曲线 / 空白带定位
+    lastCurves = activeCurves;                           // 供文字避让曲线 / 空白带定位
     // 文字锚点 = 事件点在第一条有值曲线上的收益率（与点的位置一致）
     lastAnchorY = new Map();
     groups.forEach(g => {
