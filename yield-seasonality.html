@@ -77,9 +77,9 @@ tr.cur td{background:#f5f8ff;font-weight:600;}
 .evCnt,.revCount{font-size:11.5px;color:var(--muted);}
 .evLegend{display:flex;gap:14px;align-items:center;font-size:11.5px;color:var(--muted);margin:2px 0 6px;flex-shrink:0;}
 .evLegend i{display:inline-block;vertical-align:middle;margin-right:4px;}
-.evLegend .lnSolid{width:14px;height:0;border-top:2px solid #64748b;}
-.evLegend .lnDash{width:14px;height:0;border-top:2px dashed #64748b;}
-.evLegend .tk{width:2px;height:9px;background:#64748b;}
+.evLegend .evDotSm{width:8px;height:8px;border-radius:50%;background:#d946ef;
+  border:1.5px solid #fff;box-shadow:0 0 0 1px rgba(15,23,42,.18);}
+.evLegend .evDotSm.hollow{background:#fff;border:1.5px solid #d946ef;box-shadow:none;}
 .evLbl{pointer-events:auto;cursor:pointer;}
 .evLbl:hover{background:#fff;}
 .miniBtn{font-size:11.5px;line-height:1.5;padding:1px 8px;border:1px solid var(--line);border-radius:999px;
@@ -527,8 +527,8 @@ function reviewPanelHTML(){
   <div class="revSplit">
     <div class="card revMain">
       <div class="cardhead"><h2>债市复盘 · 真实时间序列</h2><span class="revCount"></span></div>
-      <div class="note">横轴 = 真实日期；可多选国债/国开收益率曲线（1Y~30Y）。事件线：同日 ≥2 条 = 全高竖线＋顶部文字（文字标条数），单条 = 底部短刻度；勾选「显示实施日」后叠加实施日。悬停显示当日数值与事件，点右侧清单或图中事件文字可定位。</div>
-      <div class="evLegend"><span><i class="lnSolid"></i>公告/会议</span><span><i class="lnDash"></i>实施日</span><span><i class="tk"></i>单条事件</span></div>
+      <div class="note">横轴 = 真实日期；可多选国债/国开收益率曲线（1Y~30Y）。事件点标在已选曲线上（点越大 = 同日事件越多；同日 ≥2 条另在顶部标文字），勾选「显示实施日」后叠加实施日。悬停显示当日数值与事件，点右侧清单或图中事件文字可定位。</div>
+      <div class="evLegend"><span><i class="evDotSm"></i>公告/会议（点越大 = 同日事件越多）</span><span><i class="evDotSm hollow"></i>实施日（由上方开关控制）</span></div>
       <div class="revBox">
         <div class="chart revChart"></div>
         <div class="evWrap"></div>
@@ -661,15 +661,16 @@ function makeReviewPanel(RV){
       o.w = Math.min(maxW, el.offsetWidth || maxW);
     });
     const rowRight = [];                              // rowRight[r] = 第 r 行已占用右边界
-    const maxRows = Math.max(1, Math.floor((rect.height - 6) / H));
+    const maxRows = Math.min(5, Math.max(1, Math.floor((rect.height - 6) / H)));
     vis.forEach(o => {
       let left = o.x - o.w/2;
       if (left < minX) left = minX;
       if (left + o.w > maxX) left = maxX - o.w;
       let r = 0;
       while (r < rowRight.length && rowRight[r] > left) r++;   // 与本行末标签重叠 → 下一行
+      if (r >= maxRows){ o.el.remove(); return; }               // 顶部最多 5 行，避免压到曲线
       rowRight[r] = left + o.w;
-      const top = rect.y + 6 + (r % maxRows) * H;
+      const top = rect.y + 6 + r * H;
       o.el.style.left = left + 'px';
       o.el.style.top = top + 'px';
     });
@@ -682,6 +683,20 @@ function makeReviewPanel(RV){
     const s0 = st.start, s1 = st.end;
     const series = [];
     let dMin = Infinity, dMax = -Infinity;
+    const activeCurves = [];
+    const dTime = RV.dates.map(d => Date.parse(d));   // 事件落在周末/节假日时按折线插值取点
+    const valueAt = (vals, ts) => {
+      let lo = 0, hi = dTime.length - 1, k = -1;
+      while (lo <= hi){ const mid = (lo + hi) >> 1;
+        if (dTime[mid] <= ts){ k = mid; lo = mid + 1; } else hi = mid - 1; }
+      if (k < 0) return null;
+      if (dTime[k] === ts) return vals[k];
+      const j = k + 1;
+      if (j >= dTime.length) return null;
+      const v0 = vals[k], v1 = vals[j];
+      if (v0 == null || v1 == null) return null;
+      return v0 + (v1 - v0) * (ts - dTime[k]) / (dTime[j] - dTime[k]);
+    };
 
     CURVES.forEach(c => {
       if (!st.curves.has(c.key)) return;
@@ -694,6 +709,7 @@ function makeReviewPanel(RV){
         if (v != null){ dMin = Math.min(dMin, v); dMax = Math.max(dMax, v); }
         data.push([d, v]);
       }
+      activeCurves.push({name:c.name, vals});
       series.push({name:c.name, type:'line', data, showSymbol:false, connectNulls:true,
         lineStyle:{width:1.8, color:c.color}, itemStyle:{color:c.color}, z:2});
     });
@@ -705,38 +721,35 @@ function makeReviewPanel(RV){
     const groups = groupRows(rows);
     lastGroups = groups;
 
-    // 同日 ≥2 条 = 全高竖线（×N）；单条 = 底部 10px 短刻度
-    const markData = [], ticks = {};
+    // 事件点：直接落在当天已选曲线上，点越大 = 同日事件越多
+    const dotData = [];
     groups.forEach(g => {
+      const ts = Date.parse(g.date);
       const col = catColor(g.items[0].cat);
+      const sz = 5.5 + Math.min(7, (g.items.length - 1) * 1.8);
       const hasAnn = g.items.some(x => x.kind === '公告/会议');
-      if (g.items.length >= 2){
-        markData.push({xAxis:g.date,
-          lineStyle:{color:col, type:hasAnn?'solid':'dashed', width:1.3, opacity:.85}});
-      } else {
-        const cat = g.items[0].cat;
-        (ticks[cat] = ticks[cat] || []).push([g.ts, yMin]);
-      }
+      activeCurves.forEach(cv => {
+        const y = valueAt(cv.vals, ts);
+        if (y == null) return;
+        dotData.push({value:[g.date, y, g.items.length], symbolSize:sz,
+          itemStyle: hasAnn
+            ? {color:col, borderColor:'#fff', borderWidth:1.2}
+            : {color:'#fff', borderColor:col, borderWidth:2}});
+      });
     });
-    series.push({name:'_ev', type:'line', data:[], silent:true, tooltip:{show:false}, z:5,
-      markLine:{silent:true, symbol:'none', label:{show:false}, data:markData}});
+    if (dotData.length){
+      series.push({name:'_evdot', type:'scatter', data:dotData, z:6, silent:true,
+        tooltip:{show:false},
+        itemStyle:{borderColor:'#fff', borderWidth:1.2,
+          shadowBlur:2, shadowColor:'rgba(15,23,42,.18)'},
+        emphasis:{scale:1.5}});
+    }
 
     if (st.focus && st.focus >= s0 && st.focus <= s1){
       series.push({name:'_focus', type:'line', data:[], silent:true, tooltip:{show:false}, z:7,
         markLine:{silent:true, symbol:'none', label:{show:false}, data:[{xAxis:st.focus,
           lineStyle:{color:'#111827', type:'solid', width:2.2, opacity:.55}}]}});
     }
-
-    Object.keys(ticks).forEach(cat => {
-      series.push({name:'_tk_' + cat, type:'custom', silent:true, tooltip:{show:false}, z:6,
-        itemStyle:{color:catColor(cat)},
-        renderItem(params, api){
-          const p = api.coord([api.value(0), api.value(1)]);
-          return {type:'rect', shape:{x:p[0]-0.75, y:p[1]-10, width:1.5, height:10},
-                  style:api.style()};
-        },
-        data:ticks[cat]});
-    });
 
     chart.clear();
     chart.setOption({
