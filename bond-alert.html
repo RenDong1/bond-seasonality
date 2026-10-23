@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>债市预警</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;background:#f5f7fa;color:#333}
+.header{background:linear-gradient(135deg,#1a237e 0%,#283593 100%);color:white;padding:22px 30px}
+.header h1{font-size:22px;margin-bottom:6px}
+.header p{font-size:12px;opacity:0.85;line-height:1.7}
+.container{max-width:1240px;margin:0 auto;padding:20px}
+.stats-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.stat-card{flex:1;min-width:235px;background:white;border-radius:12px;padding:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-left:4px solid #c5cae9}
+.stat-card.bull{border-left-color:#2e7d32}
+.stat-card.bear{border-left-color:#c62828}
+.stat-card.neu{border-left-color:#90a4ae}
+.stat-card .label{font-size:12px;color:#666}
+.stat-card .value{font-size:26px;font-weight:700;margin-top:5px}
+.stat-card .value.bull{color:#1b5e20}
+.stat-card .value.bear{color:#b71c1c}
+.stat-card .value.neu{color:#546e7a}
+.stat-card .delta{font-size:11.5px;color:#888;margin-top:6px;line-height:1.5}
+.panel{background:white;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:16px}
+.panel h2{font-size:15px;margin-bottom:14px;color:#1a237e}
+.panel h3.sub{font-size:13px;margin:16px 0 8px;color:#37474f}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:900px){.two-col{grid-template-columns:1fr}}
+.two-col h3{font-size:13px;color:#455a64;margin-bottom:8px}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{background:#f8f9fa;padding:7px 8px;text-align:left;border-bottom:2px solid #e0e0e0;font-weight:600;color:#546e7a;white-space:nowrap}
+.tbl td{padding:6px 8px;border-bottom:1px solid #f0f0f0;white-space:nowrap}
+.tbl tbody tr:hover td{background:#e8eaf6}
+.tbl .num{text-align:right;font-variant-numeric:tabular-nums}
+.tbl .dim{color:#aaa;text-align:center}
+.tbl .win{font-weight:600;color:#37474f}
+.tbl .pos{color:#1b5e20}
+.tbl .neg{color:#b71c1c}
+.tbl-wrap{overflow-x:auto}
+.badge{display:inline-block;padding:2px 9px;border-radius:11px;font-size:11px;font-weight:600}
+.badge.bull{background:#e8f5e9;color:#1b5e20;border:1px solid #a5d6a7}
+.badge.bear{background:#ffebee;color:#b71c1c;border:1px solid #ef9a9a}
+.badge.neu{background:#eceff1;color:#607d8b;border:1px solid #cfd8dc}
+.seg{display:inline-block;padding:4px 12px;margin:0 6px 6px 0;border:1px solid #c5cae9;border-radius:14px;cursor:pointer;font-size:12px;color:#555;background:#fff;user-select:none}
+.seg:hover{background:#e8eaf6}
+.seg.active{background:#1a237e;color:#fff;border-color:#1a237e}
+.note{font-size:11px;color:#90a4ae;line-height:1.8;margin-top:8px}
+.method p{font-size:12px;color:#546e7a;line-height:1.9}
+.method code{background:#f1f3f5;padding:1px 5px;border-radius:3px;font-size:11px;color:#37474f}
+.method b{color:#37474f}
+.tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:8px;background:#eef2f7;color:#607d8b;margin-left:4px}
+</style>
+</head>
+<body>
+<!--NAV_START-->
+<style>
+.top-nav{display:flex;justify-content:space-between;align-items:center;padding:10px 30px;background:#12141d;border-bottom:1px solid #1e2130;position:sticky;top:0;z-index:200}
+.top-nav .brand{font-size:15px;font-weight:700;color:#e8eaed;text-decoration:none}
+.top-nav .brand span{color:#42a5f5}
+.top-nav .nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.top-nav .nav-links a{padding:5px 14px;border-radius:5px;font-size:12px;color:#787b86;text-decoration:none;transition:all 0.2s}
+.top-nav .nav-links a:hover{color:#e8eaed;background:rgba(255,255,255,0.05)}
+.top-nav .nav-links a.active{color:#e8eaed;background:rgba(66,165,245,0.15)}
+</style>
+<nav class="top-nav">
+  <a href="index.html" class="brand">📊 债市<span>投资策略</span>平台</a>
+  <div class="nav-links">
+    <a href="bond-seasonality.html">📅 季节性复盘</a>
+    <a href="treasury-futures.html">📈 国债期货</a>
+    <a href="stock-bond-monitor.html">🔗 股债联动</a>
+    <a href="yield-seasonality.html">📊 收益率·期限利差</a>
+    <a href="bond-flow-lead.html">📈 净买入·领先</a>
+    <a href="duration-tracking.html">⏱️ 久期跟踪</a>
+    <a href="signal-eval.html">🧪 信号评价</a>
+    <a href="bond-alert.html" class="active">🚨 预警</a>
+  </div>
+</nav>
+<!--NAV_END-->
+<div class="header">
+<h1>&#128680; 债市预警</h1>
+<p id="data-info">数据加载中…</p>
+</div>
+<div class="container">
+<div class="stats-row" id="summary"></div>
+
+<div class="panel">
+<h2>&#128276; 今日信号</h2>
+<div class="two-col">
+<div>
+<h3>超涨超跌模型（滚动分位）</h3>
+<div class="tbl-wrap"><table class="tbl" id="tbl-over"></table></div>
+</div>
+<div>
+<h3>利率拐点模型（冻结阈值）</h3>
+<div class="tbl-wrap"><table class="tbl" id="tbl-turn"></table></div>
+</div>
+</div>
+<p class="note">看多 = 预期收益率下行（债券上涨）；看空 = 预期收益率上行。超涨超跌的“指标值”为指数涨跌幅（%），拐点的“最新D”及其阈值为收益率幅度（bp）。</p>
+</div>
+
+<div class="panel">
+<h2>&#128200; 超涨超跌预警</h2>
+<div id="over-sel"></div>
+<div id="over-chart-wrap"><div id="over-chart" style="width:100%;height:420px"></div></div>
+<div id="over-yield" style="width:100%;height:300px"></div>
+<h3 class="sub">历史统计 · <span id="over-stat-name"></span></h3>
+<div class="tbl-wrap"><table class="tbl" id="over-stat"></table></div>
+<p class="note">区间内 = 信号触发期间收益率变化；后 N 日 = 信号结束后 N 个交易日的收益率变化。有利均值：看多为收益率下行幅度，看空为上行幅度，正值代表方向正确。盈亏比 = 盈利样本合计 / 亏损样本合计。</p>
+</div>
+
+<div class="panel">
+<h2>&#128201; 利率拐点预警</h2>
+<div id="turn-sel"></div>
+<div id="turn-chart-wrap"><div id="turn-chart" style="width:100%;height:420px"></div></div>
+<div id="turn-yield" style="width:100%;height:300px"></div>
+<h3 class="sub">历史统计 · <span id="turn-stat-name"></span></h3>
+<div class="tbl-wrap"><table class="tbl" id="turn-stat"></table></div>
+<p class="note">拐点统计沿用 Excel 列表口径：区间收益 D = 100×(起始日水平 − 结束日水平)，单位 bp；方向正确率按信号方向重新判定（看多 = D&gt;0，看空 = D&lt;0）。原始 Excel 列按 D&lt;0 计胜率，已作为悬浮提示保留。</p>
+</div>
+
+<div class="panel method">
+<h2>&#128221; 模型与数据说明</h2>
+<p><b>超涨超跌</b>：指标 1 = 利率债全价(7-10年) 20日涨幅 − 信用债总全价 20日涨幅；指标 2 = 长期债券全价 20日涨幅 − 中短期债券全价 20日涨幅；指标 3 = 债券综合全价 20日涨幅；指标 4 同指标 3 的 40 日涨幅（仅展示，不参与综合）。每个指标取最近 <code>1197</code> 个观测的 98% / 3% 分位作为阈值，突破上阈记为看空（超涨回调），跌破下阈记为看多（超跌反弹）；综合信号分“任一指标触发”与“≥2 个指标同向触发”两档。</p>
+<p><b>利率拐点</b>：六个指标分别为降息预期（FR007 IRS 1Y 20日均值 − FR007 20日均值）、10债-OMO 利差、隔夜杠杆（R001 成交量占比 20日均值，阈值反向）、10债-股息率分位差 10日均值、10债-大宗分位差 10日均值、风险偏好（创业板20日涨幅 − 红利20日涨幅 10日均值）。阈值冻结为 2016–2023 年 5% / 95% 分位；六个指标中≥2 个同向触发才给出综合信号。</p>
+<p><b>数据源</b>：中债登全价指数；本地收益率库（国债/国开/存单/资金利率）；中国货币网（FR007、回购成交、IRS）；天软 cjpy（创业板、红利指数）；中证指数（商品 CFCI、沪深300 股息率）。运行时 <b>零 Wind / 零 iFinD 额度</b>，每日 09:00 自动增量更新并重建本页。</p>
+<p><b>与 Excel 对账</b>：超涨超跌模型的指标值、分位、98%/3% 阈值与桌面 Excel 种子逐日完全一致（0 差异）；利率拐点模型的最新值、阈值、信号与 Excel 一致，历史少数日期的 Excel 缓存标记存在已知的公式拖拽错位，本页按实时重算结果展示。</p>
+<p id="gen-info"></p>
+</div>
+</div>
+
+<script src="bond-alert-data.js"></script>
+<script>
+const O = DATA.over, T = DATA.turn;
+const $ = id => document.getElementById(id);
+const fmt = (x, n=2) => (x === null || x === undefined || isNaN(x)) ? '—' : Number(x).toFixed(n);
+const pct = x => (x === null || x === undefined) ? '—' : (x * 100).toFixed(1) + '%';
+const sig = s => s > 0 ? ['看多','bull'] : s < 0 ? ['看空','bear'] : ['中性','neu'];
+const badge = s => { const a = sig(s); return `<span class="badge ${a[1]}">${a[0]}</span>`; };
+const cls = v => v > 0 ? 'pos' : (v < 0 ? 'neg' : '');
+const charts = {};
+
+function initChart(id){
+  if (charts[id]) charts[id].dispose();
+  charts[id] = echarts.init($(id));
+  return charts[id];
+}
+function baseGrid(bottom){ return {left:52, right:20, top:34, bottom:bottom||58}; }
+function xAxis(dates){ return {type:'category', data:dates, boundaryGap:false,
+  axisLabel:{fontSize:10, color:'#90a4ae'}, axisLine:{lineStyle:{color:'#cfd8dc'}}}; }
+function yAxis(name){
+  return {type:'value', scale:true, name:name||'', nameTextStyle:{fontSize:10,color:'#90a4ae'},
+    axisLabel:{fontSize:10, color:'#78909c'}, splitLine:{lineStyle:{color:'#f0f2f5'}}};
+}
+function zoom(){ return [{type:'inside', throttle:60}, {type:'slider', height:15, bottom:6,
+  borderColor:'#e0e0e0', fillerColor:'rgba(26,35,126,0.08)', textStyle:{fontSize:9}}]; }
+
+// ---------------- 概览 ----------------
+function renderSummary(){
+  const oi = O.dates.length - 1, ti = T.dates.length - 1;
+  const ge1 = O.comp.ge1.flags[oi], ge2 = O.comp.ge2.flags[oi], tc = T.comp.flags[ti];
+  const os = O.stats, ts = T.stats;
+  const tcnt = T.inds.filter(x => x.flags[ti] !== 0).length;
+  const y = O.yield, y0 = y[oi], y1 = y[oi-1];
+  const dY = (y0 != null && y1 != null) ? (y0 - y1) * 100 : null;
+  const a1 = sig(ge1), a2 = sig(tc);
+  $('summary').innerHTML = `
+  <div class="stat-card ${a1[1]}">
+    <div class="label">超涨超跌 · 任一触发</div>
+    <div class="value ${a1[1]}">${a1[0]}</div>
+    <div class="delta">≥2 确认：${sig(ge2)[0]} · 历史累计看多 ${os.ge1.bull.count} / 看空 ${os.ge1.bear.count}</div>
+  </div>
+  <div class="stat-card ${a2[1]}">
+    <div class="label">利率拐点 · 综合（6选≥2）</div>
+    <div class="value ${a2[1]}">${a2[0]}</div>
+    <div class="delta">今日触发 ${tcnt}/6 个指标 · 历史累计看多 ${ts.comp.bull.count} / 看空 ${ts.comp.bear.count}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">10Y 国债收益率</div>
+    <div class="value" style="font-size:24px">${fmt(y0,4)}<span style="font-size:13px;color:#999;font-weight:400"> %</span></div>
+    <div class="delta">较前一交易日 <span class="${cls(dY)}">${dY===null?'—':(dY>0?'+':'')+fmt(dY,2)+' bp'}</span> · 数据截至 ${O.dates[oi]}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">数据更新</div>
+    <div class="value" style="font-size:20px;line-height:1.3">${DATA.generated.split(' ')[0]}</div>
+    <div class="delta">超涨超跌：${O.dates[0]} ~ ${O.dates[oi]}<br>利率拐点：${T.dates[0]} ~ ${T.dates[ti]}</div>
+  </div>`;
+  $('data-info').textContent = `数据截至 ${O.dates[oi]} ｜ 超涨超跌：滚动 1197 日 98%/3% 分位 ｜ 利率拐点：2016–2023 冻结 5%/95% 阈值 ｜ 每日 09:00 自动更新`;
+  $('gen-info').textContent = `本页生成于 ${DATA.generated}；数据源：中债登 / 本地收益率库 / 中国货币网 / 天软 / 中证指数。`;
+}
+
+// ---------------- 今日信号表 ----------------
+function renderToday(){
+  const oi = O.dates.length - 1, ti = T.dates.length - 1;
+  let h = '<thead><tr><th>指标</th><th class="num">最新值</th><th class="num">分位</th><th class="num">98%阈值</th><th class="num">3%阈值</th><th>信号</th></tr></thead><tbody>';
+  for (const x of O.inds){
+    h += `<tr title="${x.desc||''}"><td>${x.id}. ${x.name}</td>
+      <td class="num">${fmt(x.values[oi],3)}</td><td class="num">${pct(x.rank[oi])}</td>
+      <td class="num">${fmt(x.hi[oi],3)}</td><td class="num">${fmt(x.lo[oi],3)}</td>
+      <td>${badge(x.flags[oi])}</td></tr>`;
+  }
+  h += `<tr><td><b>综合 · 任一触发</b></td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td>${badge(O.comp.ge1.flags[oi])}</td></tr>`;
+  h += `<tr><td><b>综合 · ≥2 同向</b></td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td>${badge(O.comp.ge2.flags[oi])}</td></tr></tbody>`;
+  $('tbl-over').innerHTML = h;
+
+  h = '<thead><tr><th>指标</th><th class="num">最新D (bp)</th><th class="num">低阈</th><th class="num">高阈</th><th>信号</th></tr></thead><tbody>';
+  for (const x of T.inds){
+    h += `<tr title="${x.formula||''}"><td>${x.id}. ${x.name}${x.reversed?'<span class="tag">反向</span>':''}</td>
+      <td class="num">${fmt(x.values[ti],2)}</td><td class="num">${fmt(x.low,2)}</td>
+      <td class="num">${fmt(x.high,2)}</td><td>${badge(x.flags[ti])}</td></tr>`;
+  }
+  h += `<tr><td><b>综合 · 6选≥2</b></td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td>${badge(T.comp.flags[ti])}</td></tr></tbody>`;
+  $('tbl-turn').innerHTML = h;
+}
+
+// ---------------- 超涨超跌 ----------------
+const OVER_SEL = [['1','指标1'],['2','指标2'],['3','指标3'],['4','指标4'],['c1','综合·任一'],['c2','综合·≥2']];
+let overSel = '1';
+const overKey = k => k[0] === 'c' ? 'ge' + k[1] : k;
+const overFlags = k => k[0] === 'c' ? O.comp['ge'+k[1]].flags : O.inds[+k-1].flags;
+const overName = k => k[0] === 'c' ? (k==='c1'?'综合 · 任一触发':'综合 · ≥2 同向') : O.inds[+k-1].name;
+
+function renderOverSel(){
+  $('over-sel').innerHTML = OVER_SEL.map(([k,t]) =>
+    `<span class="seg ${k===overSel?'active':''}" onclick="selectOver('${k}')">${t}</span>`).join('');
+}
+
+function overChart(ind){
+  const dates = O.dates;
+  const c = initChart('over-chart');
+  c.setOption({
+    animation:false,
+    tooltip:{trigger:'axis', confine:true, formatter: ps => {
+      const i = ps[0].dataIndex;
+      return `<b>${dates[i]}</b><br>指标值：${fmt(ind.values[i],4)}<br>分位：${pct(ind.rank[i])}<br>98%阈值：${fmt(ind.hi[i],4)}<br>3%阈值：${fmt(ind.lo[i],4)}<br>信号：${sig(ind.flags[i])[0]}`;
+    }},
+    legend:{top:0, itemWidth:14, itemHeight:8, textStyle:{fontSize:11,color:'#607d8b'}},
+    grid:baseGrid(58), xAxis:xAxis(dates), yAxis:yAxis('指数涨跌幅 %'),
+    dataZoom:zoom(),
+    series:[
+      {name:'指标值', type:'line', data:ind.values, showSymbol:false, connectNulls:false,
+       lineStyle:{width:1.2,color:'#1a237e'}, itemStyle:{color:'#1a237e'}},
+      {name:'98%阈值', type:'line', data:ind.hi, showSymbol:false,
+       lineStyle:{width:1,type:'dashed',color:'#ef9a9a'}, itemStyle:{color:'#c62828'}},
+      {name:'3%阈值', type:'line', data:ind.lo, showSymbol:false,
+       lineStyle:{width:1,type:'dashed',color:'#a5d6a7'}, itemStyle:{color:'#2e7d32'}},
+      {name:'看多信号', type:'scatter', symbol:'triangle', symbolSize:9,
+       data:ind.flags.map((f,i)=> f===1 ? [i, ind.values[i]] : null), itemStyle:{color:'#2e7d32'}},
+      {name:'看空信号', type:'scatter', symbol:'triangle', symbolRotate:180, symbolSize:9,
+       data:ind.flags.map((f,i)=> f===-1 ? [i, ind.values[i]] : null), itemStyle:{color:'#c62828'}}
+    ]
+  }, true);
+}
+
+function yieldChart(id, dates, ys, flags){
+  const c = initChart(id);
+  c.setOption({
+    animation:false,
+    tooltip:{trigger:'axis', confine:true, formatter: ps => {
+      const i = ps[0].dataIndex;
+      return `<b>${dates[i]}</b><br>10Y：${fmt(ys[i],4)}%<br>信号：${sig(flags[i])[0]}`;
+    }},
+    legend:{top:0, itemWidth:14, itemHeight:8, textStyle:{fontSize:11,color:'#607d8b'}},
+    grid:baseGrid(58), xAxis:xAxis(dates), yAxis:yAxis('10Y %'),
+    dataZoom:zoom(),
+    series:[
+      {name:'10Y国债收益率', type:'line', data:ys, showSymbol:false,
+       lineStyle:{width:1,color:'#546e7a'}, itemStyle:{color:'#546e7a'}},
+      {name:'看多信号', type:'scatter', symbol:'triangle', symbolSize:9,
+       data:flags.map((f,i)=> f===1 ? [i, ys[i]] : null), itemStyle:{color:'#2e7d32'}},
+      {name:'看空信号', type:'scatter', symbol:'triangle', symbolRotate:180, symbolSize:9,
+       data:flags.map((f,i)=> f===-1 ? [i, ys[i]] : null), itemStyle:{color:'#c62828'}}
+    ]
+  }, true);
+}
+
+function statCell(s, dir, isTurn){
+  if (!s || !s.n) return '<td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td>';
+  const win = isTurn ? s.win_fav : s.win;
+  const avg = s.avg;
+  const fav = avg == null ? null : (dir === 1 ? (isTurn ? avg : -avg) : (isTurn ? -avg : avg));
+  const title = isTurn ? ` title="Excel 原始胜率（按 D&lt;0 计）：${pct(s.win_excel)}"` : '';
+  return `<td class="num">${s.n}</td><td class="num"${title}>${pct(win)}</td>` +
+         `<td class="num ${cls(fav)}">${fmt(fav,1)}</td><td class="num">${fmt(s.payoff_sum,2)}</td>`;
+}
+
+function renderStatTable(id, st, isTurn){
+  const rows = [['区间内', st.bull.trigger, st.bear.trigger]];
+  for (const h of [5,10,15,20,25,30,35,40]) rows.push([`后${h}日`, st.bull.fwd[h], st.bear.fwd[h]]);
+  let html = '<thead><tr><th rowspan="2">窗口</th><th colspan="4">看多信号</th><th colspan="4">看空信号</th></tr><tr>' +
+    '<th class="num">样本</th><th class="num">方向正确率</th><th class="num">有利均值(bp)</th><th class="num">盈亏比</th>'.repeat(2) +
+    '</tr></thead><tbody>';
+  for (const [label, b, s] of rows) html += `<tr><td class="win">${label}</td>${statCell(b,1,isTurn)}${statCell(s,-1,isTurn)}</tr>`;
+  $(id).innerHTML = html + '</tbody>';
+}
+
+function selectOver(k){
+  overSel = k; renderOverSel();
+  if (k[0] !== 'c'){
+    const ind = O.inds[+k-1];
+    $('over-chart-wrap').style.display = '';
+    overChart(ind);
+  } else {
+    $('over-chart-wrap').style.display = 'none';
+  }
+  yieldChart('over-yield', O.dates, O.yield, overFlags(k));
+  $('over-stat-name').textContent = overName(k);
+  renderStatTable('over-stat', O.stats[overKey(k)], false);
+}
+
+// ---------------- 利率拐点 ----------------
+const TURN_SEL = [['1','指标1'],['2','指标2'],['3','指标3'],['4','指标4'],['5','指标5'],['6','指标6'],['comp','综合·6选≥2']];
+let turnSel = '1';
+const turnFlags = k => k === 'comp' ? T.comp.flags : T.inds[+k-1].flags;
+const turnName = k => k === 'comp' ? '综合 · 6选≥2' : T.inds[+k-1].name;
+
+function renderTurnSel(){
+  $('turn-sel').innerHTML = TURN_SEL.map(([k,t]) =>
+    `<span class="seg ${k===turnSel?'active':''}" onclick="selectTurn('${k}')">${t}</span>`).join('');
+}
+
+function turnChart(ind){
+  const dates = T.dates;
+  const c = initChart('turn-chart');
+  c.setOption({
+    animation:false,
+    tooltip:{trigger:'axis', confine:true, formatter: ps => {
+      const i = ps[0].dataIndex;
+      return `<b>${dates[i]}</b><br>D 值：${fmt(ind.values[i],4)} bp<br>低阈：${fmt(ind.low,4)}<br>高阈：${fmt(ind.high,4)}<br>信号：${sig(ind.flags[i])[0]}`;
+    }},
+    legend:{top:0, itemWidth:14, itemHeight:8, textStyle:{fontSize:11,color:'#607d8b'}},
+    grid:baseGrid(58), xAxis:xAxis(dates), yAxis:yAxis('bp'),
+    dataZoom:zoom(),
+    series:[
+      {name:'D 值', type:'line', data:ind.values, showSymbol:false,
+       lineStyle:{width:1.1,color:'#1a237e'}, itemStyle:{color:'#1a237e'},
+       markLine:{symbol:'none', silent:true, label:{fontSize:10,color:'#78909c'},
+         data:[
+           {yAxis:ind.low, lineStyle:{type:'dashed',color:'#a5d6a7'},
+            label:{formatter:'低阈 '+fmt(ind.low,2)}},
+           {yAxis:ind.high, lineStyle:{type:'dashed',color:'#ef9a9a'},
+            label:{formatter:'高阈 '+fmt(ind.high,2)}}
+         ]}},
+      {name:'看多信号', type:'scatter', symbol:'triangle', symbolSize:9,
+       data:ind.flags.map((f,i)=> f===1 ? [i, ind.values[i]] : null), itemStyle:{color:'#2e7d32'}},
+      {name:'看空信号', type:'scatter', symbol:'triangle', symbolRotate:180, symbolSize:9,
+       data:ind.flags.map((f,i)=> f===-1 ? [i, ind.values[i]] : null), itemStyle:{color:'#c62828'}}
+    ]
+  }, true);
+}
+
+function selectTurn(k){
+  turnSel = k; renderTurnSel();
+  if (k !== 'comp'){
+    $('turn-chart-wrap').style.display = '';
+    turnChart(T.inds[+k-1]);
+  } else {
+    $('turn-chart-wrap').style.display = 'none';
+  }
+  yieldChart('turn-yield', T.dates, T.yield, turnFlags(k));
+  $('turn-stat-name').textContent = turnName(k);
+  renderStatTable('turn-stat', T.stats[k === 'comp' ? 'comp' : k], true);
+}
+
+// ---------------- 启动 ----------------
+renderSummary();
+renderToday();
+renderOverSel();
+selectOver(overSel);
+renderTurnSel();
+selectTurn(turnSel);
+window.addEventListener('resize', () => Object.values(charts).forEach(c => c.resize()));
+window.addEventListener('load', () => [0, 300, 1200].forEach(t => setTimeout(() => Object.values(charts).forEach(c => c.resize()), t)));
+</script>
+</body>
+</html>
