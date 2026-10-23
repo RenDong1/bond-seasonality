@@ -249,6 +249,7 @@ function renderOverSel(){
 function overChart(ind){
   const dates = O.dates;
   const c = initChart('over-chart');
+  if (c.getDom().clientWidth > 0) c.resize();
   trackZoom('over-chart', 'over');
   c.setOption({
     animation:false,
@@ -345,6 +346,7 @@ function renderTurnSel(){
 function turnChart(ind){
   const dates = T.dates;
   const c = initChart('turn-chart');
+  if (c.getDom().clientWidth > 0) c.resize();
   trackZoom('turn-chart', 'turn');
   c.setOption({
     animation:false,
