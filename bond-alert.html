@@ -14,13 +14,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 .container{max-width:1240px;margin:0 auto;padding:20px}
 .stats-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}
 .stat-card{flex:1;min-width:235px;background:white;border-radius:12px;padding:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-left:4px solid #c5cae9}
-.stat-card.bull{border-left-color:#2e7d32}
-.stat-card.bear{border-left-color:#c62828}
+.stat-card.bull{border-left-color:#c62828}
+.stat-card.bear{border-left-color:#2e7d32}
 .stat-card.neu{border-left-color:#90a4ae}
 .stat-card .label{font-size:12px;color:#666}
 .stat-card .value{font-size:26px;font-weight:700;margin-top:5px}
-.stat-card .value.bull{color:#1b5e20}
-.stat-card .value.bear{color:#b71c1c}
+.stat-card .value.bull{color:#b71c1c}
+.stat-card .value.bear{color:#1b5e20}
 .stat-card .value.neu{color:#546e7a}
 .stat-card .delta{font-size:11.5px;color:#888;margin-top:6px;line-height:1.5}
 .panel{background:white;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:16px}
@@ -40,8 +40,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 .tbl .neg{color:#b71c1c}
 .tbl-wrap{overflow-x:auto}
 .badge{display:inline-block;padding:2px 9px;border-radius:11px;font-size:11px;font-weight:600}
-.badge.bull{background:#e8f5e9;color:#1b5e20;border:1px solid #a5d6a7}
-.badge.bear{background:#ffebee;color:#b71c1c;border:1px solid #ef9a9a}
+.badge.bull{background:#ffebee;color:#b71c1c;border:1px solid #ef9a9a}
+.badge.bear{background:#e8f5e9;color:#1b5e20;border:1px solid #a5d6a7}
 .badge.neu{background:#eceff1;color:#607d8b;border:1px solid #cfd8dc}
 .seg{display:inline-block;padding:4px 12px;margin:0 6px 6px 0;border:1px solid #c5cae9;border-radius:14px;cursor:pointer;font-size:12px;color:#555;background:#fff;user-select:none}
 .seg:hover{background:#e8eaf6}
@@ -140,11 +140,27 @@ const sig = s => s > 0 ? ['看多','bull'] : s < 0 ? ['看空','bear'] : ['中�
 const badge = s => { const a = sig(s); return `<span class="badge ${a[1]}">${a[0]}</span>`; };
 const cls = v => v > 0 ? 'pos' : (v < 0 ? 'neg' : '');
 const charts = {};
+const zstate = {over:{start:0, end:100}, turn:{start:0, end:100}};
 
 function initChart(id){
-  if (charts[id]) charts[id].dispose();
-  charts[id] = echarts.init($(id));
+  if (!charts[id]) charts[id] = echarts.init($(id));
   return charts[id];
+}
+function trackZoom(id, key){
+  const c = charts[id];
+  if (c.__zoomed) return;
+  c.__zoomed = true;
+  c.on('dataZoom', function(){
+    const dz = c.getOption().dataZoom;
+    if (dz && dz[0] && dz[0].start != null) zstate[key] = {start:dz[0].start, end:dz[0].end};
+  });
+}
+function linkGroup(ids, group){
+  ids.forEach(id => { if (charts[id]) charts[id].group = group; });
+  echarts.connect(group);
+}
+function resizeAll(){
+  Object.values(charts).forEach(c => { if (c.getDom().clientWidth > 0) c.resize(); });
 }
 function baseGrid(bottom){ return {left:52, right:20, top:34, bottom:bottom||58}; }
 function xAxis(dates){ return {type:'category', data:dates, boundaryGap:false,
@@ -153,8 +169,12 @@ function yAxis(name){
   return {type:'value', scale:true, name:name||'', nameTextStyle:{fontSize:10,color:'#90a4ae'},
     axisLabel:{fontSize:10, color:'#78909c'}, splitLine:{lineStyle:{color:'#f0f2f5'}}};
 }
-function zoom(){ return [{type:'inside', throttle:60}, {type:'slider', height:15, bottom:6,
-  borderColor:'#e0e0e0', fillerColor:'rgba(26,35,126,0.08)', textStyle:{fontSize:9}}]; }
+function zoom(key){
+  const z = zstate[key] || {start:0, end:100};
+  return [{type:'inside', start:z.start, end:z.end, throttle:60},
+          {type:'slider', start:z.start, end:z.end, height:15, bottom:6,
+           borderColor:'#e0e0e0', fillerColor:'rgba(26,35,126,0.08)', textStyle:{fontSize:9}}];
+}
 
 // ---------------- 概览 ----------------
 function renderSummary(){
@@ -229,6 +249,7 @@ function renderOverSel(){
 function overChart(ind){
   const dates = O.dates;
   const c = initChart('over-chart');
+  trackZoom('over-chart', 'over');
   c.setOption({
     animation:false,
     tooltip:{trigger:'axis', confine:true, formatter: ps => {
@@ -237,7 +258,7 @@ function overChart(ind){
     }},
     legend:{top:0, itemWidth:14, itemHeight:8, textStyle:{fontSize:11,color:'#607d8b'}},
     grid:baseGrid(58), xAxis:xAxis(dates), yAxis:yAxis('指数涨跌幅 %'),
-    dataZoom:zoom(),
+    dataZoom:zoom('over'),
     series:[
       {name:'指标值', type:'line', data:ind.values, showSymbol:false, connectNulls:false,
        lineStyle:{width:1.2,color:'#1a237e'}, itemStyle:{color:'#1a237e'}},
@@ -246,15 +267,16 @@ function overChart(ind){
       {name:'3%阈值', type:'line', data:ind.lo, showSymbol:false,
        lineStyle:{width:1,type:'dashed',color:'#a5d6a7'}, itemStyle:{color:'#2e7d32'}},
       {name:'看多信号', type:'scatter', symbol:'triangle', symbolSize:9,
-       data:ind.flags.map((f,i)=> f===1 ? [i, ind.values[i]] : null), itemStyle:{color:'#2e7d32'}},
+       data:ind.flags.map((f,i)=> f===1 ? [i, ind.values[i]] : null), itemStyle:{color:'#c62828'}},
       {name:'看空信号', type:'scatter', symbol:'triangle', symbolRotate:180, symbolSize:9,
-       data:ind.flags.map((f,i)=> f===-1 ? [i, ind.values[i]] : null), itemStyle:{color:'#c62828'}}
+       data:ind.flags.map((f,i)=> f===-1 ? [i, ind.values[i]] : null), itemStyle:{color:'#2e7d32'}}
     ]
   }, true);
 }
 
-function yieldChart(id, dates, ys, flags){
+function yieldChart(id, dates, ys, flags, key){
   const c = initChart(id);
+  trackZoom(id, key);
   c.setOption({
     animation:false,
     tooltip:{trigger:'axis', confine:true, formatter: ps => {
@@ -263,14 +285,14 @@ function yieldChart(id, dates, ys, flags){
     }},
     legend:{top:0, itemWidth:14, itemHeight:8, textStyle:{fontSize:11,color:'#607d8b'}},
     grid:baseGrid(58), xAxis:xAxis(dates), yAxis:yAxis('10Y %'),
-    dataZoom:zoom(),
+    dataZoom:zoom(key),
     series:[
       {name:'10Y国债收益率', type:'line', data:ys, showSymbol:false,
        lineStyle:{width:1,color:'#546e7a'}, itemStyle:{color:'#546e7a'}},
       {name:'看多信号', type:'scatter', symbol:'triangle', symbolSize:9,
-       data:flags.map((f,i)=> f===1 ? [i, ys[i]] : null), itemStyle:{color:'#2e7d32'}},
+       data:flags.map((f,i)=> f===1 ? [i, ys[i]] : null), itemStyle:{color:'#c62828'}},
       {name:'看空信号', type:'scatter', symbol:'triangle', symbolRotate:180, symbolSize:9,
-       data:flags.map((f,i)=> f===-1 ? [i, ys[i]] : null), itemStyle:{color:'#c62828'}}
+       data:flags.map((f,i)=> f===-1 ? [i, ys[i]] : null), itemStyle:{color:'#2e7d32'}}
     ]
   }, true);
 }
@@ -304,7 +326,7 @@ function selectOver(k){
   } else {
     $('over-chart-wrap').style.display = 'none';
   }
-  yieldChart('over-yield', O.dates, O.yield, overFlags(k));
+  yieldChart('over-yield', O.dates, O.yield, overFlags(k), 'over');
   $('over-stat-name').textContent = overName(k);
   renderStatTable('over-stat', O.stats[overKey(k)], false);
 }
@@ -323,6 +345,7 @@ function renderTurnSel(){
 function turnChart(ind){
   const dates = T.dates;
   const c = initChart('turn-chart');
+  trackZoom('turn-chart', 'turn');
   c.setOption({
     animation:false,
     tooltip:{trigger:'axis', confine:true, formatter: ps => {
@@ -331,7 +354,7 @@ function turnChart(ind){
     }},
     legend:{top:0, itemWidth:14, itemHeight:8, textStyle:{fontSize:11,color:'#607d8b'}},
     grid:baseGrid(58), xAxis:xAxis(dates), yAxis:yAxis('bp'),
-    dataZoom:zoom(),
+    dataZoom:zoom('turn'),
     series:[
       {name:'D 值', type:'line', data:ind.values, showSymbol:false,
        lineStyle:{width:1.1,color:'#1a237e'}, itemStyle:{color:'#1a237e'},
@@ -343,9 +366,9 @@ function turnChart(ind){
             label:{formatter:'高阈 '+fmt(ind.high,2)}}
          ]}},
       {name:'看多信号', type:'scatter', symbol:'triangle', symbolSize:9,
-       data:ind.flags.map((f,i)=> f===1 ? [i, ind.values[i]] : null), itemStyle:{color:'#2e7d32'}},
+       data:ind.flags.map((f,i)=> f===1 ? [i, ind.values[i]] : null), itemStyle:{color:'#c62828'}},
       {name:'看空信号', type:'scatter', symbol:'triangle', symbolRotate:180, symbolSize:9,
-       data:ind.flags.map((f,i)=> f===-1 ? [i, ind.values[i]] : null), itemStyle:{color:'#c62828'}}
+       data:ind.flags.map((f,i)=> f===-1 ? [i, ind.values[i]] : null), itemStyle:{color:'#2e7d32'}}
     ]
   }, true);
 }
@@ -358,7 +381,7 @@ function selectTurn(k){
   } else {
     $('turn-chart-wrap').style.display = 'none';
   }
-  yieldChart('turn-yield', T.dates, T.yield, turnFlags(k));
+  yieldChart('turn-yield', T.dates, T.yield, turnFlags(k), 'turn');
   $('turn-stat-name').textContent = turnName(k);
   renderStatTable('turn-stat', T.stats[k === 'comp' ? 'comp' : k], true);
 }
@@ -370,8 +393,10 @@ renderOverSel();
 selectOver(overSel);
 renderTurnSel();
 selectTurn(turnSel);
-window.addEventListener('resize', () => Object.values(charts).forEach(c => c.resize()));
-window.addEventListener('load', () => [0, 300, 1200].forEach(t => setTimeout(() => Object.values(charts).forEach(c => c.resize()), t)));
+linkGroup(['over-chart','over-yield'], 'g-over');
+linkGroup(['turn-chart','turn-yield'], 'g-turn');
+window.addEventListener('resize', resizeAll);
+window.addEventListener('load', () => [0, 300, 1200].forEach(t => setTimeout(resizeAll, t)));
 </script>
 </body>
 </html>
