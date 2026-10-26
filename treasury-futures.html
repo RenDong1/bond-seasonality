@@ -130,6 +130,9 @@
   .oi-tip{position:absolute;left:8px;top:4px;z-index:10;display:none;gap:12px;align-items:center;background:rgba(255,255,255,.94);border:1px solid #e4e4e4;border-radius:5px;padding:2px 8px;font-size:11px;color:#444;pointer-events:none;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.06)}
   .oi-tip .d{color:#999}
   .oi-tip b{font-weight:600}
+  /* 四图联动十字光标（浮层绘制，避免各 canvas 内部十字光标不刷新） */
+  .xh-line{position:absolute;top:0;bottom:22px;width:0;border-left:1px dashed #9e9e9e;display:none;pointer-events:none;z-index:4}
+  .xh-date{position:absolute;bottom:2px;transform:translateX(-50%);background:#131722;color:#fff;font-size:11px;line-height:15px;padding:0 5px;border-radius:2px;display:none;pointer-events:none;white-space:nowrap;z-index:5}
   .lg-chip{padding:2px 9px;border:1px solid #ccc;border-radius:10px;font-size:11px;cursor:pointer;user-select:none;line-height:16px;transition:opacity .15s}
   .lg-chip.off{opacity:.35}
   .kline-events{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:11px}
@@ -21694,6 +21697,55 @@ function buildContractChart(prefix, name) {
       + '<span>增仓 <b style="color:' + color + '">' + (delta > 0 ? '+' : '') + delta.toLocaleString() + '</b> 手</span>'
       + '<span>总持仓 <b>' + row.oi.toLocaleString() + '</b> 手</span>';
     oiTip.style.display = 'flex';
+  });
+
+  // —— 四图十字光标联动：任一图悬停某日，其余图同一日期同步显示竖线 ——
+  // 本版本 lightweight-charts 的 setCrosshairPosition 对尚未悬停过的副图不渲染，
+  // 改用 DOM 浮层：按 timeToCoordinate 定位虚线 + 日期标签，四图像素级对齐。
+  // 源图保留原生十字光标（含价格标签），其余图显示联动竖线；移出四图区域全部隐藏。
+  const xhPanels = [cMain, cMacd, cRsi, cOi];
+  const xhGuides = ['-main', '-macd', '-rsi', '-oi'].map(sfx => {
+    const el = document.getElementById(prefix + sfx);
+    el.style.position = 'relative';
+    const line = document.createElement('div');
+    line.className = 'xh-line';
+    const lab = document.createElement('div');
+    lab.className = 'xh-date';
+    el.appendChild(line);
+    el.appendChild(lab);
+    return { line, lab };
+  });
+  let xhHideTimer = null;
+  function hideGuides() {
+    xhGuides.forEach(g => { g.line.style.display = 'none'; g.lab.style.display = 'none'; });
+  }
+  function showGuides(t, skip) {
+    if (xhHideTimer) { clearTimeout(xhHideTimer); xhHideTimer = null; }
+    const labTxt = t.day + ' ' + t.month + '月 \'' + String(t.year % 100).padStart(2, '0');
+    xhGuides.forEach((g, i) => {
+      let x = null;
+      if (i !== skip) { try { x = xhPanels[i].timeScale().timeToCoordinate(t); } catch (e) { /* 隐藏态 */ } }
+      if (x == null) { g.line.style.display = 'none'; g.lab.style.display = 'none'; return; }
+      g.line.style.display = 'block';
+      g.line.style.left = x + 'px';
+      g.lab.style.display = 'block';
+      g.lab.style.left = x + 'px';
+      g.lab.textContent = labTxt;
+    });
+  }
+  xhPanels.forEach((ch, i) => {
+    ch.subscribeCrosshairMove(param => {
+      if (!param.point || !param.time || typeof param.time !== 'object' || param.time.year == null) return;
+      showGuides(param.time, i);
+    });
+  });
+  ['-main', '-macd', '-rsi', '-oi'].forEach(sfx => {
+    const el = document.getElementById(prefix + sfx);
+    // 四图之间移动会连续触发 leave/enter，延迟隐藏避免闪烁
+    if (el) el.addEventListener('mouseleave', () => {
+      if (xhHideTimer) clearTimeout(xhHideTimer);
+      xhHideTimer = setTimeout(hideGuides, 40);
+    });
   });
 
   // —— 图例（默认全「未选中」，点选后显示；K 线始终显示，不在此列） ——
