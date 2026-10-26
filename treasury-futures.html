@@ -135,11 +135,6 @@
   .xh-date{position:absolute;bottom:2px;transform:translateX(-50%);background:#131722;color:#fff;font-size:11px;line-height:15px;padding:0 5px;border-radius:2px;display:none;pointer-events:none;white-space:nowrap;z-index:5}
   .lg-chip{padding:2px 9px;border:1px solid #ccc;border-radius:10px;font-size:11px;cursor:pointer;user-select:none;line-height:16px;transition:opacity .15s}
   .lg-chip.off{opacity:.35}
-  .kline-events{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:11px}
-  .kline-events .oi-evt{background:#fff;border:1px solid #eee;border-radius:6px;padding:2px 8px;white-space:nowrap}
-  .kline-events .oi-evt.oi-up{color:#ff6d00;border-color:#ffd180}
-  .kline-events .oi-evt.oi-down{color:#0091ea;border-color:#81d4fa}
-  .kline-events .oi-evt-empty{color:var(--muted)}
   .kline-analysis{margin-top:10px;padding:10px 14px;background:#fffde7;border:1px solid #fff59d;border-radius:8px;font-size:12px;color:#555;line-height:1.75}
   .kline-analysis strong{color:#222}
   @media(max-width:900px){
@@ -221,7 +216,6 @@
       <div id="kT-oi" style="width:100%;height:90px;display:none"></div>
     </div>
     <div class="kline-analysis" id="analysisT"></div>
-    <div class="kline-events" id="klineEventsT"></div>
   </div>
   <div class="kline-item">
     <div class="kline-title">🕐 三十年期国债期货<span class="code">TLZL2.CFE</span></div>
@@ -233,7 +227,6 @@
       <div id="kTL-oi" style="width:100%;height:90px;display:none"></div>
     </div>
     <div class="kline-analysis" id="analysisTL"></div>
-    <div class="kline-events" id="klineEventsTL"></div>
   </div>
 </div>
 
@@ -21973,28 +21966,6 @@ function filterByRange(data) {
 
 function fmtWan(v) { return (Math.abs(v) / 10000).toFixed(2) + '万'; }
 
-// 计算区间内的大幅增仓/减仓事件（相邻两日持仓量差）
-function oiEvents(data) {
-  const ev = [];
-  for (let i = 1; i < data.length; i++) {
-    const d0 = data[i-1], d1 = data[i];
-    if (d0.oi == null || d1.oi == null) continue;
-    const delta = d1.oi - d0.oi;
-    if (delta >= OI_SURGE_THRESHOLD) ev.push({ date: d1.date, delta, up: true });
-    else if (delta <= -OI_SURGE_THRESHOLD) ev.push({ date: d1.date, delta, up: false });
-  }
-  return ev;
-}
-
-function renderOiEvents(elId, data) {
-  const el = document.getElementById(elId);
-  if (!el) return;
-  const evs = oiEvents(data).slice(-10).reverse(); // 最近10条
-  if (!evs.length) { el.innerHTML = '<span class="oi-evt-empty">当前区间无大幅增仓/减仓</span>'; return; }
-  el.innerHTML = evs.map(e =>
-    `<span class="oi-evt ${e.up?'oi-up':'oi-down'}">${e.up?'增':'减'} ${fmtWan(e.delta)} · ${e.date}</span>`).join('');
-}
-
 function renderKlines() {
   if (typeof LightweightCharts === 'undefined') return;
   const tRange = filterByRange(tData);
@@ -22003,8 +21974,6 @@ function renderKlines() {
   if (!klineCharts.TL) klineCharts.TL = buildContractChart('kTL', '三十年期国债期货');
   klineCharts.T.render(tRange);
   klineCharts.TL.render(tlRange);
-  renderOiEvents('klineEventsT', tRange);
-  renderOiEvents('klineEventsTL', tlRange);
   renderAnalysis('analysisT', tRange, '十年期国债期货');
   renderAnalysis('analysisTL', tlRange, '三十年期国债期货');
 }
