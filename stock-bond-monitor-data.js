@@ -1,7 +1,7 @@
 window.MONITOR_DATA = {
  "meta": {
   "as_of": "2026-10-26",
-  "generated_at": "2026-10-27 10:19:12",
+  "generated_at": "2026-10-27 11:39:23",
   "event_count": 20,
   "path_event_count": 15,
   "start": "2023-04-21",
@@ -11655,7 +11655,7 @@ window.MONITOR_DATA = {
  "widening": {
   "meta": {
    "as_of": "2026-10-26",
-   "generated_at": "2026-10-27 10:19:18",
+   "generated_at": "2026-10-27 11:39:27",
    "event_count": 20,
    "path_event_count": 20,
    "start": "2023-04-21",
