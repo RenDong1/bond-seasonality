@@ -187,7 +187,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
   <div class="tbl-wrap">
     <table class="tbl">
       <thead><tr>
-        <th>触发日</th><th>SR40</th><th>TL 增仓</th><th>T 增仓</th>
+        <th>触发日</th><th>股市分</th><th>TL 增仓</th><th>T 增仓</th>
         <th>rel_oi</th><th>relret</th>
         <th>5日ΔS</th><th>10日ΔS</th><th>20日ΔS</th><th>40日ΔS</th><th>60日ΔS</th>
         <th>状态</th>
@@ -218,7 +218,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
       </tr></thead>
       <tbody id="split-tbody"></tbody>
     </table>
-    <p class="note">样本外从 2025-01-01 起；事件结果日也必须落在样本外，避免用训练期结果验证。分样本基线为同一 SR40 条件下按 10 日去重的普通上涨日（不要求 rel_oi/relret）；上方 KPI 的基线为未去重的全部普通上涨日。</p>
+    <p class="note">样本外从 2025-01-01 起；事件结果日也必须落在样本外，避免用训练期结果验证。分样本基线为同一股市复合分≥2 条件下按 10 日去重的普通上涨日（不要求 rel_oi/relret）；上方 KPI 的基线为未去重的全部普通上涨日。</p>
   </div>
 </div>
 
@@ -227,12 +227,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
   <div class="rule-list" id="rule-box"></div>
   <div class="boundary" id="boundary-box">
     <b>使用边界</b><br>
-    1. 信号的目标仍是 <b>20–60 日、数 bp 的曲线变平</b>，不是持续牛市；5 日样本小、噪声大；10 日在 25–26 样本外为 8/9，但样本仅 9 个，仍不作为主判断依据。<br>
+    1. 信号的目标仍是 <b>20–60 日、数 bp 的曲线变平</b>，不是持续牛市；5 日样本小、噪声大；10 日在 25–26 样本外为 7/8，但样本仅 8 个，仍不作为主判断依据。<br>
     2. 触发日的 TL 强势不能外推为后续领涨：事件后 TL−T 的中位收益不延续，利差压缩也可能来自现券补涨。<br>
     3. 持仓增速是持仓量的变化，不是净流入，不能区分多空方向；它只说明仓位在增加。<br>
     4. 历史统计为事件研究，样本量有限（当前事件数见上方），结果用于监测而非实盘交易指令。
   </div>
-  <p class="note">数据源：现券收益率来自本地中债登库（经 treasury-seasonality 共享 JSON），国债期货与沪深300来自 cjpy；每日 09:00 随平台更新，展示 T-1 收盘信号。</p>
+  <p class="note">数据源：现券收益率来自本地中债登库（经 treasury-seasonality 共享 JSON），国债期货与国证A指来自 cjpy；每日 09:00 随平台更新，展示 T-1 收盘信号。</p>
 </div>
 
 </div>
@@ -410,7 +410,7 @@ function render(){
     if (isNa) { flag = '换月/—'; flagCls = 'na'; }
     else if (c.pass) { flag = '✓ 满足'; flagCls = 'ok'; }
     else { flag = '✗ 未满足'; flagCls = 'no'; }
-    var thrDigits = (c.key === 'sr40') ? 0 : 2;
+    var thrDigits = (c.key === 'sr40' || c.key === 'stock_score') ? 0 : 2;
     var thr = (opMap[c.op] || '') + signLabel(c.threshold, thrDigits) + c.unit;
     var gapTxt;
     if (isNa) gapTxt = '换月日不计算';
@@ -442,7 +442,7 @@ function render(){
     var win = num(meta.main_window) || (isWiden ? 10 : 20);
     var progress = Math.min(1, elapsed / win) * 100;
     var note = isWiden
-      ? '主窗口为触发后 10 个交易日，其次 40/60 日；20 日样本外弱于仅股市上涨基线，仅作观察。ΔS 为正表示利差走扩。'
+      ? '主窗口为触发后 10 个交易日，其次 40/60 日；10/20 日样本外均不高于仅股市复合分基线，40 日略高但属延展窗口，仅作观察。ΔS 为正表示利差走扩。'
       : '主窗口为触发后 20 个交易日，其次 40/60 日；5–10 日仅作观察。ΔS 为负表示利差压缩。';
     return '<div style="font-size:14px;margin-bottom:4px">' + title + '</div>' +
       '<div style="font-size:12px;color:#666">' +
@@ -667,28 +667,29 @@ function render(){
       var v = num(p.value);
       out += '<br>' + p.marker + p.seriesName + '：' +
         (v === null ? '—' : v.toFixed(2) +
-          (p.seriesName.indexOf('SR40') >= 0 ||
+          (p.seriesName.indexOf('股市分') >= 0 ? ' 项' :
            p.seriesName.indexOf('relret') >= 0 ? '%' : ''));
     });
     return out;
   }
   var rule = P.rule || {};
-  var srThr = num(rule.decl_thr);
+  var scoreThr = num(rule.stock_score_min) || 2;
   var relThr = num(rule.rel_thr);
   var tlThr = num(rule.tl_oi_thr);
   var relOiThr = num(rule.rel_oi_thr);
-  var srLine = markLine(srThr, signLabel(srThr, 0) + '%', '#c62828');
+  var scoreLine = markLine(scoreThr, '≥ ' + scoreThr + ' 项', '#c62828');
   var relLine = markLine(relThr, signLabel(relThr, 2) + '%', '#ff9800');
   var tlLine = markLine(tlThr === null ? 0 : tlThr,
     rule.tl_oi_required ? (signLabel(tlThr, 0) + '%') : '0（参考）', '#1565c0');
   var relOiLine = markLine(relOiThr,
     (relOiThr === 0 ? '0' : signLabel(relOiThr, 2)), '#26a69a');
 
-  var srSeries = {
-    name: 'SR40', type: 'line', data: histSlice(H.sr40), showSymbol: false,
+  var scoreSeries = {
+    name: '股市复合分', type: 'line',
+    data: histSlice(isWiden ? H.score_up : H.score_down), showSymbol: false,
     lineStyle: { color: '#5c6bc0', width: 1.6 }, itemStyle: { color: '#5c6bc0' }
   };
-  if (srLine) srSeries.markLine = srLine;
+  if (scoreLine) scoreSeries.markLine = scoreLine;
   var rrSeries = {
     name: 'relret', type: 'line', yAxisIndex: 1, data: histSlice(H.relret),
     showSymbol: false, connectNulls: false,
@@ -706,12 +707,13 @@ function render(){
       axisLabel: { fontSize: 9, color: '#999' }, axisLine: { lineStyle: { color: '#ddd' } }
     },
     yAxis: [
-      { type: 'value', name: 'SR40 (%)', nameTextStyle: { fontSize: 10, color: '#999' },
+      { type: 'value', name: '股市分（项）', min: 0, max: 4, interval: 1,
+        nameTextStyle: { fontSize: 10, color: '#999' },
         axisLabel: { fontSize: 9, color: '#999' }, splitLine: { lineStyle: { color: '#f4f4f4' } } },
       { type: 'value', name: 'relret (%)', nameTextStyle: { fontSize: 10, color: '#999' },
         axisLabel: { fontSize: 9, color: '#999' }, splitLine: { show: false } }
     ],
-    series: [srSeries, rrSeries]
+    series: [scoreSeries, rrSeries]
   }, true);
 
   var tlSeries = {
@@ -765,7 +767,7 @@ function render(){
       : '<span class="muted">已走完</span>';
     return '<tr' + (isActive ? ' class="current"' : '') + '>' +
       '<td class="date">' + e.date + '</td>' +
-      '<td class="' + cls(e.sr40) + '">' + fmt(e.sr40, 2) + '%</td>' +
+      '<td>' + (isWiden ? e.up_score : e.down_score) + ' 项</td>' +
       '<td class="' + cls(e.g_tl) + '">' + fmt(e.g_tl, 2) + '%</td>' +
       '<td class="' + cls(e.g_t) + '">' + fmt(e.g_t, 2) + '%</td>' +
       '<td class="' + cls(e.rel_oi) + '">' + fmt(e.rel_oi, 2) + '</td>' +
@@ -820,7 +822,7 @@ function render(){
       var s20 = (P.stats || {})['20'] || {};
       $('verify-note').innerHTML =
         '当前 R3d 事件 ' + s20.n + ' 个有效样本，20 日利差中位 ' +
-        fmt(s20.median, 2) + 'bp；同样满足 SR40 ≤ −2% 但未触发的普通下跌日 ' +
+        fmt(s20.median, 2) + 'bp；同样满足国证A指复合分≥2 但未触发的普通日 ' +
         base20.n + ' 个，中位 ' + fmt(base20.median, 2) + 'bp。' +
         'R3d 事件<b>多压缩 ' + Math.abs(extra).toFixed(2) + 'bp</b>。' +
         '负值 = 利差压缩、正值 = 走陡。';
@@ -858,20 +860,22 @@ function render(){
   // 规则与边界
   if (isWiden) {
     $('rule-box').innerHTML =
-      '<div>① 股市状态：过去 40 个交易日沪深300累计收益 <code>SR40 ≥ +2%</code></div>' +
+      '<div>① 股市状态：国证A指四项（<code>z25 ≥ +0.5</code>、<code>pct60 ≥ 75</code>、' +
+      '<code>ma60 ≥ +2%</code>、<code>距60日低点 ≥ +8%</code>）至少满足 2 项</div>' +
       '<div>② 相对减仓：<code>rel_oi = TL 增速 − T 增速 &lt; 0</code></div>' +
       '<div>③ 相对弱势：<code>relret = r_TL − β × r_T &lt; −0.10%</code>，β 为 60 日滚动、滞后 1 日</div>' +
       '<div>④ 去重：同一规则 10 个交易日内只记第一次触发</div>' +
       '<div style="margin-top:6px;color:#999">本规则不要求 TL 绝对减仓；rel_oi &lt; 0 表示 TL 持仓增速低于 T。全合约持仓口径同上。</div>';
     $('boundary-box').innerHTML =
       '<b>使用边界</b><br>' +
-      '1. 目标窗口是 <b>10 日与 40–60 日</b>的曲线走扩；20 日样本外仅 8/13，低于仅股市上涨基线，5 日边际，均不作主判断。<br>' +
+      '1. 主窗口沿用原设定 <b>10 日</b>：样本外 11/16，低于仅股市复合分基线 17/24；20 日 10/16 同样低于基线；40 日 13/16（p=0.011，基线 18/24）为延展观察，不据此改主窗口。<br>' +
       '2. rel_oi 是相对持仓增速，不是净流入；它只说明 TL 相对 T 的仓位变化，不能区分多空。<br>' +
       '3. 走扩可能来自 30Y 上行或 10Y 下行，事件后应结合 Δy30/Δy10 分解，不能直接外推为熊陡。<br>' +
-      '4. 样本量有限（20 次事件，训练 7 / 样本外 13），结果用于监测而非实盘交易指令。';
+      '4. 样本量有限（23 次事件，训练 7 / 样本外 16），结果用于监测而非实盘交易指令。';
   } else {
     $('rule-box').innerHTML =
-      '<div>① 股市状态：过去 40 个交易日沪深300累计收益 <code>SR40 ≤ −2%</code></div>' +
+      '<div>① 股市状态：国证A指四项（<code>z25 ≤ −0.5</code>、<code>pct60 ≤ 25</code>、' +
+      '<code>ma60 ≤ −2%</code>、<code>dd60 ≤ −8%</code>）至少满足 2 项</div>' +
       '<div>② TL 增仓：TL 全部在挂季度合约持仓合计的日环比增速 <code>&gt; 1%</code></div>' +
       '<div>③ 相对增仓：<code>rel_oi = TL 增速 − T 增速 &gt; 0</code></div>' +
       '<div>④ 相对强弱：<code>relret = r_TL − β × r_T &gt; 0.10%</code>，β 为 60 日滚动、滞后 1 日</div>' +
@@ -879,7 +883,7 @@ function render(){
       '<div style="margin-top:6px;color:#999">全合约持仓 = 当日所有在挂季度合约的持仓量相加，避免主连换月造成的假增仓。</div>';
     $('boundary-box').innerHTML =
       '<b>使用边界</b><br>' +
-      '1. 信号的目标仍是 <b>20–60 日、数 bp 的曲线变平</b>，不是持续牛市；5 日样本小、噪声大；10 日在 25–26 样本外为 8/9，但样本仅 9 个，仍不作为主判断依据。<br>' +
+      '1. 信号的目标仍是 <b>20–60 日、数 bp 的曲线变平</b>，不是持续牛市；5 日样本小、噪声大；10 日在 25–26 样本外为 7/8，但样本仅 8 个，仍不作为主判断依据。<br>' +
       '2. 触发日的 TL 强势不能外推为后续领涨：事件后 TL−T 的中位收益不延续，利差压缩也可能来自现券补涨。<br>' +
       '3. 持仓增速是持仓量的变化，不是净流入，不能区分多空方向；它只说明仓位在增加。<br>' +
       '4. 历史统计为事件研究，样本量有限（当前事件数见上方），结果用于监测而非实盘交易指令。';
