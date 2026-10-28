@@ -52,48 +52,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 .method b{color:#37474f}
 .tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:8px;background:#eef2f7;color:#607d8b;margin-left:4px}
 </style>
+<!--THEME_START-->
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="site.css">
+<script src="site.js"></script>
+<!--THEME_END-->
 <!--FAVICON_START-->
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="manifest" href="site.webmanifest">
-<meta name="theme-color" content="#12141d">
+<meta name="theme-color" content="#FBFCFD">
 <!--FAVICON_END-->
 </head>
-<body>
+<body data-site="inner" data-page="bond-alert">
 <!--NAV_START-->
-<style>
-.top-nav{display:flex;justify-content:space-between;align-items:center;padding:10px 30px;background:#12141d;border-bottom:1px solid #1e2130;position:sticky;top:0;z-index:200}
-.top-nav .brand{font-size:15px;font-weight:700;color:#e8eaed;text-decoration:none}
-.top-nav .brand span{color:#42a5f5}
-.top-nav .nav-links{display:flex;gap:4px;flex-wrap:wrap}
-.top-nav .nav-links a{padding:5px 14px;border-radius:5px;font-size:12px;color:#787b86;text-decoration:none;transition:all 0.2s}
-.top-nav .nav-links a:hover{color:#e8eaed;background:rgba(255,255,255,0.05)}
-.top-nav .nav-links a.active{color:#e8eaed;background:rgba(66,165,245,0.15)}
-</style>
-<nav class="top-nav">
-  <a href="index.html" class="brand">📊 债市<span>投资策略</span>平台</a>
-  <div class="nav-links">
-    <a href="bond-seasonality.html">📅 季节性复盘</a>
-    <a href="treasury-futures.html">📈 国债期货</a>
-    <a href="stock-bond-monitor.html">🔗 股债联动</a>
-    <a href="yield-seasonality.html">📊 收益率·期限利差</a>
-    <a href="bond-flow-lead.html">📈 净买入·领先</a>
-    <a href="duration-tracking.html">⏱️ 久期跟踪</a>
-    <a href="signal-eval.html">🧪 信号评价</a>
-    <a href="bond-alert.html" class="active">🚨 预警</a>
-  </div>
-</nav>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-28 21:49</span></div></div>
+<nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性全景复盘</a><a href="treasury-futures.html">国债期货日报</a><a href="stock-bond-monitor.html">股债联动</a><a href="yield-seasonality.html">收益率与期限利差季节图</a><a href="bond-flow-lead.html">净买入领先分析</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">债市信号评价</a><a href="bond-alert.html" class="active" aria-current="page">债市预警</a></div></div></nav>
+<script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
 <!--NAV_END-->
 <div class="header">
-<h1>&#128680; 债市预警</h1>
+<h1>债市预警</h1>
 <p id="data-info">数据加载中…</p>
 </div>
 <div class="container">
 <div class="stats-row" id="summary"></div>
 
 <div class="panel">
-<h2>&#128276; 今日信号</h2>
+<h2>今日信号</h2>
 <div class="two-col">
 <div>
 <h3>超涨超跌模型（滚动分位）</h3>
@@ -108,27 +94,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 </div>
 
 <div class="panel">
-<h2>&#128200; 超涨超跌预警</h2>
+<h2>超涨超跌预警</h2>
 <div id="over-sel"></div>
 <div id="over-chart-wrap"><div id="over-chart" style="width:100%;height:420px"></div></div>
 <div id="over-yield" style="width:100%;height:300px"></div>
-<h3 class="sub">历史统计 · <span id="over-stat-name"></span></h3>
+<h3 class="sub">历史统计：<span id="over-stat-name"></span></h3>
 <div class="tbl-wrap"><table class="tbl" id="over-stat"></table></div>
 <p class="note">区间内 = 信号触发期间收益率变化；后 N 日 = 信号结束后 N 个交易日的收益率变化。有利均值：看多为收益率下行幅度，看空为上行幅度，正值代表方向正确。盈亏比 = 盈利样本合计 / 亏损样本合计。</p>
 </div>
 
 <div class="panel">
-<h2>&#128201; 利率拐点预警</h2>
+<h2>利率拐点预警</h2>
 <div id="turn-sel"></div>
 <div id="turn-chart-wrap"><div id="turn-chart" style="width:100%;height:420px"></div></div>
 <div id="turn-yield" style="width:100%;height:300px"></div>
-<h3 class="sub">历史统计 · <span id="turn-stat-name"></span></h3>
+<h3 class="sub">历史统计：<span id="turn-stat-name"></span></h3>
 <div class="tbl-wrap"><table class="tbl" id="turn-stat"></table></div>
 <p class="note">拐点统计沿用 Excel 列表口径：区间收益 D = 100×(起始日水平 − 结束日水平)，单位 bp；方向正确率按信号方向重新判定（看多 = D&gt;0，看空 = D&lt;0）。原始 Excel 列按 D&lt;0 计胜率，已作为悬浮提示保留。</p>
 </div>
 
 <div class="panel method">
-<h2>&#128221; 模型与数据说明</h2>
+<h2>模型与数据说明</h2>
 <p><b>超涨超跌</b>：指标 1 = 利率债全价(7-10年) 20日涨幅 − 信用债总全价 20日涨幅；指标 2 = 长期债券全价 20日涨幅 − 中短期债券全价 20日涨幅；指标 3 = 债券综合全价 20日涨幅；指标 4 同指标 3 的 40 日涨幅（仅展示，不参与综合）。每个指标取最近 <code>1197</code> 个观测的 98% / 3% 分位作为阈值，突破上阈记为看空（超涨回调），跌破下阈记为看多（超跌反弹）；综合信号分“任一指标触发”与“≥2 个指标同向触发”两档。</p>
 <p><b>利率拐点</b>：六个指标分别为降息预期（FR007 IRS 1Y 20日均值 − FR007 20日均值）、10债-OMO 利差、隔夜杠杆（R001 成交量占比 20日均值，阈值反向）、10债-股息率分位差 10日均值、10债-大宗分位差 10日均值、风险偏好（创业板20日涨幅 − 红利20日涨幅 10日均值）。阈值冻结为 2016–2023 年 5% / 95% 分位；六个指标中≥2 个同向触发才给出综合信号。</p>
 <p><b>数据源</b>：中债登全价指数；本地收益率库（国债/国开/存单/资金利率）；中国货币网（FR007、回购成交、IRS）；天软 cjpy（创业板、红利指数）；中证指数（商品 CFCI、沪深300 股息率）。运行时 <b>零 Wind / 零 iFinD 额度</b>，每日 09:00 自动增量更新并重建本页。</p>
@@ -194,19 +180,19 @@ function renderSummary(){
   const a1 = sig(ge1), a2 = sig(tc);
   $('summary').innerHTML = `
   <div class="stat-card ${a1[1]}">
-    <div class="label">超涨超跌 · 任一触发</div>
+    <div class="label">超涨超跌，任一触发</div>
     <div class="value ${a1[1]}">${a1[0]}</div>
-    <div class="delta">≥2 确认：${sig(ge2)[0]} · 历史累计看多 ${os.ge1.bull.count} / 看空 ${os.ge1.bear.count}</div>
+    <div class="delta">≥2 确认：${sig(ge2)[0]}；历史累计看多 ${os.ge1.bull.count} / 看空 ${os.ge1.bear.count}</div>
   </div>
   <div class="stat-card ${a2[1]}">
-    <div class="label">利率拐点 · 综合（6选≥2）</div>
+    <div class="label">利率拐点，综合（6选≥2）</div>
     <div class="value ${a2[1]}">${a2[0]}</div>
-    <div class="delta">今日触发 ${tcnt}/6 个指标 · 历史累计看多 ${ts.comp.bull.count} / 看空 ${ts.comp.bear.count}</div>
+    <div class="delta">今日触发 ${tcnt}/6 个指标；历史累计看多 ${ts.comp.bull.count} / 看空 ${ts.comp.bear.count}</div>
   </div>
   <div class="stat-card">
     <div class="label">10Y 国债收益率</div>
     <div class="value" style="font-size:24px">${fmt(y0,4)}<span style="font-size:13px;color:#999;font-weight:400"> %</span></div>
-    <div class="delta">较前一交易日 <span class="${cls(dY)}">${dY===null?'—':(dY>0?'+':'')+fmt(dY,2)+' bp'}</span> · 数据截至 ${O.dates[oi]}</div>
+    <div class="delta">较前一交易日 <span class="${cls(dY)}">${dY===null?'—':(dY>0?'+':'')+fmt(dY,2)+' bp'}</span>，数据截至 ${O.dates[oi]}</div>
   </div>
   <div class="stat-card">
     <div class="label">数据更新</div>
@@ -227,8 +213,8 @@ function renderToday(){
       <td class="num">${fmt(x.hi[oi],3)}</td><td class="num">${fmt(x.lo[oi],3)}</td>
       <td>${badge(x.flags[oi])}</td></tr>`;
   }
-  h += `<tr><td><b>综合 · 任一触发</b></td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td>${badge(O.comp.ge1.flags[oi])}</td></tr>`;
-  h += `<tr><td><b>综合 · ≥2 同向</b></td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td>${badge(O.comp.ge2.flags[oi])}</td></tr></tbody>`;
+  h += `<tr><td><b>综合，任一触发</b></td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td>${badge(O.comp.ge1.flags[oi])}</td></tr>`;
+  h += `<tr><td><b>综合，≥2 同向</b></td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td>${badge(O.comp.ge2.flags[oi])}</td></tr></tbody>`;
   $('tbl-over').innerHTML = h;
 
   h = '<thead><tr><th>指标</th><th class="num">最新D (bp)</th><th class="num">低阈</th><th class="num">高阈</th><th>信号</th></tr></thead><tbody>';
@@ -237,16 +223,16 @@ function renderToday(){
       <td class="num">${fmt(x.values[ti],2)}</td><td class="num">${fmt(x.low,2)}</td>
       <td class="num">${fmt(x.high,2)}</td><td>${badge(x.flags[ti])}</td></tr>`;
   }
-  h += `<tr><td><b>综合 · 6选≥2</b></td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td>${badge(T.comp.flags[ti])}</td></tr></tbody>`;
+  h += `<tr><td><b>综合，6选≥2</b></td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td>${badge(T.comp.flags[ti])}</td></tr></tbody>`;
   $('tbl-turn').innerHTML = h;
 }
 
 // ---------------- 超涨超跌 ----------------
-const OVER_SEL = [['1','指标1'],['2','指标2'],['3','指标3'],['4','指标4'],['c1','综合·任一'],['c2','综合·≥2']];
+const OVER_SEL = [['1','指标1'],['2','指标2'],['3','指标3'],['4','指标4'],['c1','综合，任一'],['c2','综合，≥2']];
 let overSel = '1';
 const overKey = k => k[0] === 'c' ? 'ge' + k[1] : k;
 const overFlags = k => k[0] === 'c' ? O.comp['ge'+k[1]].flags : O.inds[+k-1].flags;
-const overName = k => k[0] === 'c' ? (k==='c1'?'综合 · 任一触发':'综合 · ≥2 同向') : O.inds[+k-1].name;
+const overName = k => k[0] === 'c' ? (k==='c1'?'综合，任一触发':'综合，≥2 同向') : O.inds[+k-1].name;
 
 function renderOverSel(){
   $('over-sel').innerHTML = OVER_SEL.map(([k,t]) =>
@@ -271,13 +257,13 @@ function overChart(ind){
       {name:'指标值', type:'line', data:ind.values, showSymbol:false, connectNulls:false,
        lineStyle:{width:1.2,color:'#1a237e'}, itemStyle:{color:'#1a237e'}},
       {name:'98%阈值', type:'line', data:ind.hi, showSymbol:false,
-       lineStyle:{width:1,type:'dashed',color:'#ef9a9a'}, itemStyle:{color:'#c62828'}},
+       lineStyle:{width:1,type:'dashed',color:'#749AB2'}, itemStyle:{color:'#749AB2'}},
       {name:'3%阈值', type:'line', data:ind.lo, showSymbol:false,
-       lineStyle:{width:1,type:'dashed',color:'#a5d6a7'}, itemStyle:{color:'#2e7d32'}},
+       lineStyle:{width:1,type:'dashed',color:'#769365'}, itemStyle:{color:'#769365'}},
       {name:'看多信号', type:'scatter', symbol:'triangle', symbolSize:9,
-       data:ind.flags.map((f,i)=> f===1 ? [i, ind.values[i]] : null), itemStyle:{color:'#c62828'}},
+       data:ind.flags.map((f,i)=> f===1 ? [i, ind.values[i]] : null), itemStyle:{color:'#C23531'}},
       {name:'看空信号', type:'scatter', symbol:'triangle', symbolRotate:180, symbolSize:9,
-       data:ind.flags.map((f,i)=> f===-1 ? [i, ind.values[i]] : null), itemStyle:{color:'#2e7d32'}}
+       data:ind.flags.map((f,i)=> f===-1 ? [i, ind.values[i]] : null), itemStyle:{color:'#2E8B57'}}
     ]
   }, true);
 }
@@ -298,9 +284,9 @@ function yieldChart(id, dates, ys, flags, key){
       {name:'10Y国债收益率', type:'line', data:ys, showSymbol:false,
        lineStyle:{width:1,color:'#546e7a'}, itemStyle:{color:'#546e7a'}},
       {name:'看多信号', type:'scatter', symbol:'triangle', symbolSize:9,
-       data:flags.map((f,i)=> f===1 ? [i, ys[i]] : null), itemStyle:{color:'#c62828'}},
+       data:flags.map((f,i)=> f===1 ? [i, ys[i]] : null), itemStyle:{color:'#C23531'}},
       {name:'看空信号', type:'scatter', symbol:'triangle', symbolRotate:180, symbolSize:9,
-       data:flags.map((f,i)=> f===-1 ? [i, ys[i]] : null), itemStyle:{color:'#2e7d32'}}
+       data:flags.map((f,i)=> f===-1 ? [i, ys[i]] : null), itemStyle:{color:'#2E8B57'}}
     ]
   }, true);
 }
@@ -340,10 +326,10 @@ function selectOver(k){
 }
 
 // ---------------- 利率拐点 ----------------
-const TURN_SEL = [['1','指标1'],['2','指标2'],['3','指标3'],['4','指标4'],['5','指标5'],['6','指标6'],['comp','综合·6选≥2']];
+const TURN_SEL = [['1','指标1'],['2','指标2'],['3','指标3'],['4','指标4'],['5','指标5'],['6','指标6'],['comp','综合，6选≥2']];
 let turnSel = '1';
 const turnFlags = k => k === 'comp' ? T.comp.flags : T.inds[+k-1].flags;
-const turnName = k => k === 'comp' ? '综合 · 6选≥2' : T.inds[+k-1].name;
+const turnName = k => k === 'comp' ? '综合，6选≥2' : T.inds[+k-1].name;
 
 function renderTurnSel(){
   $('turn-sel').innerHTML = TURN_SEL.map(([k,t]) =>
@@ -362,22 +348,23 @@ function turnChart(ind){
       return `<b>${dates[i]}</b><br>D 值：${fmt(ind.values[i],4)} bp<br>低阈：${fmt(ind.low,4)}<br>高阈：${fmt(ind.high,4)}<br>信号：${sig(ind.flags[i])[0]}`;
     }},
     legend:{top:0, itemWidth:14, itemHeight:8, textStyle:{fontSize:11,color:'#607d8b'}},
-    grid:baseGrid(58), xAxis:xAxis(dates), yAxis:yAxis('bp'),
+    /* 右侧留出阈值线标注的位置（默认画在网格右端外侧，20px 会被画布裁掉） */
+    grid:Object.assign(baseGrid(58),{right:78}), xAxis:xAxis(dates), yAxis:yAxis('bp'),
     dataZoom:zoom('turn'),
     series:[
       {name:'D 值', type:'line', data:ind.values, showSymbol:false,
        lineStyle:{width:1.1,color:'#1a237e'}, itemStyle:{color:'#1a237e'},
-       markLine:{symbol:'none', silent:true, label:{fontSize:10,color:'#78909c'},
+       markLine:{symbol:'none', silent:true, label:{fontSize:11,color:'#66665B',distance:3},
          data:[
-           {yAxis:ind.low, lineStyle:{type:'dashed',color:'#a5d6a7'},
+           {yAxis:ind.low, lineStyle:{type:'dashed',color:'#769365'},
             label:{formatter:'低阈 '+fmt(ind.low,2)}},
-           {yAxis:ind.high, lineStyle:{type:'dashed',color:'#ef9a9a'},
+           {yAxis:ind.high, lineStyle:{type:'dashed',color:'#749AB2'},
             label:{formatter:'高阈 '+fmt(ind.high,2)}}
          ]}},
       {name:'看多信号', type:'scatter', symbol:'triangle', symbolSize:9,
-       data:ind.flags.map((f,i)=> f===1 ? [i, ind.values[i]] : null), itemStyle:{color:'#c62828'}},
+       data:ind.flags.map((f,i)=> f===1 ? [i, ind.values[i]] : null), itemStyle:{color:'#C23531'}},
       {name:'看空信号', type:'scatter', symbol:'triangle', symbolRotate:180, symbolSize:9,
-       data:ind.flags.map((f,i)=> f===-1 ? [i, ind.values[i]] : null), itemStyle:{color:'#2e7d32'}}
+       data:ind.flags.map((f,i)=> f===-1 ? [i, ind.values[i]] : null), itemStyle:{color:'#2E8B57'}}
     ]
   }, true);
 }
@@ -407,5 +394,8 @@ linkGroup(['turn-chart','turn-yield'], 'g-turn');
 window.addEventListener('resize', resizeAll);
 window.addEventListener('load', () => [0, 300, 1200].forEach(t => setTimeout(resizeAll, t)));
 </script>
+<!--FOOTER_START-->
+<footer class="site-footer"><div class="site-wrap"><span>数据来源 中国货币网 / 同花顺 iFinD / 中债登</span><span>每日 09:00 自动更新</span></div></footer>
+<!--FOOTER_END-->
 </body>
 </html>
