@@ -1,0 +1,419 @@
+/* 债市投资策略平台 · 共享视觉层
+ * 由 scripts/build_site.py 注入到每个页面的 <head> 末尾（THEME 块）。
+ * 只放全站一致的部分：设计变量、字体角色、顶部信息条、主导航、页脚、
+ * 以及各页共用的标题/章节/表格/控件基元。页面自身的细节样式仍留在各页。
+ * 规则：0.5px 细线、无圆角/阴影/渐变；宋体=文字层，黑体=数据与界面层。
+ */
+
+:root{
+  --black-olive:#42423A;
+  --asparagus:#769365;
+  --columbia:#C6D6E5;
+  --air:#749AB2;
+  --violet:#5D4C68;
+
+  --paper:#FBFCFD;
+  --paper-2:#FFFFFF;
+  --paper-3:#F4F7F9;
+  --ink:var(--black-olive);
+  --ink-2:#5B5B51;
+  --muted:#66665B;
+  --faint:#75756A;
+  --rule:#DFE7ED;
+  --rule-strong:var(--columbia);
+  --seal:var(--violet);
+  --event:var(--asparagus);
+  --date:var(--violet);
+  --chart-primary:var(--violet);
+  --chart-secondary:var(--asparagus);
+  --chart-air:var(--air);
+  --chart-grid:#E7EEF3;
+
+  --serif:"Noto Serif SC Web","Noto Serif SC","Source Han Serif SC","Songti SC",serif;
+  --sans:"Noto Sans SC Web","Noto Sans SC","Source Han Sans SC","Microsoft YaHei UI","Microsoft YaHei",sans-serif;
+
+  --t-display:32px;
+  --t-figure:20px;
+  --t-body:16px;
+  --t-small:13px;
+
+  --hair:0.5px;
+  --site-max:1200px;
+  --site-gutter:40px;
+  --site-topbar:30px;
+  --site-nav-h:56px;
+}
+
+/* ===== 顶部信息条 ===== */
+.site-utility{
+  background:var(--columbia);
+  color:#4B4B42;
+  font-family:var(--sans);
+  font-size:var(--t-small);
+  line-height:1.4;
+}
+.site-utility .site-wrap{
+  max-width:var(--site-max);margin:0 auto;padding:0 var(--site-gutter);
+  display:flex;justify-content:space-between;align-items:center;gap:16px;
+  height:var(--site-topbar);
+}
+/* 内页在信息条左侧带站名；首页由刊头承担，不重复 */
+.site-utility .site-name{
+  display:none;
+  font-family:var(--serif);font-weight:500;letter-spacing:.04em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+body[data-site="inner"] .site-utility .site-name{display:block}
+.site-utility .site-stamp{
+  margin-left:auto;flex:none;
+  font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;
+  white-space:nowrap;
+}
+
+/* ===== 主导航 ===== */
+.site-nav{
+  position:sticky;top:0;z-index:900;
+  background:var(--paper);
+  border-bottom:var(--hair) solid var(--rule);
+  font-family:var(--sans);
+}
+.site-nav .site-wrap{
+  max-width:var(--site-max);margin:0 auto;padding:0 var(--site-gutter);
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+  min-height:var(--site-nav-h);
+}
+.site-seal{
+  display:flex;align-items:center;gap:10px;flex:none;
+  text-decoration:none;color:var(--ink);
+}
+.site-seal .seal-mark{
+  width:28px;height:28px;flex:none;
+  display:grid;place-items:center;
+  background:var(--seal);border:var(--hair) solid var(--seal);color:#fff;
+  font-family:var(--serif);font-size:var(--t-body);font-weight:600;line-height:1;
+}
+.site-seal .seal-txt{
+  font-family:var(--serif);font-size:var(--t-body);font-weight:600;
+  letter-spacing:.02em;white-space:nowrap;
+}
+.site-seal:hover .seal-txt{color:var(--violet)}
+
+.site-links{
+  display:flex;align-items:center;gap:20px;min-width:0;
+  padding-right:18px;
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 18px),transparent);
+  mask-image:linear-gradient(to right,#000 calc(100% - 18px),transparent);
+}
+.site-links::-webkit-scrollbar{display:none}
+.site-links a{
+  flex:none;
+  color:var(--muted);text-decoration:none;
+  font-size:var(--t-body);line-height:1.4;
+  padding:18px 0 16px;white-space:nowrap;
+  transition:color .15s ease;
+  border-bottom:2px solid transparent;
+}
+.site-links a:hover{color:var(--ink)}
+.site-links a.active{color:var(--ink);font-weight:600;border-bottom-color:var(--seal)}
+
+/* ===== 页脚 ===== */
+.site-footer{
+  margin-top:44px;
+  border-top:var(--hair) solid var(--rule-strong);
+  padding:16px 0 36px;
+  font-family:var(--serif);font-weight:500;
+  font-size:var(--t-small);color:var(--muted);
+}
+.site-footer .site-wrap{
+  max-width:var(--site-max);margin:0 auto;padding:0 var(--site-gutter);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+
+/* ============================================================
+ * 内容页：把各页自带的旧版亮色卡片系统统一到新视觉
+ * （共享层在 <head> 末尾，同优先级下覆盖各页 <style>）
+ * ============================================================ */
+body[data-site="inner"]{
+  background:var(--paper);color:var(--ink);
+  font-family:var(--sans);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+body[data-site="inner"] .container,
+body[data-site="inner"] > .wrap{
+  max-width:var(--site-max);margin-left:auto;margin-right:auto;
+  padding-left:var(--site-gutter);padding-right:var(--site-gutter);
+}
+
+/* 页头：去掉深蓝渐变，回到纸面 + 细线 */
+.header{
+  background:var(--paper);background-image:none;color:var(--ink);
+  padding:32px max(var(--site-gutter), calc((100vw - var(--site-max)) / 2)) 20px;
+  border-bottom:var(--hair) solid var(--rule-strong);
+  text-align:left;
+}
+.header h1,.header h2{color:var(--ink);opacity:1}
+.header p,.header .sub{color:var(--muted);opacity:1;font-size:var(--t-small);line-height:1.7}
+body[data-site="inner"] h1{
+  font-family:var(--serif);font-size:var(--t-display);font-weight:500;
+  line-height:1.3;letter-spacing:0;color:var(--ink);
+}
+.header h1{font-size:var(--t-display);margin:0}
+.header p{margin-top:6px}
+
+/* 面板 / 卡片：去圆角、去阴影，只留 0.5px 边 */
+.panel{
+  background:var(--paper-2);border:var(--hair) solid var(--rule);
+  border-radius:0;box-shadow:none;
+  padding:18px 20px;margin-bottom:14px;
+}
+.panel h2{font-family:var(--serif);font-size:var(--t-body);font-weight:600;color:var(--ink);margin-bottom:12px}
+.panel h2 .sub{font-family:var(--sans);font-size:var(--t-small);font-weight:400;color:var(--muted)}
+.card{
+  background:var(--paper-2);border:var(--hair) solid var(--rule);
+  border-radius:0;box-shadow:none;
+}
+.card h2{font-family:var(--serif);font-weight:600;color:var(--ink)}
+.controls{border-radius:0;border-color:var(--rule)}
+.note{font-size:var(--t-small);color:var(--muted);line-height:1.7}
+.sub{color:var(--muted)}
+
+/* 指标行：细线分栏，不再是一排白卡片 */
+.stats-row{border-top:var(--hair) solid var(--rule-strong);border-bottom:var(--hair) solid var(--rule);gap:0}
+.stat-card{
+  background:none;border:0;border-left:var(--hair) solid var(--rule);
+  border-radius:0;box-shadow:none;padding:12px 18px 11px;
+}
+.stat-card:first-child{border-left:0;padding-left:0}
+.stat-card .label{font-family:var(--serif);font-weight:500;font-size:var(--t-small);color:var(--muted)}
+.stat-card .value{font-size:var(--t-figure);font-weight:600;line-height:1.3;margin-top:2px}
+.stat-card .unit{font-size:var(--t-small);color:var(--muted);font-weight:400}
+.stat-card .delta{font-size:var(--t-small);color:var(--muted);margin-top:2px}
+.stat-card.hit{border-top:0;box-shadow:inset 0 2px 0 var(--violet)}
+.stat-card.hit:first-child{box-shadow:inset 0 2px 0 var(--violet)}
+
+/* 涨跌两色：紫色只做强调，绿色不做小字 */
+.pos,.up{color:var(--violet)}
+.neg,.down{color:var(--ink-2)}
+.muted,.dim{color:var(--muted)}
+
+/* 表格：宋体表头，数字等宽，0.5px 行线 */
+.tbl,.kpi-table{font-size:var(--t-small);border-collapse:collapse}
+.tbl th,.kpi-table th{
+  background:none;font-family:var(--serif);font-weight:500;color:var(--muted);
+  border-bottom:var(--hair) solid var(--rule-strong);padding:8px;
+}
+.tbl td,.kpi-table td{border-bottom:var(--hair) solid var(--rule);padding:7px 8px}
+.tbl tr:hover td,.kpi-table tr:hover td{background:var(--paper-3)}
+.tbl tr.current td{background:#F1F4F6}
+.kpi-table tr.key td{background:#F1F4F6}
+.tbl-wrap{border-radius:0}
+
+/* 按钮 / 分段 / 选择器：直角细线，选中的用紫底 */
+.seg,.mode-btn,.btn{
+  background:var(--paper-2);border:var(--hair) solid var(--rule);
+  border-radius:0;color:var(--ink-2);font-family:var(--sans);
+}
+.seg.active,.seg.on,.mode-btn.active,.btn.active,.tab.active{
+  background:var(--violet);border-color:var(--violet);color:#fff;
+}
+.seg button.on,.seg button.active{background:var(--violet);color:#fff}
+.mode-btn:hover,.seg:hover,.btn:hover{border-color:var(--violet);color:var(--violet)}
+.seg.active:hover,.mode-btn.active:hover{color:#fff}
+.controls select,.controls input[type=date]{
+  border-radius:0;border:var(--hair) solid var(--rule);background:var(--paper-2);color:var(--ink);
+}
+.pill{border-radius:0;border:var(--hair) solid var(--rule);background:var(--paper-2)}
+.pill.cur{border-color:var(--violet);color:var(--violet)}
+.pill.on{background:var(--paper-3);border-color:var(--violet);color:var(--violet)}
+.pill:not(.cur):hover{border-color:var(--violet);color:var(--violet)}
+
+/* 进度条：紫/哥蓝 */
+.progress{background:var(--paper-3);border-radius:0}
+.progress > i{background:var(--violet)}
+
+/* 徽章/标签：直角实心，哥蓝底墨字 */
+.badge{border-radius:0;font-family:var(--serif);font-weight:500;font-size:var(--t-small);padding:2px 8px 3px}
+.badge.active,.badge.idle,.badge.done,.badge.trigger{background:var(--columbia);color:var(--ink)}
+.tag{border-radius:0}
+
+/* 旧页脚（仅净买入、季节图有）降为脚注，统一页脚由组装器注入 */
+body[data-site="inner"] .footer{
+  border-top:0;background:none;margin:10px 0 0;padding:0;
+  font-family:var(--serif);font-size:var(--t-small);color:var(--muted);
+}
+
+/* 信号评价：页面没有容器，用正文三栏栅格把内容对齐到同一版心 */
+body[data-page="signal-eval"]{
+  display:grid;align-content:start;
+  grid-template-columns:minmax(var(--site-gutter),1fr) minmax(0,var(--site-max)) minmax(var(--site-gutter),1fr);
+  max-width:none;margin:0;padding:0;background:var(--paper);
+}
+body[data-page="signal-eval"] > *{grid-column:2;min-width:0}
+body[data-page="signal-eval"] > .site-utility,
+body[data-page="signal-eval"] > .site-nav,
+body[data-page="signal-eval"] > .site-footer{grid-column:1 / -1}
+body[data-page="signal-eval"] > h1{
+  font-size:var(--t-display);font-weight:500;margin:28px 0 8px;padding:0 0 14px;
+  border-bottom:var(--hair) solid var(--rule-strong);
+}
+
+/* 自检条：一行状态，不做胶囊 */
+body[data-page="signal-eval"] .chip{
+  display:block;background:none;border:0;border-radius:0;padding:0;
+  margin:6px 0 2px;font-size:var(--t-small);color:var(--muted);
+}
+body[data-page="signal-eval"] .chip.ok{color:var(--asparagus)}
+body[data-page="signal-eval"] .chip.bad{color:#B23A32}
+body[data-page="signal-eval"] .meta{font-size:12px;color:var(--muted);line-height:1.8;margin:0 0 12px}
+
+/* 控件行：细线夹住，不做白卡 */
+body[data-page="signal-eval"] .panel{
+  background:none;border:0;border-top:var(--hair) solid var(--rule);
+  border-bottom:var(--hair) solid var(--rule);border-radius:0;
+  padding:12px 0;margin:0 0 12px;gap:10px 18px;
+  font-size:var(--t-small);color:var(--ink-2);
+}
+body[data-page="signal-eval"] .panel label{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--serif);font-weight:500;font-size:12px;color:var(--muted);
+}
+body[data-page="signal-eval"] .panel select,
+body[data-page="signal-eval"] .panel input[type=number],
+body[data-page="signal-eval"] .panel input[type=date]{
+  border:var(--hair) solid var(--rule);border-radius:0;background:var(--paper-2);
+  color:var(--ink);font-size:var(--t-small);font-family:var(--sans);padding:4px 8px;
+}
+body[data-page="signal-eval"] .panel button{
+  border:var(--hair) solid var(--violet);border-radius:0;background:var(--violet);
+  color:#fff;font-size:var(--t-small);font-family:var(--sans);
+  padding:5px 16px;cursor:pointer;
+}
+body[data-page="signal-eval"] .panel button:hover{background:#4B3E55;border-color:#4B3E55}
+body[data-page="signal-eval"] .panel button:disabled{background:var(--paper-3);border-color:var(--rule);color:var(--muted)}
+body[data-page="signal-eval"] .errbox{
+  border:var(--hair) solid #B23A32;background:none;color:#B23A32;
+  border-radius:0;font-size:var(--t-small);line-height:1.7;
+}
+body[data-page="signal-eval"] #usage{font-size:12px;color:var(--muted);line-height:1.8}
+
+/* 报告区：章节、要点、指标、表格 */
+#report{margin-top:4px}
+#report h1{font-family:var(--serif);font-size:var(--t-figure);font-weight:600;
+  line-height:1.4;margin:16px 0 8px;color:var(--ink)}
+#report section{background:var(--paper-2);border:var(--hair) solid var(--rule);
+  border-radius:0;padding:16px 18px;margin:14px 0;overflow-x:auto}
+#report h2{font-family:var(--serif);font-size:var(--t-body);font-weight:600;
+  border:0;border-bottom:var(--hair) solid var(--rule-strong);
+  padding:0 0 6px;margin:0 0 10px;color:var(--ink)}
+#report h3{font-family:var(--serif);font-size:var(--t-small);font-weight:500;
+  color:var(--ink-2);margin:10px 0 4px}
+#report .verdict{border:var(--hair) solid var(--rule);background:none;border-radius:0;
+  padding:10px 14px;font-family:var(--serif);font-size:var(--t-small);
+  line-height:1.9;color:var(--ink-2)}
+#report .note{font-size:12px;color:var(--muted);line-height:1.7;margin-top:4px}
+#report .row{gap:10px 22px}
+#report .kpis{gap:0;border-top:var(--hair) solid var(--rule-strong);
+  border-bottom:var(--hair) solid var(--rule);margin:4px 0 8px}
+#report .kpi{background:none;border:0;border-left:var(--hair) solid var(--rule);
+  border-radius:0;padding:9px 16px;text-align:left;flex:1 1 0;min-width:96px}
+#report .kpi:first-child{border-left:0;padding-left:0}
+#report .kpi span{font-family:var(--serif);font-size:12px;color:var(--muted)}
+#report .kpi b{font-family:var(--sans);font-size:var(--t-figure);font-weight:600;
+  color:var(--ink);font-variant-numeric:tabular-nums;margin-top:2px}
+#report .kpi b.pos{color:#C23531}
+#report .kpi b.neg{color:#2E8B57}
+#report table{font-size:12px;border-collapse:collapse}
+#report th{background:none;border:0;border-bottom:var(--hair) solid var(--rule-strong);
+  font-family:var(--serif);font-weight:500;color:var(--muted);
+  padding:5px 7px;text-align:right}
+#report td{border:0;border-bottom:var(--hair) solid var(--rule);
+  padding:4px 7px;font-variant-numeric:tabular-nums}
+#report td.pos{color:#C23531;background:none;font-weight:600}
+#report td.neg{color:#2E8B57;background:none;font-weight:600}
+#report .l3sub td,#report .l4sub td{background:var(--paper-3);font-family:var(--serif);
+  font-weight:500;color:var(--ink-2)}
+#report .tip{color:var(--air)}
+#report b{color:var(--ink);font-weight:600}
+
+/* ===== 窄屏 ===== */
+/* ===== 债市预警：信号标签、评级徽标、表格涨跌 ===== */
+body[data-page="bond-alert"] .stat-card.bull,
+body[data-page="bond-alert"] .stat-card.bear,
+body[data-page="bond-alert"] .stat-card.neu{border-left-color:var(--rule)}
+body[data-page="bond-alert"] .stat-card .value.bull{color:#C23531}
+body[data-page="bond-alert"] .stat-card .value.bear{color:#2E8B57}
+body[data-page="bond-alert"] .stat-card .value.neu{color:var(--ink-2)}
+
+body[data-page="bond-alert"] .badge{
+  background:none;border:var(--hair) solid var(--rule);border-radius:0;
+  padding:1px 7px;font-size:11px;font-weight:500;letter-spacing:.02em;
+}
+body[data-page="bond-alert"] .badge.bull{background:none;border-color:#C23531;color:#C23531}
+body[data-page="bond-alert"] .badge.bear{background:none;border-color:#2E8B57;color:#2E8B57}
+body[data-page="bond-alert"] .badge.neu{background:none;border-color:var(--rule);color:var(--muted)}
+
+body[data-page="bond-alert"] .seg{
+  border:var(--hair) solid var(--rule);border-radius:0;
+  background:var(--paper-2);color:var(--ink-2);padding:3px 11px;
+}
+body[data-page="bond-alert"] .seg:hover{background:var(--paper-3)}
+body[data-page="bond-alert"] .seg.active{
+  background:var(--violet);border-color:var(--violet);color:#fff;
+}
+
+body[data-page="bond-alert"] .tbl .pos{color:#C23531}
+body[data-page="bond-alert"] .tbl .neg{color:#2E8B57}
+body[data-page="bond-alert"] .tbl .dim{color:var(--faint)}
+body[data-page="bond-alert"] .tbl .win{color:var(--ink);font-weight:600}
+body[data-page="bond-alert"] .tbl tbody tr:hover td{background:var(--paper-3)}
+body[data-page="bond-alert"] .two-col > *{min-width:0}
+body[data-page="bond-alert"] .tbl-wrap{max-width:100%}
+
+body[data-page="bond-alert"] .note{color:var(--muted)}
+body[data-page="bond-alert"] .method p{color:var(--ink-2)}
+body[data-page="bond-alert"] .method b{color:var(--ink)}
+body[data-page="bond-alert"] .method code{
+  background:var(--paper-3);border:var(--hair) solid var(--rule);border-radius:0;
+  padding:0 4px;color:var(--ink-2);font-family:var(--sans);
+}
+body[data-page="bond-alert"] .tag{
+  border:var(--hair) solid var(--rule);border-radius:0;background:none;
+  color:var(--muted);font-size:11px;
+}
+body[data-page="bond-alert"] .panel h3.sub,
+body[data-page="bond-alert"] .two-col h3{
+  font-family:var(--serif);font-weight:500;color:var(--ink-2);
+}
+
+@media(max-width:560px){
+  body[data-page="bond-alert"] .tbl{font-size:11px}
+  body[data-page="bond-alert"] .tbl th,
+  body[data-page="bond-alert"] .tbl td{padding:4px 5px}
+}
+@media(max-width:860px){
+  :root{--site-gutter:20px}
+  .site-nav .site-wrap{gap:14px;min-height:52px}
+  body[data-page="signal-eval"] > h1{font-size:26px;margin-top:22px}
+  body[data-page="signal-eval"] .panel{gap:8px 12px}
+  #report section{padding:12px}
+  #report .kpi{flex:1 1 33%;min-width:104px;padding:8px 10px}
+  #report .kpis{flex-wrap:wrap}
+  #report .chartrow{display:block}
+  /* 三栏叠图的网格位置是绝对像素（top 40/221/416 + 高 142/163/182），
+     压矮会把第三栏裁掉，移动端保持 650px */
+  #report .chartrow>.chart1{height:650px}
+  #report .chartrow>.l3{flex:none;max-width:none;margin-top:12px}
+  #report .row>div{flex:1 1 100%}
+  #report table{font-size:11.5px}
+  #report th,#report td{padding:4px 5px}
+}
+@media(max-width:560px){
+  .site-nav .site-wrap{flex-wrap:nowrap;gap:14px}
+  .site-seal .seal-mark{width:26px;height:26px}
+  .site-links{flex:1 1 auto;width:auto;gap:0 16px;padding:0 18px 0 0}
+  .site-links a{font-size:var(--t-small);padding:16px 0 14px}
+  body[data-site="inner"] .site-utility .site-name{font-size:12px}
+}
