@@ -7,233 +7,353 @@
 <script src="echarts.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;background:#f5f7fa;color:#333}
-.header{background:linear-gradient(135deg,#1a237e 0%,#283593 100%);color:#fff;padding:22px 30px}
-.header h1{font-size:22px;margin-bottom:8px}
-.header p{font-size:12px;opacity:.85;line-height:1.7}
-.container{max-width:1200px;margin:0 auto;padding:20px}
-.panel{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:16px}
-.panel h2{font-size:15px;color:#1a237e;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.panel h2 .sub{font-size:11px;color:#999;font-weight:400}
-.hero{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.hero .left{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600}
-.badge.trigger{background:#ffebee;color:#c62828}
-.badge.active{background:#e3f2fd;color:#1565c0}
-.badge.done{background:#e8f5e9;color:#2e7d32}
-.badge.idle{background:#eceff1;color:#546e7a}
-.hero .asof{font-size:12px;color:#666;line-height:1.8}
-.hero .asof b{color:#1a237e;font-size:14px}
-.stats-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}
-.stat-card{flex:1;min-width:220px;background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.stat-card .label{font-size:12px;color:#666}
-.stat-card .value{font-size:28px;font-weight:700;margin-top:6px;font-variant-numeric:tabular-nums}
-.stat-card .unit{font-size:13px;color:#999;font-weight:400;margin-left:2px}
-.stat-card .delta{font-size:12px;margin-top:6px;color:#888}
-.stat-card.hit{border-top:3px solid #c62828}
-.neg{color:#1565c0}
-.pos{color:#c62828}
-.muted{color:#999}
-.cond{display:grid;grid-template-columns:1.4fr .7fr .8fr 1.1fr .6fr;gap:10px;align-items:center;padding:11px 6px;border-bottom:1px solid #f0f0f0;font-size:13px}
-.cond:last-child{border-bottom:none}
-.cond .name{font-weight:600}
-.cond .val{font-variant-numeric:tabular-nums}
-.cond .thr{color:#888;font-size:12px}
-.cond .gap{font-size:12px}
-.cond .flag{text-align:right;font-weight:700}
-.cond .flag.ok{color:#2e7d32}
-.cond .flag.no{color:#b0bec5}
-.cond .flag.na{color:#ff9800}
-.cond-head{font-size:11px;color:#999;border-bottom:1px solid #e8e8e8;padding-bottom:6px}
-.progress{height:8px;background:#eceff1;border-radius:4px;overflow:hidden;margin-top:8px}
-.progress > i{display:block;height:100%;background:linear-gradient(90deg,#42a5f5,#1565c0)}
-.event-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:6px}
-.event-grid .cell{background:#f8f9fb;border-radius:8px;padding:12px 14px}
-.event-grid .cell .k{font-size:11px;color:#888}
-.event-grid .cell .v{font-size:20px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums}
-.event-grid .cell .u{font-size:12px;color:#999;font-weight:400}
-.note{font-size:11px;color:#999;line-height:1.8;margin-top:10px}
-.seg-bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.seg{display:inline-block;padding:4px 12px;border:1px solid #c5cae9;border-radius:14px;cursor:pointer;font-size:12px;color:#555;background:#fff;user-select:none}
-.seg.active{background:#1a237e;color:#fff;border-color:#1a237e}
-.chart{width:100%;height:400px}
-.chart.sm{height:300px}
-.tbl{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
-.tbl th{background:#f8f9fa;padding:8px 8px;text-align:left;border-bottom:2px solid #e0e0e0;position:sticky;top:0;z-index:2;white-space:nowrap}
-.tbl td{padding:7px 8px;border-bottom:1px solid #f0f0f0;white-space:nowrap}
-.tbl tr:hover td{background:#e8eaf6}
-.tbl tr.current td{background:#fff8e1}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:var(--t-body);line-height:1.6}
+.container{max-width:var(--site-max);margin:0 auto;padding:0 var(--site-gutter)}
+
+/* 模式切换：文字标签 + 下划线 */
+.mode-bar{display:flex;gap:28px;margin-top:20px;border-bottom:var(--hair) solid var(--rule)}
+.view-tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;
+  padding:6px 0 9px;margin-bottom:-0.5px;color:var(--muted);
+  font-family:var(--sans);font-size:var(--t-body);line-height:1.4;cursor:pointer}
+.view-tab:hover{color:var(--ink)}
+.view-tab.active{color:var(--ink);font-weight:600;border-bottom-color:var(--violet)}
+.view-tab:disabled{opacity:.4;cursor:not-allowed}
+
+/* 判定带 */
+.verdict{display:grid;grid-template-columns:1.1fr .95fr 1fr;margin-top:14px;
+  border-bottom:var(--hair) solid var(--rule)}
+.verdict>div{padding:18px 28px 18px 0;border-right:var(--hair) solid var(--rule);
+  display:flex;flex-direction:column;min-width:0}
+.verdict>div+div{padding-left:28px}
+.verdict>div:last-child{border-right:0;padding-right:0}
+.verdict .v-primary{background:var(--violet);color:#fff;border-right:0;padding:18px 24px}
+.v-label{font-size:var(--t-small);color:var(--muted);line-height:1.5;margin-bottom:4px}
+.v-primary .v-label{color:rgba(255,255,255,.74)}
+.v-value{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap;min-height:40px}
+.v-num{font-size:var(--t-display);font-weight:600;line-height:1.05;
+  letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.v-state{font-size:var(--t-figure);font-weight:600;line-height:1.3}
+.v-delta{font-size:var(--t-figure);font-weight:600;line-height:1.3;
+  font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.v-delta.emph{color:var(--violet)}
+.v-sub{font-size:var(--t-small);color:var(--muted);line-height:1.5;margin-top:4px}
+.v-primary .v-sub{color:rgba(255,255,255,.74)}
+.unit{font-size:var(--t-small);font-weight:400;color:var(--muted);margin-left:2px}
+.v-primary .unit{color:rgba(255,255,255,.74)}
+
+/* 统计行 */
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);
+  border-bottom:var(--hair) solid var(--rule)}
+.stat{padding:14px 24px 14px 0;min-width:0}
+.stat+.stat{border-left:var(--hair) solid var(--rule);padding-left:24px}
+.stat .val{font-size:var(--t-figure);font-weight:600;line-height:1.3;
+  font-variant-numeric:tabular-nums}
+.stat .lbl{font-size:var(--t-small);color:var(--muted);margin-top:2px;line-height:1.5}
+
+/* 章节 */
+.section{padding-top:34px}
+.section-head{border-top:var(--hair) solid var(--rule-strong);padding-top:10px;
+  margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline;gap:16px}
+.section-head h2{font-family:var(--serif);font-size:var(--t-body);font-weight:600;line-height:1.4}
+.section-head .sub{font-family:var(--sans);font-size:var(--t-small);color:var(--muted);
+  line-height:1.5;text-align:right}
+
+/* 条件表 */
+.cond{display:grid;grid-template-columns:minmax(0,1.7fr) .62fr .62fr .5fr;gap:16px;
+  align-items:center;padding:10px 0;border-bottom:var(--hair) solid var(--rule);
+  font-size:var(--t-body)}
+.cond.head{font-size:var(--t-small);color:var(--muted);padding:7px 0;
+  border-bottom:var(--hair) solid var(--rule-strong)}
+.cond .name{font-weight:600;line-height:1.5}
+.cond .name .gap{display:block;font-size:var(--t-small);color:var(--muted);
+  font-weight:400;margin-top:1px;line-height:1.5}
+.cond .val,.cond .thr{text-align:right;font-variant-numeric:tabular-nums}
+.cond .thr{color:var(--muted)}
+.cond .state{text-align:right}
+.tag{display:inline-block;background:var(--columbia);color:var(--ink);
+  font-family:var(--serif);font-weight:500;font-size:var(--t-small);
+  line-height:1.3;padding:2px 7px 3px;white-space:nowrap}
+.tag.is-off{background:none;border:var(--hair) solid var(--rule);color:var(--muted)}
+
+/* 图 */
+.figure{margin-top:2px}
+.fig-head{display:flex;justify-content:space-between;align-items:center;
+  gap:12px 16px;flex-wrap:wrap;margin-bottom:4px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:var(--t-small);color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:2px;background:var(--violet);
+  vertical-align:middle;margin-right:6px}
+.legend i.dot{width:7px;height:7px;border-radius:50%;background:var(--asparagus);
+  margin-right:7px}
+.legend i.band{height:8px;background:rgba(116,154,178,.24)}
+.legend i.sm{background:var(--violet)}
+.legend i.cur{background:var(--asparagus)}
+.fig-tools{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.range-tabs{display:flex;gap:14px}
+.range-tab{appearance:none;background:none;border:0;padding:0;color:var(--muted);
+  font-family:var(--sans);font-size:var(--t-small);line-height:1.6;cursor:pointer}
+.range-tab:hover{color:var(--ink)}
+.range-tab.active{color:var(--violet);font-weight:600}
+.fig-note{font-size:var(--t-small);color:var(--muted);font-variant-numeric:tabular-nums}
+.chart{width:100%;height:300px}
+.chart.sm{height:260px}
+.chart.xs{height:240px}
+
+/* 数据表折叠 */
+.data-view{margin-top:8px}
+.data-view summary{font-size:var(--t-small);color:var(--muted);cursor:pointer;
+  list-style:none;display:inline-block}
+.data-view summary::-webkit-details-marker{display:none}
+.data-view summary::before{content:"＋ ";color:var(--faint)}
+.data-view[open] summary::before{content:"－ "}
+.data-view summary:hover{color:var(--violet)}
+.data-view table{width:100%;border-collapse:collapse;font-size:var(--t-small);
+  margin-top:6px;font-variant-numeric:tabular-nums}
+.data-view th{font-family:var(--serif);font-weight:500;color:var(--muted);
+  text-align:left;padding:6px 8px;border-bottom:var(--hair) solid var(--rule-strong)}
+.data-view td{padding:6px 8px;border-bottom:var(--hair) solid var(--rule)}
+.data-view .num{text-align:right}
+
+/* 表格 */
+.tbl{width:100%;border-collapse:collapse;font-size:var(--t-small);
+  font-variant-numeric:tabular-nums}
+.tbl th{font-family:var(--serif);font-weight:500;color:var(--muted);text-align:left;
+  padding:8px;border-bottom:var(--hair) solid var(--rule-strong);white-space:nowrap}
+.tbl td{padding:8px;border-bottom:var(--hair) solid var(--rule);white-space:nowrap}
+.tbl .num{text-align:right}
 .tbl .date{font-weight:600}
-.tbl-wrap{max-height:460px;overflow:auto;border-radius:8px}
-.empty{padding:26px;text-align:center;color:#999;font-size:13px}
-.kpi-table{width:100%;border-collapse:collapse;font-size:12px}
-.kpi-table th{background:#f8f9fa;padding:9px 10px;text-align:right;border-bottom:2px solid #e0e0e0;white-space:nowrap}
-.kpi-table th:first-child{text-align:left}
-.kpi-table td{padding:8px 10px;text-align:right;border-bottom:1px solid #f0f0f0;font-variant-numeric:tabular-nums}
-.kpi-table td:first-child{text-align:left;font-weight:600}
-.kpi-table tr.key td{background:#e8f5e9}
-.rule-list{font-size:12px;color:#555;line-height:2}
-.rule-list code{background:#f1f3f5;padding:1px 6px;border-radius:4px;font-size:12px}
-.boundary{font-size:12px;color:#666;line-height:1.9;margin-top:10px;padding:12px 14px;background:#fafafa;border-left:3px solid #c5cae9;border-radius:4px}
-.fatal{display:none;background:#fff5f5;border-left:4px solid #c62828;color:#b71c1c}
-.mode-bar{display:flex;gap:8px;margin-bottom:14px}
-.mode-btn{padding:8px 18px;border:1px solid #c5cae9;border-radius:20px;background:#fff;color:#3949ab;font-size:13px;cursor:pointer;font-family:inherit}
-.mode-btn.active{background:#1a237e;color:#fff;border-color:#1a237e}
-.mode-btn:disabled{opacity:.45;cursor:not-allowed}
+.tbl tr.key td{background:var(--paper-3)}
+.tbl tr.current td{background:var(--paper-3)}
+.tbl-wrap{overflow-x:auto}
+.tbl-more{margin-top:10px}
+.tbl-more button{appearance:none;background:none;border:var(--hair) solid var(--rule);
+  padding:4px 14px;font-family:var(--sans);font-size:var(--t-small);
+  color:var(--muted);cursor:pointer}
+.tbl-more button:hover{border-color:var(--violet);color:var(--violet)}
+
+/* 事件跟踪 */
+.track-head{display:flex;justify-content:space-between;align-items:baseline;
+  gap:8px 16px;flex-wrap:wrap;margin-bottom:2px}
+.track-head .t{font-size:var(--t-body)}
+.track-head .t b{font-weight:600}
+.track-head .m{font-size:var(--t-small);color:var(--muted)}
+.progress{height:4px;background:var(--paper-3);overflow:hidden;margin:8px 0 14px}
+.progress>i{display:block;height:100%;background:var(--violet)}
+.track-grid{display:grid;grid-template-columns:repeat(4,1fr);
+  border-top:var(--hair) solid var(--rule);border-bottom:var(--hair) solid var(--rule)}
+.track-grid .cell{padding:12px 18px 12px 0;min-width:0}
+.track-grid .cell+.cell{border-left:var(--hair) solid var(--rule);padding-left:18px}
+.track-grid .k{font-size:var(--t-small);color:var(--muted);line-height:1.5}
+.track-grid .v{font-size:var(--t-figure);font-weight:600;line-height:1.3;
+  font-variant-numeric:tabular-nums;margin-top:2px}
+.track-grid .v .u{font-size:var(--t-small);color:var(--muted);font-weight:400;margin-left:2px}
+
+/* 涨跌强调：压缩页负值为信号，走扩页正值为信号；其余降为墨色 */
+.container .pos,.container .neg{color:var(--ink-2)}
+.container.mode-compress .neg{color:var(--violet)}
+.container.mode-widen .pos{color:var(--violet)}
+
+.note{font-size:var(--t-small);color:var(--muted);line-height:1.75;margin-top:10px}
+.empty{padding:24px 0;color:var(--muted);font-size:var(--t-small)}
+.muted{color:var(--muted)}
+.rule-list{font-size:var(--t-small);color:var(--ink-2);line-height:2}
+.rule-list code{font-family:var(--sans);background:var(--paper-3);padding:1px 6px}
+.rule-list .dim{color:var(--muted)}
+.boundary{font-size:var(--t-small);color:var(--muted);line-height:1.9;
+  margin-top:12px;padding-left:14px;border-left:2px solid var(--columbia)}
+.fatal{display:none;border-left:2px solid var(--violet);padding:12px 0 12px 14px;
+  color:var(--ink);margin-top:16px}
+
 @media(max-width:820px){
-  .cond{grid-template-columns:1.4fr .8fr .8fr .9fr}
-  .cond .thr{display:none}
-  .event-grid{grid-template-columns:repeat(2,1fr)}
-  .chart{height:330px}
+  .verdict{grid-template-columns:1fr}
+  .verdict>div{border-right:0;border-bottom:var(--hair) solid var(--rule);padding:14px 0}
+  .verdict>div+div{padding-left:0}
+  .verdict>div:last-child{border-bottom:0}
+  .verdict .v-primary{padding:14px 16px;border-bottom:0}
+  .stat-strip{grid-template-columns:1fr 1fr}
+  .stat:nth-child(3){border-left:0;padding-left:0}
+  .track-grid{grid-template-columns:1fr 1fr}
+  .track-grid .cell:nth-child(3){border-left:0;padding-left:0}
+  .cond{grid-template-columns:1.5fr .7fr .7fr .62fr;gap:10px;font-size:var(--t-small)}
+  .chart{height:260px}
+  .chart.sm{height:240px}
+  .chart.xs{height:220px}
+}
+@media(max-width:560px){
+  .section-head{flex-wrap:wrap;row-gap:2px}
+  .section-head .sub{text-align:left;flex-basis:100%}
+  .cond{gap:8px}
 }
 </style>
+<!--THEME_START-->
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="site.css">
+<script src="site.js"></script>
+<!--THEME_END-->
 <!--FAVICON_START-->
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="manifest" href="site.webmanifest">
-<meta name="theme-color" content="#12141d">
+<meta name="theme-color" content="#FBFCFD">
 <!--FAVICON_END-->
 </head>
-<body>
+<body data-site="inner" data-page="stock-bond-monitor">
 <!--NAV_START-->
-<style>
-.top-nav{display:flex;justify-content:space-between;align-items:center;padding:10px 30px;background:#12141d;border-bottom:1px solid #1e2130;position:sticky;top:0;z-index:200}
-.top-nav .brand{font-size:15px;font-weight:700;color:#e8eaed;text-decoration:none}
-.top-nav .brand span{color:#42a5f5}
-.top-nav .nav-links{display:flex;gap:4px;flex-wrap:wrap}
-.top-nav .nav-links a{padding:5px 14px;border-radius:5px;font-size:12px;color:#787b86;text-decoration:none;transition:all 0.2s}
-.top-nav .nav-links a:hover{color:#e8eaed;background:rgba(255,255,255,0.05)}
-.top-nav .nav-links a.active{color:#e8eaed;background:rgba(66,165,245,0.15)}
-</style>
-<nav class="top-nav">
-  <a href="index.html" class="brand">📊 债市<span>投资策略</span>平台</a>
-  <div class="nav-links">
-    <a href="bond-seasonality.html">📅 季节性复盘</a>
-    <a href="treasury-futures.html">📈 国债期货</a>
-    <a href="stock-bond-monitor.html" class="active">🔗 股债联动</a>
-    <a href="yield-seasonality.html">📊 收益率·期限利差</a>
-    <a href="bond-flow-lead.html">📈 净买入·领先</a>
-    <a href="duration-tracking.html">⏱️ 久期跟踪</a>
-    <a href="signal-eval.html">🧪 信号评价</a>
-    <a href="bond-alert.html">🚨 预警</a>
-  </div>
-</nav>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-28 21:48</span></div></div>
+<nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性全景复盘</a><a href="treasury-futures.html">国债期货日报</a><a href="stock-bond-monitor.html" class="active" aria-current="page">股债联动</a><a href="yield-seasonality.html">收益率与期限利差季节图</a><a href="bond-flow-lead.html">净买入领先分析</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">债市信号评价</a><a href="bond-alert.html">债市预警</a></div></div></nav>
+<script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
 <!--NAV_END-->
 <div class="header">
-<h1>&#128279; 股债联动</h1>
+<h1 id="page-title">股债联动</h1>
 <p id="data-info">数据范围：加载中...</p>
 </div>
-<div class="container">
+<div class="container" id="main">
 
-<div class="mode-bar" id="mode-bar">
-  <button class="mode-btn active" data-mode="compress">利差压缩信号</button>
-  <button class="mode-btn" data-mode="widen">利差走扩信号</button>
+<div class="mode-bar" id="mode-bar" role="tablist">
+  <button class="view-tab active" data-mode="compress" role="tab">利差压缩信号</button>
+  <button class="view-tab" data-mode="widen" role="tab">利差走扩信号</button>
 </div>
 
-<div id="fatal" class="panel fatal">
+<div id="fatal" class="fatal">
   <b>数据未加载</b><br>
   未找到 <code>window.MONITOR_DATA</code>。请确认同目录下的 <code>stock-bond-monitor-data.js</code> 已生成并随页面一同发布。
 </div>
 
-<div class="panel hero">
-  <div class="left">
-    <span id="status-badge" class="badge idle">加载中</span>
-    <div class="asof" id="asof-box"></div>
+<section class="verdict">
+  <div class="v-primary">
+    <div class="v-label">当前利差</div>
+    <div class="v-value"><span class="v-num" id="v-spread">—</span><span class="unit">bp</span></div>
+    <div class="v-sub" id="v-spread-sub"></div>
   </div>
-  <div class="asof" id="gen-box" style="text-align:right"></div>
-</div>
+  <div>
+    <div class="v-label">事件状态</div>
+    <div class="v-value"><span class="v-state" id="v-state">—</span></div>
+    <div class="v-sub" id="v-state-sub"></div>
+  </div>
+  <div>
+    <div class="v-label">20 日累计变动</div>
+    <div class="v-value"><span class="v-delta" id="v-delta">—</span><span class="unit">bp</span></div>
+    <div class="v-sub" id="v-delta-sub"></div>
+  </div>
+</section>
 
-<div class="stats-row" id="stats"></div>
+<section class="stat-strip" id="stat-strip"></section>
 
-<div class="panel">
-  <h2>触发条件 <span class="sub" id="cond-sub">四项同时满足，且距上次触发超过 10 个交易日</span></h2>
-  <div class="cond cond-head">
-    <div>条件</div><div>当前值</div><div>阈值</div><div>距离</div><div style="text-align:right">状态</div>
+<section class="section">
+  <div class="section-head"><h2>触发条件</h2><span class="sub" id="cond-sub"></span></div>
+  <div class="cond head">
+    <span>条件</span><span class="val">当前</span><span class="thr">阈值</span><span class="state">状态</span>
   </div>
   <div id="conds"></div>
-  <p class="note">换月日 TL 相对 T 的 DV01 中性收益无法计算，页面显示为「换月/—」，不按 0 处理。</p>
-</div>
+  <p class="note">换月日 TL 相对 T 的 DV01 中性收益无法计算，显示为「换月」，不按 0 处理。</p>
+</section>
 
-<div class="panel">
-  <h2>事件跟踪</h2>
+<section class="section">
+  <div class="section-head"><h2>事件跟踪</h2><span class="sub">触发后主窗口与延展窗口</span></div>
   <div id="event-box"></div>
-</div>
+</section>
 
-<div class="panel">
-  <h2>30Y–10Y 利差走势 <span class="sub" id="spread-sub">TL 上市以来；红点为利差压缩信号触发日</span></h2>
-  <div class="seg-bar" id="range-seg">
-    <span class="seg" data-range="1">近 1 年</span>
-    <span class="seg" data-range="2">近 2 年</span>
-    <span class="seg active" data-range="0">TL 以来</span>
+<section class="section">
+  <div class="section-head"><h2>利差走势与触发日</h2></div>
+  <div class="figure">
+    <div class="fig-head">
+      <div class="legend">
+        <span><i></i>30Y–10Y 利差</span>
+        <span><i class="dot"></i>触发日</span>
+      </div>
+      <div class="fig-tools">
+        <div class="range-tabs" id="range-seg">
+          <button class="range-tab" data-range="1">近 1 年</button>
+          <button class="range-tab" data-range="2">近 2 年</button>
+          <button class="range-tab active" data-range="0">TL 以来</button>
+        </div>
+        <span class="fig-note" id="spread-note"></span>
+      </div>
+    </div>
+    <div id="spread-chart" class="chart" role="img" aria-label="30Y–10Y 利差走势与触发日"></div>
+    <details class="data-view"><summary>查看数据表</summary><div id="spread-table"></div></details>
   </div>
-  <div id="spread-chart" class="chart"></div>
-</div>
+</section>
 
-<div class="panel">
-  <h2>事件后利差路径 <span class="sub">历史事件中位与 25–75% 区间；橙线为当前事件实际路径</span></h2>
-  <div id="path-chart" class="chart"></div>
-  <p class="note" id="path-note"></p>
-</div>
+<section class="section">
+  <div class="section-head"><h2>事件后利差路径</h2></div>
+  <div class="figure">
+    <div class="fig-head">
+      <div class="legend">
+        <span><i class="sm"></i>历史中位</span>
+        <span><i class="band"></i>25–75% 区间</span>
+        <span id="lg-active"><i class="cur"></i>当前事件</span>
+      </div>
+      <span class="fig-note" id="path-note-top"></span>
+    </div>
+    <div id="path-chart" class="chart sm" role="img" aria-label="事件后利差路径"></div>
+    <p class="note" id="path-note"></p>
+    <details class="data-view"><summary>查看数据表</summary><div id="path-table"></div></details>
+  </div>
+</section>
 
-<div class="panel">
-  <h2>条件历史 <span class="sub">最近 120 个交易日；虚线为阈值</span></h2>
-  <div id="cond-chart-a" class="chart sm"></div>
-  <div id="cond-chart-b" class="chart sm" style="margin-top:10px"></div>
-</div>
+<section class="section">
+  <div class="section-head"><h2>条件历史</h2><span class="sub">最近 120 个交易日，虚线为阈值</span></div>
+  <div id="cond-chart-a" class="chart xs"></div>
+  <div id="cond-chart-b" class="chart xs" style="margin-top:10px"></div>
+</section>
 
-<div class="panel">
-  <h2>事件明细 <span class="sub" id="event-sub">按时间倒序；ΔS 为 30Y–10Y 利差变化（bp），负值为压缩</span></h2>
+<section class="section">
+  <div class="section-head"><h2>事件明细</h2><span class="sub" id="event-sub"></span></div>
   <div class="tbl-wrap">
     <table class="tbl">
       <thead><tr>
-        <th>触发日</th><th>股市分</th><th>TL 增仓</th><th>T 增仓</th>
-        <th>rel_oi</th><th>relret</th>
-        <th>5日ΔS</th><th>10日ΔS</th><th>20日ΔS</th><th>40日ΔS</th><th>60日ΔS</th>
+        <th>触发日</th><th class="num">利差 (bp)</th>
+        <th class="num">5 日 ΔS</th><th class="num">10 日 ΔS</th><th class="num">20 日 ΔS</th>
         <th>状态</th>
       </tr></thead>
       <tbody id="event-tbody"></tbody>
+      <tbody id="event-tbody-more" style="display:none"></tbody>
     </table>
   </div>
   <div id="event-empty" class="empty" style="display:none">尚未出现触发事件。</div>
-</div>
+  <div class="tbl-more" id="event-more-wrap" style="display:none">
+    <button type="button" id="show-all" aria-expanded="false">全部</button>
+  </div>
+</section>
 
-<div class="panel">
-  <h2>历史验证 <span class="sub" id="kpi-sub">全部事件等权；p 值为单侧符号检验（原假设：中位 ΔS ≥ 0）</span></h2>
-  <table class="kpi-table">
+<section class="section">
+  <div class="section-head"><h2>历史验证</h2><span class="sub" id="kpi-sub"></span></div>
+  <div class="tbl-wrap">
+  <table class="tbl">
     <thead><tr>
-      <th>事件后交易日</th><th>有效样本</th><th>中位 ΔS</th><th id="hit-head">压缩比例</th>
-      <th>单侧 p</th><th>90% 区间</th><th id="base-head">普通下跌日中位</th><th>相对基线（事件−基线）</th>
+      <th>事件后交易日</th><th class="num">有效样本</th><th class="num">中位 ΔS</th>
+      <th class="num" id="hit-head">压缩比例</th><th class="num">单侧 p</th>
+      <th class="num">90% 区间</th><th class="num" id="base-head">普通下跌日中位</th>
+      <th class="num">相对基线</th>
     </tr></thead>
     <tbody id="kpi-tbody"></tbody>
   </table>
+  </div>
   <p class="note" id="verify-note"></p>
-  <div id="split-wrap" style="display:none;margin-top:18px">
-    <h3 style="font-size:13px;color:#1a237e;margin-bottom:8px">分样本验证（23–24 训练 / 25–26 样本外）</h3>
-    <table class="kpi-table">
+  <div id="split-wrap" style="display:none;margin-top:24px">
+    <div class="section-head"><h2>分样本验证</h2><span class="sub">23–24 训练 / 25–26 样本外</span></div>
+    <div class="tbl-wrap">
+    <table class="tbl">
       <thead><tr>
-        <th>事件后交易日</th><th>训练样本</th><th>训练走扩率</th><th>训练 p</th>
-        <th>样本外样本</th><th>样本外走扩率</th><th>样本外 p</th>
-        <th>仅股市上涨基线（样本外）</th><th>样本外增量</th>
+        <th>事件后交易日</th><th class="num">训练样本</th><th class="num">训练走扩率</th>
+        <th class="num">训练 p</th><th class="num">样本外样本</th><th class="num">样本外走扩率</th>
+        <th class="num">样本外 p</th><th class="num">仅股市上涨基线（样本外）</th>
+        <th class="num">样本外增量</th>
       </tr></thead>
       <tbody id="split-tbody"></tbody>
     </table>
+    </div>
     <p class="note">样本外从 2025-01-01 起；事件结果日也必须落在样本外，避免用训练期结果验证。分样本基线为同一股市复合分≥2 条件下按 10 日去重的普通上涨日（不要求 rel_oi/relret）；上方 KPI 的基线为未去重的全部普通上涨日。</p>
   </div>
-</div>
+</section>
 
-<div class="panel">
-  <h2>规则与使用边界</h2>
+<section class="section">
+  <div class="section-head"><h2>规则与使用边界</h2></div>
   <div class="rule-list" id="rule-box"></div>
-  <div class="boundary" id="boundary-box">
-    <b>使用边界</b><br>
-    1. 信号的目标仍是 <b>20–60 日、数 bp 的曲线变平</b>，不是持续牛市；5 日样本小、噪声大；10 日在 25–26 样本外为 7/8，但样本仅 8 个，仍不作为主判断依据。<br>
-    2. 触发日的 TL 强势不能外推为后续领涨：事件后 TL−T 的中位收益不延续，利差压缩也可能来自现券补涨。<br>
-    3. 持仓增速是持仓量的变化，不是净流入，不能区分多空方向；它只说明仓位在增加。<br>
-    4. 历史统计为事件研究，样本量有限（当前事件数见上方），结果用于监测而非实盘交易指令。
-  </div>
-  <p class="note">数据源：现券收益率来自本地中债登库（经 treasury-seasonality 共享 JSON），国债期货与国证A指来自 cjpy；每日 09:00 随平台更新，展示 T-1 收盘信号。</p>
-</div>
+  <div class="boundary" id="boundary-box"></div>
+  <p class="note">数据源：现券收益率来自本地中债登库（经 treasury-seasonality 共享 JSON），国债期货与国证A指来自 cjpy；每日 09:00 随平台更新，展示 T-1 收盘信号；页面生成 <span id="gen-note"></span>。</p>
+</section>
 
 </div>
 <script src="stock-bond-monitor-data.js"></script>
@@ -260,12 +380,14 @@ function fmt(v, d){
   if (d === undefined) d = 2;
   var x = num(v);
   if (x === null) return '—';
+  if (x < 0) return '−' + Math.abs(x).toFixed(d);
   return (x > 0 ? '+' : '') + x.toFixed(d);
 }
 function fmtPlain(v, d){
   if (d === undefined) d = 2;
   var x = num(v);
-  return x === null ? '—' : x.toFixed(d);
+  if (x === null) return '—';
+  return x < 0 ? '−' + Math.abs(x).toFixed(d) : x.toFixed(d);
 }
 function fmtPct(v, d){
   if (d === undefined) d = 0;
@@ -308,18 +430,25 @@ function initChart(id){
   charts.push(c);
   return c;
 }
-function markLine(value, label, color){
+function markLine(value, label){
   if (value === null) return null;
   return {
     symbol: 'none', silent: true,
-    lineStyle: { color: color, type: 'dashed', width: 1 },
+    lineStyle: { color: C.columbia, type: 'dashed', width: 1 },
     label: {
-      formatter: label, position: 'insideStartTop', fontSize: 9,
-      backgroundColor: 'rgba(255,255,255,0.85)', padding: [1, 3], color: color
+      formatter: label, position: 'insideStartTop', fontSize: 10,
+      backgroundColor: 'rgba(255,255,255,0.88)', padding: [1, 3], color: C.muted
     },
     data: [{ yAxis: value }]
   };
 }
+
+/* 色板（与 site.css 一致；site.js 也会把旧色映射到同族） */
+var C = {
+  violet: '#5D4C68', green: '#769365', air: '#749AB2',
+  columbia: '#C6D6E5', ink: '#42423A', ink2: '#5B5B51',
+  muted: '#66665B', grid: '#E7EEF3', rule: '#DFE7ED', paper: '#FFFFFF'
+};
 
 function render(){
   var P = MODES[mode];
@@ -331,71 +460,66 @@ function render(){
   var isWiden = meta.direction === 'widen';
   var trigArr = isWiden ? (H.trigger_widen || []) : (H.trigger || []);
   var keyHs = meta.key_horizons || (isWiden ? [10, 40, 60] : [20, 40, 60]);
+  var dirWord = isWiden ? '走扩' : '压缩';
+  var mainWin = num(meta.main_window) || (isWiden ? 10 : 20);
+
+  $('main').className = 'container mode-' + mode;
 
   // 顶部切换
-  var btns = $('mode-bar').querySelectorAll('.mode-btn');
+  var btns = $('mode-bar').querySelectorAll('.view-tab');
   for (var bi = 0; bi < btns.length; bi++) {
     var bm = btns[bi].getAttribute('data-mode');
     btns[bi].classList.toggle('active', bm === mode);
     btns[bi].disabled = !MODES[bm];
   }
 
+  var title = '30Y–10Y 利差' + dirWord;
+  if (last && last.active) title += '，第 ' + last.elapsed + ' 日';
+  $('page-title').textContent = title;
   $('data-info').textContent =
-    (isWiden ? '30Y–10Y 利差走扩' : '30Y–10Y 利差压缩') +
-    ' · 数据截至 ' + meta.as_of + '（T-1 收盘） · 样本自 ' + meta.start +
-    ' · 共 ' + meta.event_count + ' 次事件 · 生成于 ' + meta.generated_at;
+    '数据截至 ' + meta.as_of + '（T-1 收盘），样本自 ' + meta.start +
+    '，共 ' + meta.event_count + ' 次事件';
+  $('gen-note').textContent = meta.generated_at;
 
-  var statusMap = {
-    '最新交易日触发': ['trigger', '● 最新交易日触发'],
-    '事件进行中': ['active', '● 事件进行中'],
-    '最近事件已结束': ['done', '● 最近事件已结束'],
-    '未触发': ['idle', '○ 未触发']
-  };
-  var st = statusMap[meta.status] || ['idle', meta.status];
-  var badge = $('status-badge');
-  badge.className = 'badge ' + st[0];
-  badge.textContent = st[1];
-
-  var asofHtml = '最新交易日 <b>' + meta.as_of + '</b>';
-  if (last) {
-    asofHtml += ' · 最近触发 <b>' + last.date + '</b>';
-    asofHtml += last.active
-      ? '（已过 ' + last.elapsed + ' 个交易日）'
-      : '（事件已结束）';
-  }
-  if (meta.roll_day) {
-    asofHtml += ' · <span style="color:#ff9800">最新交易日为换月日</span>';
-  }
-  $('asof-box').innerHTML = asofHtml;
-  $('gen-box').innerHTML =
-    '事件数 <b>' + meta.event_count + '</b> · 已走完 60 日 <b>' + meta.path_event_count + '</b><br>' +
-    '<span style="font-size:11px;color:#999">生成时间 ' + meta.generated_at + '</span>';
-
-  // 四张指标卡
+  // 判定带
   var prevSpread = dates.length > 1 ? H.spread[dates.length - 2] : null;
   var spreadDelta = (num(cur.spread) !== null && num(prevSpread) !== null)
     ? cur.spread - prevSpread : null;
-  var spreadDeltaTxt = spreadDelta === null ? '较前一日 —'
-    : ('较前一日 ' + fmt(spreadDelta, 2) + 'bp');
-  var cards = [
-    { label: '30Y–10Y 利差', value: fmtPlain(cur.spread, 2), unit: 'bp',
-      sub: spreadDeltaTxt, color: '' },
-    { label: 'TL 全合约持仓日增', value: fmt(cur.g_tl, 2), unit: '%',
-      sub: 'T 增仓 ' + fmt(cur.g_t, 2) + '%', color: cls(cur.g_tl) },
-    { label: 'TL−T 相对增仓', value: fmt(cur.rel_oi, 2), unit: 'pp',
-      sub: isWiden ? '阈值 < 0 pp' : '阈值 > 0 pp', color: cls(cur.rel_oi) },
-    { label: 'TL 对 T 的 DV01 中性收益',
-      value: meta.roll_day ? '换月' : fmt(cur.relret, 3),
-      unit: meta.roll_day ? '—' : '%',
-      sub: meta.roll_day ? '换月日不计算' : ('β = ' + fmtPlain(cur.beta, 2)),
-      color: meta.roll_day ? 'muted' : cls(cur.relret) }
+  $('v-spread').textContent = fmtPlain(cur.spread, 2);
+  $('v-spread-sub').textContent = spreadDelta === null
+    ? '较前一日 —' : ('较前一日 ' + fmt(spreadDelta, 2) + ' bp');
+
+  var stateTxt, stateSub;
+  if (last) {
+    stateTxt = dirWord + '，' + (last.active ? '进行中' : '已结束');
+    stateSub = '最近触发 ' + last.date + '，已过 ' + last.elapsed + ' 个交易日';
+  } else {
+    stateTxt = '未触发';
+    stateSub = '样本自 ' + meta.start;
+  }
+  if (meta.roll_day) stateSub += '；最新交易日为换月日';
+  $('v-state').textContent = stateTxt;
+  $('v-state-sub').textContent = stateSub;
+
+  var sr20 = num(cur.sr20);
+  var deltaEl = $('v-delta');
+  deltaEl.textContent = sr20 === null ? '—' : signLabel(sr20, 2);
+  deltaEl.className = 'v-delta' + (sr20 === null ? '' :
+    ((isWiden ? sr20 > 0 : sr20 < 0) ? ' emph' : ''));
+  $('v-delta-sub').textContent = '当前利差与 20 个交易日前之差';
+
+  // 指标行
+  var sMain = (P.stats || {})[String(mainWin)] || {};
+  var stats = [
+    { v: meta.event_count, u: '次', l: '有效事件' },
+    { v: fmtPct(sMain.hit), u: '', l: mainWin + ' 日' + (isWiden ? '走扩' : '压缩') + '比例' },
+    { v: fmt(sMain.median, 2), u: 'bp', l: mainWin + ' 日中位 ΔS' },
+    { v: pText(sMain.p), u: '', l: 'p 值（单侧）' }
   ];
-  $('stats').innerHTML = cards.map(function(c){
-    return '<div class="stat-card' + (c.label.indexOf('利差') >= 0 ? ' hit' : '') + '">' +
-      '<div class="label">' + c.label + '</div>' +
-      '<div class="value ' + c.color + '">' + c.value +
-        '<span class="unit">' + c.unit + '</span></div>' +
-      '<div class="delta">' + c.sub + '</div></div>';
+  $('stat-strip').innerHTML = stats.map(function(s){
+    return '<div class="stat"><div class="val">' + s.v +
+      (s.u ? '<span class="unit">' + s.u + '</span>' : '') +
+      '</div><div class="lbl">' + s.l + '</div></div>';
   }).join('');
 
   // 条件清单
@@ -406,25 +530,29 @@ function render(){
   $('conds').innerHTML = (P.conditions || []).map(function(c){
     var v = num(c.value);
     var isNa = (v === null);
-    var flag, flagCls;
-    if (isNa) { flag = '换月/—'; flagCls = 'na'; }
-    else if (c.pass) { flag = '✓ 满足'; flagCls = 'ok'; }
-    else { flag = '✗ 未满足'; flagCls = 'no'; }
+    var stateHtml, gapTxt;
+    if (isNa) {
+      stateHtml = '<span class="tag is-off">换月</span>';
+      gapTxt = '换月日不计算';
+    } else if (c.pass) {
+      stateHtml = '<span class="tag">满足</span>';
+      gapTxt = '';
+    } else {
+      stateHtml = '<span class="tag is-off">未满足</span>';
+      gapTxt = (c.gap !== null && c.gap !== undefined)
+        ? (gapPrefix[c.op] || '距阈值 ') + num(c.gap).toFixed(2) + c.unit
+        : '距阈值 —';
+    }
     var thrDigits = (c.key === 'sr40' || c.key === 'stock_score') ? 0 : 2;
-    var thr = (opMap[c.op] || '') + signLabel(c.threshold, thrDigits) + c.unit;
-    var gapTxt;
-    if (isNa) gapTxt = '换月日不计算';
-    else if (c.pass) gapTxt = '已满足';
-    else if (c.gap !== null && c.gap !== undefined) {
-      gapTxt = (gapPrefix[c.op] || '距阈值 ') + num(c.gap).toFixed(2) + c.unit;
-    } else gapTxt = '—';
+    var u = (c.unit === '项') ? ' 项' : c.unit;
+    var thr = (opMap[c.op] || '') + signLabel(c.threshold, thrDigits) + u;
     return '<div class="cond">' +
-      '<div class="name">' + c.label + '</div>' +
+      '<div class="name">' + c.label +
+        (gapTxt ? '<span class="gap">' + gapTxt + '</span>' : '') + '</div>' +
       '<div class="val ' + (isNa ? 'muted' : '') + '">' +
-        (isNa ? '—' : fmtPlain(v, c.key === 'relret' ? 3 : 2) + c.unit) + '</div>' +
+        (isNa ? '—' : fmtPlain(v, c.key === 'relret' ? 3 : 2) + u) + '</div>' +
       '<div class="thr">' + thr + '</div>' +
-      '<div class="gap">' + gapTxt + '</div>' +
-      '<div class="flag ' + flagCls + '">' + flag + '</div>' +
+      '<div class="state">' + stateHtml + '</div>' +
       '</div>';
   }).join('');
 
@@ -435,24 +563,22 @@ function render(){
         (isWiden ? '利差走扩信号' : '利差压缩信号') + '触发事件。</div>';
     }
     var active = last.active;
-    var title = active
+    var head = active
       ? '活跃事件：<b>' + last.date + '</b> 触发'
-      : '最近事件：<b>' + last.date + '</b>（已结束）';
+      : '最近事件：<b>' + last.date + '</b>，已结束';
     var elapsed = last.elapsed;
-    var win = num(meta.main_window) || (isWiden ? 10 : 20);
-    var progress = Math.min(1, elapsed / win) * 100;
+    var progress = Math.min(1, elapsed / mainWin) * 100;
     var note = isWiden
       ? '主窗口为触发后 10 个交易日，其次 40/60 日；10/20 日样本外均不高于仅股市复合分基线，40 日略高但属延展窗口，仅作观察。ΔS 为正表示利差走扩。'
       : '主窗口为触发后 20 个交易日，其次 40/60 日；5–10 日仅作观察。ΔS 为负表示利差压缩。';
-    return '<div style="font-size:14px;margin-bottom:4px">' + title + '</div>' +
-      '<div style="font-size:12px;color:#666">' +
-        (active
-          ? '已过 <b>' + elapsed + '</b> 个交易日 · ' + win + ' 日主窗口进度 ' +
-            Math.min(elapsed, win) + '/' + win
-          : '距触发已 ' + elapsed + ' 个交易日，主窗口与延展窗口均已走完') +
-      '</div>' +
+    return '<div class="track-head"><span class="t">' + head + '</span>' +
+      '<span class="m">' + (active
+        ? '已过 ' + elapsed + ' 个交易日，' + mainWin + ' 日主窗口进度 ' +
+          Math.min(elapsed, mainWin) + '/' + mainWin
+        : '距触发已 ' + elapsed + ' 个交易日，主窗口与延展窗口均已走完') +
+      '</span></div>' +
       '<div class="progress"><i style="width:' + progress + '%"></i></div>' +
-      '<div class="event-grid">' +
+      '<div class="track-grid">' +
         '<div class="cell"><div class="k">' + (active ? '当前' : '事件后') +
           ' ΔS（30Y−10Y）</div>' +
           '<div class="v ' + cls(last.dS) + '">' + fmt(last.dS, 2) +
@@ -467,12 +593,10 @@ function render(){
           '<div class="v">' + elapsed + '<span class="u">日</span></div></div>' +
       '</div>' +
       '<p class="note">' + note +
-      (active ? '当前路径见下方「事件后利差路径」橙线。' : '') + '</p>';
+      (active ? '当前路径见下方「事件后利差路径」绿线。' : '') + '</p>';
   })();
 
   // 利差走势
-  $('spread-sub').textContent =
-    'TL 上市以来；红点为' + (isWiden ? '利差走扩信号' : '利差压缩信号') + '触发日';
   var spreadChart = initChart('spread-chart');
   var range = 0;
   function rangeStart(rs){
@@ -483,6 +607,22 @@ function render(){
     }
     return 0;
   }
+  function spreadTableHtml(start){
+    var n = dates.length;
+    var step = Math.max(1, Math.ceil((n - start) / 10));
+    var set = {};
+    for (var i = n - 1; i >= start; i -= step) set[i] = 1;
+    set[start] = 1;
+    for (var j = start; j < n; j++) if (trigArr[j]) set[j] = 1;
+    var idx = Object.keys(set).map(Number).sort(function(a, b){ return b - a; });
+    var rows = idx.map(function(i){
+      return '<tr><td class="date">' + dates[i] + '</td>' +
+        '<td class="num">' + fmtPlain(H.spread[i], 2) + '</td>' +
+        '<td>' + (trigArr[i] ? '是' : '否') + '</td></tr>';
+    }).join('');
+    return '<table><thead><tr><th>日期</th><th class="num">利差 (bp)</th>' +
+      '<th>触发</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }
   function spreadOption(rs){
     var start = rangeStart(rs);
     var x = dates.slice(start);
@@ -491,7 +631,7 @@ function render(){
     for (var i = start; i < dates.length; i++) {
       trig.push(trigArr[i] ? H.spread[i] : null);
     }
-    var markArea = { silent: true, itemStyle: { color: 'rgba(255,152,0,0.10)' }, data: [] };
+    var markArea = { silent: true, itemStyle: { color: 'rgba(116,154,178,0.10)' }, data: [] };
     if (last && last.active) {
       var ei = dates.indexOf(last.date);
       if (ei >= 0) {
@@ -504,7 +644,7 @@ function render(){
     }
     return {
       animation: false,
-      grid: { left: 58, right: 24, top: 26, bottom: 58 },
+      grid: { left: 54, right: 20, top: 18, bottom: 40 },
       tooltip: {
         trigger: 'axis',
         formatter: function(ps){
@@ -512,7 +652,7 @@ function render(){
           var out = '<b>' + x[i] + '</b><br>利差：' + tooltipNum(y[i], ' bp', 2);
           var gi = start + i;
           if (trigArr[gi]) {
-            out += '<br><span style="color:#c62828">● ' +
+            out += '<br><span style="color:' + C.green + '">● ' +
               (isWiden ? '利差走扩信号' : '利差压缩信号') + '触发</span>';
           }
           return out;
@@ -520,44 +660,45 @@ function render(){
       },
       xAxis: {
         type: 'category', data: x, boundaryGap: false,
-        axisLabel: { fontSize: 10, color: '#888' },
-        axisLine: { lineStyle: { color: '#ddd' } }
+        axisLine: { lineStyle: { color: C.rule } }
       },
       yAxis: {
-        type: 'value', name: 'bp', nameTextStyle: { fontSize: 11, color: '#999' },
-        scale: true, axisLabel: { fontSize: 10, color: '#888' },
-        splitLine: { lineStyle: { color: '#f0f0f0' } }
+        type: 'value', name: 'bp', nameTextStyle: { color: C.muted },
+        scale: true,
+        splitLine: { lineStyle: { color: C.grid } }
       },
-      dataZoom: [
-        { type: 'inside', start: 0, end: 100 },
-        { type: 'slider', height: 18, bottom: 12, borderColor: '#e0e0e0',
-          fillerColor: 'rgba(26,35,126,0.08)', handleSize: '80%',
-          textStyle: { fontSize: 9, color: '#999' } }
-      ],
       series: [
         {
           name: '30Y–10Y', type: 'line', data: y, showSymbol: false,
-          lineStyle: { color: '#1a237e', width: 1.6 },
-          areaStyle: { color: 'rgba(26,35,126,0.05)' },
+          lineStyle: { color: C.violet, width: 2 },
+          itemStyle: { color: C.violet },
+          areaStyle: { color: 'rgba(116,154,178,0.16)' },
           markArea: markArea
         },
         {
           name: (isWiden ? '利差走扩信号触发' : '利差压缩信号触发'), type: 'scatter', data: trig,
-          symbolSize: 9, itemStyle: { color: '#c62828' },
+          symbolSize: 8, itemStyle: { color: C.green, borderColor: C.paper, borderWidth: 2 },
           tooltip: { show: false }, z: 6
         }
       ]
     };
   }
-  spreadChart.setOption(spreadOption(range), true);
+  function paintSpread(rs){
+    var start = rangeStart(rs);
+    spreadChart.setOption(spreadOption(rs), true);
+    $('spread-note').textContent = dates[start] + ' 至 ' + meta.as_of +
+      '，' + (dates.length - start) + ' 个交易日';
+    $('spread-table').innerHTML = spreadTableHtml(start);
+  }
+  paintSpread(range);
   $('range-seg').onclick = function(e){
     var t = e.target;
-    if (!t.classList.contains('seg')) return;
-    var segs = $('range-seg').querySelectorAll('.seg');
+    if (!t.classList.contains('range-tab')) return;
+    var segs = $('range-seg').querySelectorAll('.range-tab');
     for (var i = 0; i < segs.length; i++) segs[i].classList.remove('active');
     t.classList.add('active');
     range = Number(t.getAttribute('data-range'));
-    spreadChart.setOption(spreadOption(range), true);
+    paintSpread(range);
   };
 
   // 事件后路径
@@ -579,12 +720,7 @@ function render(){
   var pathChart = initChart('path-chart');
   pathChart.setOption({
     animation: false,
-    grid: { left: 58, right: 24, top: 28, bottom: 46 },
-    legend: {
-      top: 0, right: 10, itemWidth: 14, itemHeight: 8,
-      textStyle: { fontSize: 11, color: '#666' },
-      data: ['25–75% 区间', '历史中位', '当前事件']
-    },
+    grid: { left: 54, right: 20, top: 18, bottom: 40 },
     tooltip: {
       trigger: 'axis',
       formatter: function(ps){
@@ -595,7 +731,7 @@ function render(){
           '25–75%：' + tooltipNum(r.q25, '', 2) + ' ~ ' + tooltipNum(r.q75, '', 2) + '<br>' +
           '样本：' + r.n;
         if (activeLine[i] !== null) {
-          out += '<br><span style="color:#ef6c00">当前事件：' +
+          out += '<br><span style="color:' + C.green + '">当前事件：' +
             tooltipNum(activeLine[i], ' bp', 2) + '</span>';
         }
         return out;
@@ -604,15 +740,13 @@ function render(){
     xAxis: {
       type: 'category', data: offsets, boundaryGap: false,
       axisLabel: {
-        fontSize: 10, color: '#888',
         formatter: function(v){ return v === '0' ? '触发日' : v; }
       },
-      axisLine: { lineStyle: { color: '#ddd' } }
+      axisLine: { lineStyle: { color: C.rule } }
     },
     yAxis: {
-      type: 'value', name: 'ΔS (bp)', nameTextStyle: { fontSize: 11, color: '#999' },
-      axisLabel: { fontSize: 10, color: '#888' },
-      splitLine: { lineStyle: { color: '#f0f0f0' } }
+      type: 'value', name: 'ΔS (bp)', nameTextStyle: { color: C.muted },
+      splitLine: { lineStyle: { color: C.grid } }
     },
     series: [
       {
@@ -623,24 +757,24 @@ function render(){
       {
         name: '25–75% 区间', type: 'line', data: band, stack: 'band',
         stackStrategy: 'all', symbol: 'none', lineStyle: { opacity: 0 },
-        areaStyle: { color: 'rgba(66,165,245,0.20)' },
-        itemStyle: { color: '#64b5f6' },
+        areaStyle: { color: 'rgba(116,154,178,0.24)' },
+        itemStyle: { color: C.air },
         silent: true, tooltip: { show: false }
       },
       {
         name: '历史中位', type: 'line', data: med, symbol: 'none',
-        lineStyle: { color: '#1565c0', width: 2.4 },
-        itemStyle: { color: '#1565c0' }, z: 5,
+        lineStyle: { color: C.violet, width: 2 },
+        itemStyle: { color: C.violet }, z: 5,
         markLine: {
           symbol: 'none', silent: true,
-          lineStyle: { color: '#bbb', type: 'dashed', width: 1 },
+          lineStyle: { color: C.columbia, type: 'dashed', width: 1 },
           data: [{ yAxis: 0 }]
         }
       },
       {
         name: '当前事件', type: 'line', data: activeLine,
-        symbol: 'circle', symbolSize: 5, connectNulls: false,
-        lineStyle: { color: '#ef6c00', width: 2.2 }, itemStyle: { color: '#ef6c00' },
+        symbol: 'circle', symbolSize: 6, connectNulls: false,
+        lineStyle: { color: C.green, width: 2 }, itemStyle: { color: C.green },
         z: 7
       }
     ]
@@ -651,6 +785,27 @@ function render(){
        (isWiden ? '纵轴正值为走扩。' : '纵轴负值为压缩。') +
        '当前事件进度见上方。')
     : '当前没有已走完 60 个交易日的事件，历史路径暂不可用。';
+  $('path-note-top').textContent = path.length
+    ? (meta.path_event_count + ' 次事件，中位路径')
+    : '';
+  var hasActive = false;
+  for (var ai = 0; ai < activeLine.length; ai++) {
+    if (activeLine[ai] !== null) { hasActive = true; break; }
+  }
+  $('lg-active').style.display = hasActive ? '' : 'none';
+  var pathRows = path.filter(function(r, i){
+    return r.offset % 10 === 0 || i === path.length - 1;
+  });
+  $('path-table').innerHTML = '<table><thead><tr>' +
+    '<th>事件后日</th><th class="num">中位 ΔS</th><th class="num">25%</th>' +
+    '<th class="num">75%</th><th class="num">样本</th></tr></thead><tbody>' +
+    pathRows.map(function(r){
+      return '<tr><td>' + (r.offset === 0 ? '触发日' : (r.offset > 0 ? '+' : '') + r.offset + ' 日') + '</td>' +
+        '<td class="num">' + fmtPlain(r.median, 2) + '</td>' +
+        '<td class="num">' + fmtPlain(r.q25, 2) + '</td>' +
+        '<td class="num">' + fmtPlain(r.q75, 2) + '</td>' +
+        '<td class="num">' + r.n + '</td></tr>';
+    }).join('') + '</tbody></table>';
 
   // 条件历史
   var N = 120;
@@ -677,60 +832,60 @@ function render(){
   var relThr = num(rule.rel_thr);
   var tlThr = num(rule.tl_oi_thr);
   var relOiThr = num(rule.rel_oi_thr);
-  var scoreLine = markLine(scoreThr, '≥ ' + scoreThr + ' 项', '#c62828');
-  var relLine = markLine(relThr, signLabel(relThr, 2) + '%', '#ff9800');
+  var scoreLine = markLine(scoreThr, '≥ ' + scoreThr + ' 项');
+  var relLine = markLine(relThr, signLabel(relThr, 2) + '%');
   var tlLine = markLine(tlThr === null ? 0 : tlThr,
-    rule.tl_oi_required ? (signLabel(tlThr, 0) + '%') : '0（参考）', '#1565c0');
+    rule.tl_oi_required ? (signLabel(tlThr, 0) + '%') : '0（参考）');
   var relOiLine = markLine(relOiThr,
-    (relOiThr === 0 ? '0' : signLabel(relOiThr, 2)), '#26a69a');
+    (relOiThr === 0 ? '0' : signLabel(relOiThr, 2)));
 
   var scoreSeries = {
     name: '股市复合分', type: 'line',
     data: histSlice(isWiden ? H.score_up : H.score_down), showSymbol: false,
-    lineStyle: { color: '#5c6bc0', width: 1.6 }, itemStyle: { color: '#5c6bc0' }
+    lineStyle: { color: C.violet, width: 2 }, itemStyle: { color: C.violet }
   };
   if (scoreLine) scoreSeries.markLine = scoreLine;
   var rrSeries = {
     name: 'relret', type: 'line', yAxisIndex: 1, data: histSlice(H.relret),
     showSymbol: false, connectNulls: false,
-    lineStyle: { color: '#ef6c00', width: 1.4 }, itemStyle: { color: '#ef6c00' }
+    lineStyle: { color: C.green, width: 2 }, itemStyle: { color: C.green }
   };
   if (relLine) rrSeries.markLine = relLine;
 
   condA.setOption({
     animation: false,
-    grid: { left: 52, right: 58, top: 30, bottom: 40 },
-    legend: { top: 0, left: 'center', itemWidth: 14, itemHeight: 8, itemGap: 16, textStyle: { fontSize: 10, color: '#666' } },
+    grid: { left: 52, right: 56, top: 28, bottom: 26 },
+    legend: { top: 0, left: 'center', itemWidth: 14, itemHeight: 2, itemGap: 16 },
     tooltip: { trigger: 'axis', formatter: condTooltip },
     xAxis: {
       type: 'category', data: hDates, boundaryGap: false,
-      axisLabel: { fontSize: 9, color: '#999' }, axisLine: { lineStyle: { color: '#ddd' } }
+      axisLine: { lineStyle: { color: C.rule } }
     },
     yAxis: [
       { type: 'value', name: '股市分（项）', min: 0, max: 4, interval: 1,
-        nameTextStyle: { fontSize: 10, color: '#999' },
-        axisLabel: { fontSize: 9, color: '#999' }, splitLine: { lineStyle: { color: '#f4f4f4' } } },
-      { type: 'value', name: 'relret (%)', nameTextStyle: { fontSize: 10, color: '#999' },
-        axisLabel: { fontSize: 9, color: '#999' }, splitLine: { show: false } }
+        nameTextStyle: { color: C.muted },
+        splitLine: { lineStyle: { color: C.grid } } },
+      { type: 'value', name: 'relret (%)', nameTextStyle: { color: C.muted },
+        splitLine: { show: false } }
     ],
     series: [scoreSeries, rrSeries]
   }, true);
 
   var tlSeries = {
     name: 'TL 增仓', type: 'line', data: histSlice(H.g_tl), showSymbol: false,
-    lineStyle: { color: '#1565c0', width: 1.6 }, itemStyle: { color: '#1565c0' }
+    lineStyle: { color: C.violet, width: 2 }, itemStyle: { color: C.violet }
   };
   if (tlLine) tlSeries.markLine = tlLine;
   var oiSeries = {
     name: 'rel_oi', type: 'line', data: histSlice(H.rel_oi), showSymbol: false,
-    lineStyle: { color: '#26a69a', width: 1.4 }, itemStyle: { color: '#26a69a' }
+    lineStyle: { color: C.air, width: 2 }, itemStyle: { color: C.air }
   };
   if (relOiLine) oiSeries.markLine = relOiLine;
 
   condB.setOption({
     animation: false,
-    grid: { left: 52, right: 30, top: 30, bottom: 40 },
-    legend: { top: 0, left: 'center', itemWidth: 14, itemHeight: 8, itemGap: 16, textStyle: { fontSize: 10, color: '#666' } },
+    grid: { left: 52, right: 30, top: 28, bottom: 26 },
+    legend: { top: 0, left: 'center', itemWidth: 14, itemHeight: 2, itemGap: 16 },
     tooltip: {
       trigger: 'axis',
       formatter: function(ps){
@@ -746,40 +901,43 @@ function render(){
     },
     xAxis: {
       type: 'category', data: hDates, boundaryGap: false,
-      axisLabel: { fontSize: 9, color: '#999' }, axisLine: { lineStyle: { color: '#ddd' } }
+      axisLine: { lineStyle: { color: C.rule } }
     },
     yAxis: {
-      type: 'value', name: '% / pp', nameTextStyle: { fontSize: 10, color: '#999' },
-      axisLabel: { fontSize: 9, color: '#999' }, splitLine: { lineStyle: { color: '#f4f4f4' } }
+      type: 'value', name: '% / pp', nameTextStyle: { color: C.muted },
+      splitLine: { lineStyle: { color: C.grid } }
     },
     series: [tlSeries, oiSeries]
   }, true);
 
   // 事件明细
-  $('event-sub').textContent = '按时间倒序；ΔS 为 30Y–10Y 利差变化（bp），' +
+  $('event-sub').textContent = '按时间倒序；ΔS 为 30Y–10Y 利差变化，' +
     (isWiden ? '正值为走扩' : '负值为压缩');
   var evs = (P.events || []).slice().reverse();
-  $('event-empty').style.display = evs.length ? 'none' : 'block';
-  $('event-tbody').innerHTML = evs.map(function(e){
+  function eventRow(e){
     var isActive = (last && e.date === last.date && e.status === 'active');
     var status = e.status === 'active'
-      ? '<span style="color:#1565c0">进行中 · 第 ' + e.elapsed + ' 日</span>'
+      ? '<span class="tag">进行中</span> 第 ' + e.elapsed + ' 日'
       : '<span class="muted">已走完</span>';
     return '<tr' + (isActive ? ' class="current"' : '') + '>' +
       '<td class="date">' + e.date + '</td>' +
-      '<td>' + (isWiden ? e.up_score : e.down_score) + ' 项</td>' +
-      '<td class="' + cls(e.g_tl) + '">' + fmt(e.g_tl, 2) + '%</td>' +
-      '<td class="' + cls(e.g_t) + '">' + fmt(e.g_t, 2) + '%</td>' +
-      '<td class="' + cls(e.rel_oi) + '">' + fmt(e.rel_oi, 2) + '</td>' +
-      '<td class="' + cls(e.relret) + '">' + fmt(e.relret, 3) + '%</td>' +
-      '<td class="' + cls(e.dS5) + '">' + fmt(e.dS5, 2) + '</td>' +
-      '<td class="' + cls(e.dS10) + '">' + fmt(e.dS10, 2) + '</td>' +
-      '<td class="' + cls(e.dS20) + '">' + fmt(e.dS20, 2) + '</td>' +
-      '<td class="' + cls(e.dS40) + '">' + fmt(e.dS40, 2) + '</td>' +
-      '<td class="' + cls(e.dS60) + '">' + fmt(e.dS60, 2) + '</td>' +
+      '<td class="num">' + fmtPlain(e.spread, 2) + '</td>' +
+      '<td class="num ' + cls(e.dS5) + '">' + fmt(e.dS5, 2) + '</td>' +
+      '<td class="num ' + cls(e.dS10) + '">' + fmt(e.dS10, 2) + '</td>' +
+      '<td class="num ' + cls(e.dS20) + '">' + fmt(e.dS20, 2) + '</td>' +
       '<td>' + status + '</td>' +
       '</tr>';
-  }).join('');
+  }
+  var FIRST = 5;
+  $('event-empty').style.display = evs.length ? 'none' : 'block';
+  $('event-tbody').innerHTML = evs.slice(0, FIRST).map(eventRow).join('');
+  $('event-tbody-more').innerHTML = evs.slice(FIRST).map(eventRow).join('');
+  $('event-tbody-more').style.display = 'none';
+  $('event-more-wrap').style.display = evs.length > FIRST ? 'block' : 'none';
+  var moreBtn = $('show-all');
+  moreBtn.textContent = '全部 ' + evs.length + ' 条';
+  moreBtn.setAttribute('aria-expanded', 'false');
+  moreBtn.setAttribute('data-n', evs.length);
 
   // 历史验证
   var horizons = [5, 10, 20, 40, 60];
@@ -795,13 +953,14 @@ function render(){
       ? (s.median - b.median) : null;
     return '<tr' + key + '>' +
       '<td>' + h + ' 日</td>' +
-      '<td>' + (s.n === undefined ? '—' : s.n) + '</td>' +
-      '<td class="' + cls(s.median) + '">' + fmt(s.median, 2) + ' bp</td>' +
-      '<td>' + fmtPct(s.hit) + '</td>' +
-      '<td>' + pText(s.p) + '</td>' +
-      '<td>[' + fmtPlain(s.ci_lo, 2) + ', ' + fmtPlain(s.ci_hi, 2) + ']</td>' +
-      '<td>' + fmt(b.median, 2) + ' bp</td>' +
-      '<td class="' + cls(inc) + '">' + (inc === null ? '—' : fmt(inc, 2) + ' bp') + '</td>' +
+      '<td class="num">' + (s.n === undefined ? '—' : s.n) + '</td>' +
+      '<td class="num ' + cls(s.median) + '">' + fmt(s.median, 2) + '</td>' +
+      '<td class="num">' + fmtPct(s.hit) + '</td>' +
+      '<td class="num">' + pText(s.p) + '</td>' +
+      '<td class="num">[' + fmtPlain(s.ci_lo, 2) + ', ' + fmtPlain(s.ci_hi, 2) + ']</td>' +
+      '<td class="num">' + fmt(b.median, 2) + '</td>' +
+      '<td class="num ' + cls(inc) + '">' +
+        (inc === null ? '—' : fmt(inc, 2) + ' bp') + '</td>' +
       '</tr>';
   }).join('');
 
@@ -822,10 +981,10 @@ function render(){
       var s20 = (P.stats || {})['20'] || {};
       $('verify-note').innerHTML =
         '当前利差压缩信号事件 ' + s20.n + ' 个有效样本，20 日利差中位 ' +
-        fmt(s20.median, 2) + 'bp；同样满足国证A指复合分≥2 但未触发的普通日 ' +
-        base20.n + ' 个，中位 ' + fmt(base20.median, 2) + 'bp。' +
-        '利差压缩信号事件<b>多压缩 ' + Math.abs(extra).toFixed(2) + 'bp</b>。' +
-        '负值 = 利差压缩、正值 = 走陡。';
+        fmt(s20.median, 2) + ' bp；同样满足国证A指复合分≥2 但未触发的普通日 ' +
+        base20.n + ' 个，中位 ' + fmt(base20.median, 2) + ' bp。' +
+        '利差压缩信号事件多压缩 ' + Math.abs(extra).toFixed(2) + ' bp。' +
+        '负值 = 利差压缩，正值 = 走陡。';
     } else {
       $('verify-note').textContent = '样本不足，暂无法计算相对普通下跌日的增量压缩。';
     }
@@ -842,15 +1001,15 @@ function render(){
       var key = keyHs.indexOf(h) >= 0 ? ' class="key"' : '';
       return '<tr' + key + '>' +
         '<td>' + h + ' 日</td>' +
-        '<td>' + (t.n === undefined ? '—' : t.n) + '</td>' +
-        '<td>' + fmtPct(t.hit) + '</td>' +
-        '<td>' + pText(t.p) + '</td>' +
-        '<td>' + (o.n === undefined ? '—' : o.n) + '</td>' +
-        '<td>' + fmtPct(o.hit) + '</td>' +
-        '<td>' + pText(o.p) + '</td>' +
-        '<td>' + fmtPct(b.hit) + '</td>' +
-        '<td class="' + cls(inc) + '">' +
-          (inc === null ? '—' : fmt(inc, 1) + 'pp') + '</td>' +
+        '<td class="num">' + (t.n === undefined ? '—' : t.n) + '</td>' +
+        '<td class="num">' + fmtPct(t.hit) + '</td>' +
+        '<td class="num">' + pText(t.p) + '</td>' +
+        '<td class="num">' + (o.n === undefined ? '—' : o.n) + '</td>' +
+        '<td class="num">' + fmtPct(o.hit) + '</td>' +
+        '<td class="num">' + pText(o.p) + '</td>' +
+        '<td class="num">' + fmtPct(b.hit) + '</td>' +
+        '<td class="num ' + cls(inc) + '">' +
+          (inc === null ? '—' : fmt(inc, 1) + ' pp') + '</td>' +
         '</tr>';
     }).join('');
   } else {
@@ -865,7 +1024,7 @@ function render(){
       '<div>② 相对减仓：<code>rel_oi = TL 增速 − T 增速 &lt; 0</code></div>' +
       '<div>③ 相对弱势：<code>relret = r_TL − β × r_T &lt; −0.10%</code>，β 为 60 日滚动、滞后 1 日</div>' +
       '<div>④ 去重：同一规则 10 个交易日内只记第一次触发</div>' +
-      '<div style="margin-top:6px;color:#999">本规则不要求 TL 绝对减仓；rel_oi &lt; 0 表示 TL 持仓增速低于 T。全合约持仓口径同上。</div>';
+      '<div class="dim" style="margin-top:6px">本规则不要求 TL 绝对减仓；rel_oi &lt; 0 表示 TL 持仓增速低于 T。全合约持仓口径同上。</div>';
     $('boundary-box').innerHTML =
       '<b>使用边界</b><br>' +
       '1. 主窗口沿用原设定 <b>10 日</b>：样本外 11/16，低于仅股市复合分基线 17/24；20 日 10/16 同样低于基线；40 日 13/16（p=0.011，基线 18/24）为延展观察，不据此改主窗口。<br>' +
@@ -880,7 +1039,7 @@ function render(){
       '<div>③ 相对增仓：<code>rel_oi = TL 增速 − T 增速 &gt; 0</code></div>' +
       '<div>④ 相对强弱：<code>relret = r_TL − β × r_T &gt; 0.10%</code>，β 为 60 日滚动、滞后 1 日</div>' +
       '<div>⑤ 去重：同一规则 10 个交易日内只记第一次触发</div>' +
-      '<div style="margin-top:6px;color:#999">全合约持仓 = 当日所有在挂季度合约的持仓量相加，避免主连换月造成的假增仓。</div>';
+      '<div class="dim" style="margin-top:6px">全合约持仓 = 当日所有在挂季度合约的持仓量相加，避免主连换月造成的假增仓。</div>';
     $('boundary-box').innerHTML =
       '<b>使用边界</b><br>' +
       '1. 信号的目标仍是 <b>20–60 日、数 bp 的曲线变平</b>，不是持续牛市；5 日样本小、噪声大；10 日在 25–26 样本外为 7/8，但样本仅 8 个，仍不作为主判断依据。<br>' +
@@ -892,7 +1051,7 @@ function render(){
 
 $('mode-bar').addEventListener('click', function(e){
   var t = e.target;
-  if (!t.classList.contains('mode-btn')) return;
+  if (!t.classList.contains('view-tab')) return;
   var m = t.getAttribute('data-mode');
   if (!MODES[m] || m === mode) return;
   mode = m;
@@ -904,6 +1063,14 @@ $('mode-bar').addEventListener('click', function(e){
   render();
 });
 
+$('show-all').addEventListener('click', function(){
+  var more = $('event-tbody-more');
+  var open = more.style.display !== 'none';
+  more.style.display = open ? 'none' : '';
+  this.textContent = open ? ('全部 ' + this.getAttribute('data-n') + ' 条') : '收起';
+  this.setAttribute('aria-expanded', open ? 'false' : 'true');
+});
+
 window.addEventListener('resize', function(){
   charts.forEach(function(c){ c.resize(); });
 });
@@ -912,5 +1079,8 @@ render();
 
 })();
 </script>
+<!--FOOTER_START-->
+<footer class="site-footer"><div class="site-wrap"><span>数据来源 中国货币网 / 同花顺 iFinD / 中债登</span><span>每日 09:00 自动更新</span></div></footer>
+<!--FOOTER_END-->
 </body>
 </html>
