@@ -127,8 +127,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 <div class="container">
 
 <div class="mode-bar" id="mode-bar">
-  <button class="mode-btn active" data-mode="compress">利差压缩（R3d）</button>
-  <button class="mode-btn" data-mode="widen">利差走扩（R3u-D）</button>
+  <button class="mode-btn active" data-mode="compress">利差压缩信号</button>
+  <button class="mode-btn" data-mode="widen">利差走扩信号</button>
 </div>
 
 <div id="fatal" class="panel fatal">
@@ -161,7 +161,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 </div>
 
 <div class="panel">
-  <h2>30Y–10Y 利差走势 <span class="sub" id="spread-sub">TL 上市以来；红点为 R3d 触发日</span></h2>
+  <h2>30Y–10Y 利差走势 <span class="sub" id="spread-sub">TL 上市以来；红点为利差压缩信号触发日</span></h2>
   <div class="seg-bar" id="range-seg">
     <span class="seg" data-range="1">近 1 年</span>
     <span class="seg" data-range="2">近 2 年</span>
@@ -341,7 +341,7 @@ function render(){
   }
 
   $('data-info').textContent =
-    (isWiden ? '30Y–10Y 走扩 R3u-D' : '30Y–10Y 压缩 R3d') +
+    (isWiden ? '30Y–10Y 利差走扩' : '30Y–10Y 利差压缩') +
     ' · 数据截至 ' + meta.as_of + '（T-1 收盘） · 样本自 ' + meta.start +
     ' · 共 ' + meta.event_count + ' 次事件 · 生成于 ' + meta.generated_at;
 
@@ -432,7 +432,7 @@ function render(){
   $('event-box').innerHTML = (function(){
     if (!last) {
       return '<div class="empty">尚未出现 ' +
-        (isWiden ? 'R3u-D' : 'R3d') + ' 触发事件。</div>';
+        (isWiden ? '利差走扩信号' : '利差压缩信号') + '触发事件。</div>';
     }
     var active = last.active;
     var title = active
@@ -472,7 +472,7 @@ function render(){
 
   // 利差走势
   $('spread-sub').textContent =
-    'TL 上市以来；红点为 ' + (isWiden ? 'R3u-D' : 'R3d') + ' 触发日';
+    'TL 上市以来；红点为' + (isWiden ? '利差走扩信号' : '利差压缩信号') + '触发日';
   var spreadChart = initChart('spread-chart');
   var range = 0;
   function rangeStart(rs){
@@ -513,7 +513,7 @@ function render(){
           var gi = start + i;
           if (trigArr[gi]) {
             out += '<br><span style="color:#c62828">● ' +
-              (isWiden ? 'R3u-D' : 'R3d') + ' 触发</span>';
+              (isWiden ? '利差走扩信号' : '利差压缩信号') + '触发</span>';
           }
           return out;
         }
@@ -542,7 +542,7 @@ function render(){
           markArea: markArea
         },
         {
-          name: (isWiden ? 'R3u-D 触发' : 'R3d 触发'), type: 'scatter', data: trig,
+          name: (isWiden ? '利差走扩信号触发' : '利差压缩信号触发'), type: 'scatter', data: trig,
           symbolSize: 9, itemStyle: { color: '#c62828' },
           tooltip: { show: false }, z: 6
         }
@@ -821,10 +821,10 @@ function render(){
       var base20 = (P.baseline || {})['20'] || {};
       var s20 = (P.stats || {})['20'] || {};
       $('verify-note').innerHTML =
-        '当前 R3d 事件 ' + s20.n + ' 个有效样本，20 日利差中位 ' +
+        '当前利差压缩信号事件 ' + s20.n + ' 个有效样本，20 日利差中位 ' +
         fmt(s20.median, 2) + 'bp；同样满足国证A指复合分≥2 但未触发的普通日 ' +
         base20.n + ' 个，中位 ' + fmt(base20.median, 2) + 'bp。' +
-        'R3d 事件<b>多压缩 ' + Math.abs(extra).toFixed(2) + 'bp</b>。' +
+        '利差压缩信号事件<b>多压缩 ' + Math.abs(extra).toFixed(2) + 'bp</b>。' +
         '负值 = 利差压缩、正值 = 走陡。';
     } else {
       $('verify-note').textContent = '样本不足，暂无法计算相对普通下跌日的增量压缩。';
