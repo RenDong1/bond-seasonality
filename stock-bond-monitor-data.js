@@ -13337,7 +13337,7 @@ window.MONITOR_DATA = {
   "n_contracts_TL": 3
  },
  "rule": {
-  "name": "R3d-全A复合",
+  "name": "利差压缩信号",
   "stock_name": "国证A指",
   "stock_score_min": 2,
   "decl_thr": -2.0,
@@ -14990,7 +14990,7 @@ window.MONITOR_DATA = {
    "n_contracts_TL": 3
   },
   "rule": {
-   "name": "R3u-D-全A复合",
+   "name": "利差走扩信号",
    "stock_name": "国证A指",
    "stock_score_min": 2,
    "decl_thr": 2.0,
