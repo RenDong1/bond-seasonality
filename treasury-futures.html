@@ -199,7 +199,7 @@
 <body data-site="inner" data-page="treasury-futures">
 
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 09:41</span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 09:55</span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性全景复盘</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货日报</a><a href="stock-bond-monitor.html">股债联动</a><a href="yield-seasonality.html">收益率与期限利差季节图</a><a href="bond-flow-lead.html">净买入领先分析</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">债市信号评价</a><a href="bond-alert.html">债市预警</a></div></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
 <!--NAV_END-->
@@ -21700,28 +21700,30 @@ function buildContractChart(prefix, name) {
 
   // —— 主图：蜡烛（始终显示）+ VOL / MA / BOLL（默认隐藏，图例点选后显示） ——
   const candle = cMain.addCandlestickSeries({ upColor: KUP, downColor: KDOWN, borderUpColor: KUP, borderDownColor: KDOWN, wickUpColor: KUP, wickDownColor: KDOWN, priceFormat: { type: 'price', precision: 3, minMove: 0.001 } });
-  const vol = cMain.addHistogramSeries({ priceScaleId: 'vol', priceFormat: { type: 'volume' }, lastValueVisible: false, priceLineVisible: false, title: 'VOL', visible: false });
+  // 注：lightweight-charts 会把 series.title 画成价格轴上的色块标签（红/绿底压住右端 K 线），
+  // 故所有副序列不设 title —— 名称由图例 chip 表达，值由十字光标/悬停读数表达。
+  const vol = cMain.addHistogramSeries({ priceScaleId: 'vol', priceFormat: { type: 'volume' }, lastValueVisible: false, priceLineVisible: false, visible: false });
   cMain.priceScale('vol').applyOptions({ scaleMargins: { top: 0.80, bottom: 0 } });
-  const ma5  = cMain.addLineSeries({ color: '#5D4C68', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'MA5', visible: false });
-  const ma10 = cMain.addLineSeries({ color: '#3E6B8C', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'MA10', visible: false });
-  const ma20 = cMain.addLineSeries({ color: '#5A7448', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'MA20', visible: false });
-  const bollU = cMain.addLineSeries({ color: '#C6D6E5', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false, lastValueVisible: false, title: 'BOLL上', visible: false });
-  const bollM = cMain.addLineSeries({ color: '#5B5B51', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'BOLL中', visible: false });
-  const bollL = cMain.addLineSeries({ color: '#C6D6E5', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false, lastValueVisible: false, title: 'BOLL下', visible: false });
+  const ma5  = cMain.addLineSeries({ color: '#5D4C68', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, visible: false });
+  const ma10 = cMain.addLineSeries({ color: '#3E6B8C', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, visible: false });
+  const ma20 = cMain.addLineSeries({ color: '#5A7448', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, visible: false });
+  const bollU = cMain.addLineSeries({ color: '#C6D6E5', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false, lastValueVisible: false, visible: false });
+  const bollM = cMain.addLineSeries({ color: '#5B5B51', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, visible: false });
+  const bollL = cMain.addLineSeries({ color: '#C6D6E5', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false, lastValueVisible: false, visible: false });
 
   // —— MACD 副图（默认隐藏） ——
-  const macdBar  = cMacd.addHistogramSeries({ priceLineVisible: false, lastValueVisible: false, title: 'MACD' });
-  const macdDiff = cMacd.addLineSeries({ color: '#5D4C68', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'DIFF' });
-  const macdDea  = cMacd.addLineSeries({ color: '#5A7448', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'DEA' });
+  const macdBar  = cMacd.addHistogramSeries({ priceLineVisible: false, lastValueVisible: false });
+  const macdDiff = cMacd.addLineSeries({ color: '#5D4C68', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
+  const macdDea  = cMacd.addLineSeries({ color: '#5A7448', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
 
   // —— RSI 副图 + 70/30 参考线（默认隐藏） ——
-  const rsi6  = cRsi.addLineSeries({ color: '#5D4C68', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'RSI6' });
-  const rsi12 = cRsi.addLineSeries({ color: '#3E6B8C', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'RSI12' });
+  const rsi6  = cRsi.addLineSeries({ color: '#5D4C68', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
+  const rsi12 = cRsi.addLineSeries({ color: '#3E6B8C', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
   rsi6.createPriceLine({ price: 70, color: '#C6D6E5', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: false, title: '' });
   rsi6.createPriceLine({ price: 30, color: '#C6D6E5', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: false, title: '' });
 
   // —— 增仓/减仓副图（默认隐藏） ——
-  const oiBar = cOi.addHistogramSeries({ priceLineVisible: false, lastValueVisible: false, title: '增仓' });
+  const oiBar = cOi.addHistogramSeries({ priceLineVisible: false, lastValueVisible: false });
 
   // 增仓副图悬停读数：日期 / 当日增仓（精确手数）/ 当日总持仓
   const oiEl = document.getElementById(prefix + '-oi');
