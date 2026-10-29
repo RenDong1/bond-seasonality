@@ -4,8 +4,10 @@
  * 只改样式键，不动 grid/坐标范围等几何设置。
  */
 (function () {
+  /* 图表用“加深刻”：同一色相保留，但压深到纸上 ≥4.5:1，
+     细线和小标记不再发灰发淡（2026-10-28 对比度修订）。 */
   var C = {
-    violet: '#5D4C68', green: '#769365', air: '#749AB2',
+    violet: '#5D4C68', green: '#5A7448', air: '#3E6B8C',
     columbia: '#C6D6E5', ink: '#42423A', ink2: '#5B5B51',
     muted: '#66665B', grid: '#E7EEF3', rule: '#DFE7ED', paper: '#FFFFFF'
   };
@@ -27,6 +29,8 @@
     '#d48265': C.green, '#91c7ae': C.green, '#749f83': C.green,
     '#ca8622': C.green, '#bda29a': C.muted, '#6e7074': C.muted,
     '#546570': C.ink2, '#c4ccd3': C.columbia,
+    /* 本站五色板自身也压深一档，避免细线在纸面上发虚 */
+    '#769365': C.green, '#749ab2': C.air,
     '#999': C.muted, '#888': C.muted, '#666': C.muted, '#607d8b': C.muted,
     '#546e7a': C.ink2, '#333': C.ink, '#222': C.ink,
     '#ddd': C.rule, '#e0e0e0': C.rule, '#cfd8dc': C.rule, '#c5cae9': C.rule,
