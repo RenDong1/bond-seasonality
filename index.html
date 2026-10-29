@@ -35,11 +35,37 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
 .lead-fig .v.t-bear{color:var(--sig-bear)}
 .lead-fig .blk{display:inline-block;background:var(--violet);color:#fff;padding:1px 7px 2px}
 
+/* 今日读数 */
+.kpi-strip{max-width:var(--site-max);margin:0 auto;padding:0 var(--site-gutter);
+  border-bottom:var(--hair) solid var(--rule)}
+.kpi-inner{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));column-gap:0}
+.kpi{display:flex;flex-direction:column;gap:1px;min-width:0;
+  padding:11px 22px;border-left:var(--hair) solid var(--rule);
+  text-decoration:none;color:inherit}
+.kpi:first-child{border-left:0;padding-left:0}
+.kpi:last-child{padding-right:0}
+.kpi-k{font-family:var(--serif);font-size:var(--t-small);font-weight:500;color:var(--muted);line-height:1.4}
+.kpi-v{font-size:var(--t-figure);font-weight:600;line-height:1.3;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kpi-v .unit{font-size:var(--t-small);font-weight:400;color:var(--muted);margin-left:0}
+.kpi-v.t-bull{color:var(--sig-bull)}
+.kpi-v.t-bear{color:var(--sig-bear)}
+.kpi-s{font-family:var(--sans);font-size:var(--t-small);color:var(--muted);line-height:1.4;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi-d{margin-right:6px;color:var(--faint);font-variant-numeric:tabular-nums}
+.kpi-s .t-bull,.kpi-s .sig-long{color:var(--sig-bull)}
+.kpi-s .t-bear,.kpi-s .sig-short{color:var(--sig-bear)}
+.kpi:hover .kpi-k{color:var(--ink)}
+
 /* 栏目 */
 .front{max-width:var(--site-max);margin:0 auto;padding:0 var(--site-gutter)}
-.ledger{padding-top:26px}
+.ledger{padding-top:22px}
 .ledger-head{border-bottom:var(--hair) solid var(--rule-strong);padding-bottom:6px}
 .ledger-head h2{font-family:var(--serif);font-size:var(--t-small);font-weight:500;letter-spacing:.12em;color:var(--muted)}
+.ledger-group{margin-top:14px}
+.ledger-group-head{display:flex;align-items:center;gap:10px;padding-bottom:5px;
+  border-bottom:var(--hair) solid var(--rule-strong)}
+.ledger-group-head span{font-family:var(--serif);font-size:var(--t-small);font-weight:500;
+  letter-spacing:.08em;color:var(--ink-2);white-space:nowrap}
 .ledger-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:32px}
 .entry{display:grid;grid-template-columns:24px minmax(0,1fr);gap:0 6px;align-items:baseline;
   padding:13px 0 14px;border-bottom:var(--hair) solid var(--rule);text-decoration:none;color:inherit;min-width:0}
@@ -49,6 +75,7 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
 .entry .st{display:block;margin-top:1px;font-family:var(--serif);font-size:var(--t-small);font-weight:500;
   line-height:1.5;color:var(--muted);font-variant-numeric:tabular-nums;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entry .st-date{display:inline-block;margin-right:6px;color:var(--faint);font-variant-numeric:tabular-nums}
 .entry:hover h3{color:var(--violet)}
 .entry:hover .st{color:var(--ink-2)}
 
@@ -59,6 +86,9 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
   display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
 @media(max-width:1120px){
+  .kpi-inner{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .kpi:nth-child(3n+1){border-left:0;padding-left:0}
+  .kpi{padding:10px 18px}
   .ledger-grid{grid-template-columns:1fr 1fr}
 }
 @media(max-width:860px){
@@ -67,8 +97,17 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
   .lead{grid-template-columns:1fr;gap:10px}
   .lead-figs{gap:28px}
   .lead-fig{text-align:left}
+  .kpi-inner{grid-template-columns:1fr 1fr}
+  .kpi:nth-child(n){border-left:var(--hair) solid var(--rule);padding-left:18px}
+  .kpi:nth-child(odd){border-left:0;padding-left:0}
 }
 @media(max-width:560px){
+  .kpi-strip{padding:0 var(--site-gutter)}
+  .kpi{padding:9px 14px}
+  .kpi:nth-child(n){padding-left:14px}
+  .kpi:nth-child(odd){padding-left:0}
+  .kpi-v{font-size:18px}
+  .kpi-s{white-space:normal;overflow:visible;text-overflow:clip}
   .ledger-grid{grid-template-columns:1fr;column-gap:0}
   .masthead .wrap{align-items:center}
   .issue-date{flex-direction:row;align-items:baseline;gap:8px}
@@ -90,9 +129,9 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
 </head>
 <body>
 
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 13:43</span></div></div>
-<nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></div></nav>
-<script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-10-29 14:39</span></span></div></div>
+<nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
+<script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 
 <header class="masthead">
   <div class="wrap">
@@ -106,76 +145,100 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
 
 <div class="lead wrap"><div class="lead-main"><span class="tag">进行中</span><a href="stock-bond-monitor.html">30Y–10Y 利差<span class="t-bull">压缩</span>，第 10 日</a></div><div class="lead-figs"><div class="lead-fig"><span class="k">当前利差</span><span class="v"><span class="blk">41.44<small class="unit">bp</small></span></span></div><div class="lead-fig"><span class="k">20 日变动</span><span class="v t-bull">-12.42<small class="unit">bp</small></span></div></div></div>
 
+<section class="kpi-strip" aria-label="今日读数">
+  <div class="kpi-inner">
+<a class="kpi" href="yield-seasonality.html"><span class="kpi-k">10Y 国债</span><span class="kpi-v t-bear">1.635<small class="unit">%</small></span><span class="kpi-s"><span class="kpi-d">10-28</span><span class="t-bear">+0.9bp</span></span></a>
+<a class="kpi" href="stock-bond-monitor.html"><span class="kpi-k">30Y–10Y 利差</span><span class="kpi-v">41.44<small class="unit">bp</small></span><span class="kpi-s"><span class="kpi-d">10-28</span><span class="t-bull">20日 -12.4bp</span></span></a>
+<a class="kpi" href="bond-flow-lead.html"><span class="kpi-k">DR001</span><span class="kpi-v t-bear">1.278<small class="unit">%</small></span><span class="kpi-s"><span class="kpi-d">10-28</span><span class="t-bear">+0.1bp</span></span></a>
+<a class="kpi" href="treasury-futures.html"><span class="kpi-k">国债期货 T</span><span class="kpi-v">110.005</span><span class="kpi-s"><span class="kpi-d">10-28</span>+0.00%｜TL 118.560</span></a>
+<a class="kpi" href="signal-eval.html"><span class="kpi-k">量化信号1</span><span class="kpi-v sig-long">多</span><span class="kpi-s"><span class="kpi-d">10-27</span>连续 67 日</span></a>
+  </div>
+</section>
+
 <div class="front">
   <section class="ledger" aria-labelledby="ledger-title">
     <div class="ledger-head">
       <h2 id="ledger-title">栏目</h2>
     </div>
-    <div class="ledger-grid">
+      <div class="ledger-group">
+        <div class="ledger-group-head"><span>利率与期限</span></div>
+        <div class="ledger-grid">
         <a class="entry" href="bond-seasonality.html">
           <span class="no">01</span>
           <div>
             <h3>季节性规律</h3>
-            <span class="st">10-29 更新</span>
+            <span class="st"><span class="st-date">10-28</span>10Y 未来10日 <span class="t-bull">下行 53%</span>（n=19）</span>
           </div>
         </a>
         <a class="entry" href="yield-seasonality.html">
           <span class="no">02</span>
           <div>
             <h3>利率和利差</h3>
-            <span class="st">10-29 更新</span>
+            <span class="st"><span class="st-date">10-28</span>10Y 1.635%｜国开 1.670%</span>
           </div>
         </a>
         <a class="entry" href="treasury-futures.html">
           <span class="no">03</span>
           <div>
             <h3>国债期货</h3>
-            <span class="st">10-29 更新</span>
+            <span class="st"><span class="st-date">10-28</span>T 110.005｜TL 118.560</span>
           </div>
         </a>
+        </div>
+      </div>
+      <div class="ledger-group">
+        <div class="ledger-group-head"><span>成交与持仓</span></div>
+        <div class="ledger-grid">
         <a class="entry" href="stock-bond-monitor.html">
           <span class="no">04</span>
           <div>
             <h3>股债联动</h3>
-            <span class="st"><span class="t-bull">压缩</span>，第 10 日</span>
+            <span class="st"><span class="st-date">10-28</span><span class="t-bull">压缩</span>，第 10 日</span>
           </div>
         </a>
         <a class="entry" href="bond-flow-lead.html">
           <span class="no">05</span>
           <div>
             <h3>现券成交</h3>
-            <span class="st">10-29 更新</span>
+            <span class="st"><span class="st-date">10-23</span>近5日 大行 7-10Y 净买入 <span class="t-bull">+37.8亿</span></span>
           </div>
         </a>
         <a class="entry" href="duration-tracking.html">
           <span class="no">06</span>
           <div>
             <h3>久期跟踪</h3>
-            <span class="st">10-29 更新</span>
+            <span class="st"><span class="st-date">10-27</span>长债 11.19 年｜信用 12.55 年</span>
           </div>
         </a>
+        </div>
+      </div>
+      <div class="ledger-group">
+        <div class="ledger-group-head"><span>信号与预警</span></div>
+        <div class="ledger-grid">
         <a class="entry" href="signal-eval.html">
           <span class="no">07</span>
           <div>
             <h3>信号评价</h3>
-            <span class="st">10-29 更新</span>
+            <span class="st"><span class="st-date">10-27</span>信号1 <span class="sig-long">多</span>，连续 67 日</span>
           </div>
         </a>
         <a class="entry" href="bond-alert.html">
           <span class="no">08</span>
           <div>
             <h3>预警指标</h3>
-            <span class="st">10-29 更新</span>
+            <span class="st"><span class="st-date">10-27</span>超涨超跌 中性｜拐点 <span class="t-bear">看空</span></span>
           </div>
         </a>
-    </div>
+        </div>
+      </div>
   </section>
 </div>
 
 <footer class="site-footer">
   <div class="site-wrap">
     <span>数据来源 中国货币网 / 同花顺 iFinD / 中债登</span>
-    <span>每日 09:00 自动更新</span>
+    <span class="site-footer-actions"><span>每日 09:00 自动更新</span>
+      <button class="glossary-open" type="button">术语与口径</button></span>
   </div>
 </footer>
 
