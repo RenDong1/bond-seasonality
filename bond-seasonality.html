@@ -53,10 +53,10 @@ select:focus{outline:none;border-color:var(--violet)}
 .up-tbl .dir{white-space:nowrap}
 .strength{font-family:var(--serif);font-weight:600;color:var(--violet)}
 
-/* 方向：紫=下行（利率下行），墨=上行 */
+/* 方向：红=下行（利率下行、利好），绿=上行 */
 .dir{font-weight:600}
-.dir.down,.is-bull{color:var(--violet)}
-.dir.up,.is-bear{color:var(--ink-2)}
+.dir.down,.is-bull{color:var(--sig-bull)}
+.dir.up,.is-bear{color:var(--sig-bear)}
 
 /* 事件表 */
 .summary-box{padding:9px 0 7px;background:none;border:0;border-top:var(--hair) solid var(--rule);margin:0;font-family:var(--serif);font-weight:500;font-size:var(--t-small);color:var(--muted);line-height:1.7}
@@ -73,12 +73,13 @@ select:focus{outline:none;border-color:var(--violet)}
 .events-table .prob{white-space:nowrap}
 .events-table select.series-filter{width:auto;max-width:100%;border:0;background:none;padding:0;font-family:var(--serif);font-size:var(--t-small);color:var(--muted);cursor:pointer}
 .events-table select.series-filter:hover{color:var(--ink)}
-.num.down{color:var(--violet)}
+.num.down{color:var(--sig-bull)}
+.num.up{color:var(--sig-bear)}
 .pv{font-variant-numeric:tabular-nums}
 .pbar{display:inline-block;width:46px;height:4px;background:var(--paper-3);vertical-align:middle;margin-left:8px}
 .pbar i{display:block;height:100%}
-.pbar i.down{background:var(--violet)}
-.pbar i.up{background:var(--asparagus)}
+.pbar i.down{background:var(--sig-bull-mark)}
+.pbar i.up{background:var(--sig-bear-mark)}
 
 /* 详情弹层：纸面 + 细边，去圆角阴影 */
 .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(66,66,58,.36);z-index:1000;justify-content:center;align-items:center}
@@ -92,8 +93,8 @@ select:focus{outline:none;border-color:var(--violet)}
 .stat-card:first-child{border-left:0;padding-left:0}
 .stat-card .label{font-family:var(--serif);font-weight:500;font-size:var(--t-small);color:var(--muted)}
 .stat-card .value{font-family:var(--sans);font-size:var(--t-figure);font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums}
-.modal .value.down{color:var(--violet)}
-.modal .value.up{color:var(--ink-2)}
+.modal .value.down{color:var(--sig-bull)}
+.modal .value.up{color:var(--sig-bear)}
 .charts-row{display:flex;gap:20px;flex-wrap:wrap}
 .charts-row>div{flex:1;min-width:360px}
 .hidden{display:none!important}
@@ -124,7 +125,7 @@ select:focus{outline:none;border-color:var(--violet)}
 </head>
 <body data-site="inner" data-page="bond-seasonality">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-28 21:48</span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 09:41</span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html" class="active" aria-current="page">季节性全景复盘</a><a href="treasury-futures.html">国债期货日报</a><a href="stock-bond-monitor.html">股债联动</a><a href="yield-seasonality.html">收益率与期限利差季节图</a><a href="bond-flow-lead.html">净买入领先分析</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">债市信号评价</a><a href="bond-alert.html">债市预警</a></div></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
 <!--NAV_END-->
@@ -391,8 +392,8 @@ function renderEvents(){
             '<td>'+formatName(e.series)+'</td>'+
             '<td><span class="dir '+dc+'">'+e.direction+'</span></td>'+
             '<td class="prob"><span class="pv">'+pct+'%</span><span class="pbar"><i class="'+dc+'" style="width:'+pct+'%"></i></span></td>'+
-            '<td class="num'+(e.avg_change<0?' down':'')+'">'+sgn(e.avg_change,1)+'<span class="unit">bp</span></td>'+
-            '<td class="num'+(e.median_change<0?' down':'')+'">'+sgn(e.median_change,1)+'<span class="unit">bp</span></td>'+
+            '<td class="num'+(e.avg_change<0?' down':e.avg_change>0?' up':'')+'">'+sgn(e.avg_change,1)+'<span class="unit">bp</span></td>'+
+            '<td class="num'+(e.median_change<0?' down':e.median_change>0?' up':'')+'">'+sgn(e.median_change,1)+'<span class="unit">bp</span></td>'+
             '<td class="num">'+e.n_years+'</td></tr>';
     }).join('');
 }
@@ -406,7 +407,7 @@ function showDetail(series,mdKey){
     document.getElementById('modal-stats').innerHTML=
         '<div class="stat-card"><div class="label">下行概率</div><div class="value down">'+(s.d*100).toFixed(0)+'%</div></div>'+
         '<div class="stat-card"><div class="label">上行概率</div><div class="value up">'+(s.u*100).toFixed(0)+'%</div></div>'+
-        '<div class="stat-card"><div class="label">平均变化</div><div class="value">'+sgn(s.a,1)+'bp</div></div>'+
+        '<div class="stat-card"><div class="label">平均变化</div><div class="value '+(s.a<0?'down':s.a>0?'up':'')+'">'+sgn(s.a,1)+'bp</div></div>'+
         '<div class="stat-card"><div class="label">样本年数</div><div class="value">'+s.n+'</div></div>';
     var yrs=Object.keys(s.y).sort();
     var vals=yrs.map(function(y){return s.y[y];});
@@ -417,7 +418,7 @@ function showDetail(series,mdKey){
         xAxis:{type:'category',data:yrs},
         yAxis:{type:'value',name:'bp'},
         series:[{type:'bar',data:vals.map(function(v){return {value:v,
-                itemStyle:{color:v<0?'#5D4C68':'#769365'},
+                itemStyle:{color:v<0?'#C23531':'#2E8B57'},
                 label:{position:v<0?'bottom':'top'}};}),
             barMaxWidth:26,
             label:{show:true,fontSize:10,color:'#66665B',formatter:function(p){return sgn(p.value,1);}}}],
@@ -457,7 +458,7 @@ function showDetail(series,mdKey){
             });
             legendYrs.push(yr);
             tSeries.push({name:yr,type:'line',data:vals2,connectNulls:true,
-                lineStyle:{width:yr===curYear?2.5:1},itemStyle:{color:yr===curYear?'#769365':violetAt((parseInt(yr)-y0)/Math.max(1,y1-y0))},
+                lineStyle:{width:yr===curYear?2.5:1},itemStyle:{color:yr===curYear?'#42423A':violetAt((parseInt(yr)-y0)/Math.max(1,y1-y0))},
                 symbol:'none',emphasis:{lineStyle:{width:2.5}}});
         });
         var c2=echarts.init(document.getElementById('modal-trend'));
@@ -497,7 +498,7 @@ function renderHeatmap(){
         yAxis:{type:'category',data:['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],splitArea:{show:true,areaStyle:{color:['#FBFCFD','#F4F7F9']}}},
         visualMap:{min:-1,max:1,calculable:true,orient:'horizontal',left:'center',bottom:0,
             itemWidth:12,itemHeight:120,textStyle:{fontSize:13,color:'#66665B'},
-            inRange:{color:['#5D4C68','#A79AB0','#FBFCFD','#B7C8AA','#769365']},text:['上行','下行']},
+            inRange:{color:['#C23531','#E4A49E','#FBFCFD','#A9C7AE','#2E8B57']},text:['上行','下行']},
         series:[{type:'heatmap',data:cData.map(function(d){return [d[0],d[1],d[2]];}),label:{show:false}}],
         grid:{left:50,right:15,top:10,bottom:60}
     });
@@ -530,7 +531,7 @@ function renderCalendar(){
         tooltip:{trigger:'axis'},
         xAxis:{type:'category',data:days,axisLabel:{show:false},axisTick:{show:false}},
         yAxis:{type:'value'},
-        series:[{type:'bar',barMaxWidth:22,data:avgs.map(function(v){return {value:v,itemStyle:{color:v<0?'#5D4C68':'#769365'}};})}],
+        series:[{type:'bar',barMaxWidth:22,data:avgs.map(function(v){return {value:v,itemStyle:{color:v<0?'#C23531':'#2E8B57'}};})}],
         grid:{left:48,right:20,top:36,bottom:10}
     });
     chart.on('click',function(p){
