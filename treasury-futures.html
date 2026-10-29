@@ -24,6 +24,7 @@
   .signal-card.long{border-top-color:var(--sig-bull-mark)}
   .signal-card.short{border-top-color:var(--sig-bear-mark)}
   .signal-header{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:10px}
+  .signal-main{min-width:0}
   .signal-header .contract-name{font-family:var(--serif);font-size:var(--t-body);font-weight:600;
     color:var(--ink);line-height:1.4}
   .signal-info{font-size:var(--t-small);color:var(--muted);margin-top:3px}
@@ -182,7 +183,16 @@
   }
   @media(max-width:560px){
     .sig-grid{grid-template-columns:1fr}
-    .ohlc-grid{gap:0}
+    .ohlc-grid{gap:0 16px}
+    .ohlc-item{padding:6px 0}
+    .ohlc-item .k{font-size:12px}
+    .ohlc-item .v{white-space:nowrap;font-size:12px}
+    .date-break{display:block}
+    .signal-header{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;align-items:start}
+    .signal-main{display:contents}
+    .signal-header .contract-name{grid-column:1;grid-row:1}
+    .signal-side{grid-column:2;grid-row:1}
+    .signal-info{grid-column:1/-1;grid-row:2;margin-top:2px}
     .quick-stats{grid-template-columns:1fr}
     .quick-stats .stat-card{border-left:0;padding-left:0}
   }
@@ -203,9 +213,9 @@
 <body data-site="inner" data-page="treasury-futures">
 
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 13:43</span></div></div>
-<nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></div></nav>
-<script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-10-29 14:39</span><span class="site-stamp site-stamp-data">数据截至 2026-10-28</span></span></div></div>
+<nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
+<script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
 
 <div class="header">
@@ -22104,10 +22114,11 @@ function renderAll() {
 
   // Header
   document.getElementById('hdStatus').textContent = D.status || '已收盘';
-  document.getElementById('hdDate').textContent =
+  document.getElementById('hdDate').innerHTML =
     (D.date||'') + '（' + (D.day_of_week||'') + '），中金所 15:15 收盘，'
+    + '<span class="date-break">'
     + (D.oi_source === 'total' ? '持仓为全合约合计' : '持仓口径部分回退主力连续')
-    + '，交易性择时多空信号跟踪';
+    + '，交易性择时多空信号跟踪</span>';
 
   // Signal Bar — 合并浙商8维信号 + MCP扩展指标信号
   const tIndSigs = getIndicatorSignals(D.indicators_t);
@@ -22124,24 +22135,24 @@ function renderAll() {
     const last = data[data.length-1];
     const prev = data.length > 1 ? data[data.length-2] : null;
     const chgPct = prev ? ((last.c-prev.c)/prev.c*100) : 0;
-    const chgDir = chgPct >= 0 ? 'red' : 'green';
-    const chgArrow = chgPct >= 0 ? '▲' : '▼';
+    const chgDir = chgPct > 0 ? 'red' : chgPct < 0 ? 'green' : '';
+    const chgArrow = chgPct > 0 ? ' ▲' : chgPct < 0 ? ' ▼' : '';
     const oiDelta = (prev && last.oi != null && prev.oi != null) ? last.oi - prev.oi : null;
     return `<div class="signal-card ${zsSig.signalClass}">
       <div class="signal-header">
-        <div><div class="contract-name">${name}</div>
+        <div class="signal-main"><div class="contract-name">${name}</div>
           <div class="signal-info">全指标共振 <strong>${bullN}</strong> 多 / <strong>${bearN}</strong> 空，有效信号 <strong>${total}</strong> 个</div></div>
         <div class="signal-side"><span class="signal-badge ${zsSig.signalClass}"><span class="dot"></span>${zsSig.signalLabel}</span>
           <div class="signal-code">${code}</div></div></div>
       <div class="ohlc-grid">
         <div class="ohlc-item"><span class="k">开盘价</span><span class="v">${last.o||'—'}</span></div>
-        <div class="ohlc-item"><span class="k">收盘价</span><span class="v ${chgDir}">${last.c} ${chgArrow}</span></div>
+        <div class="ohlc-item"><span class="k">收盘价</span><span class="v ${chgDir}">${last.c}${chgArrow}</span></div>
         <div class="ohlc-item"><span class="k">最高价</span><span class="v">${last.h||'—'}</span></div>
         <div class="ohlc-item"><span class="k">最低价</span><span class="v">${last.l||'—'}</span></div>
         <div class="ohlc-item"><span class="k">成交量</span><span class="v">${last.v?last.v.toLocaleString():'—'} 手</span></div>
-        <div class="ohlc-item"><span class="k">持仓量（全合约）</span><span class="v">${last.oi?last.oi.toLocaleString():'—'} 手</span></div>
-        <div class="ohlc-item"><span class="k">当日增仓（全合约）</span><span class="v" style="color:${oiDelta==null||oiDelta===0?'var(--muted)':oiDelta>0?'var(--sig-bull)':'var(--sig-bear)'}">${oiDelta!=null?(oiDelta>0?'+':'')+oiDelta.toLocaleString()+' 手':'—'}</span></div>
-        <div class="ohlc-item"><span class="k">涨跌幅</span><span class="v ${chgDir}">${chgPct.toFixed(4)}%</span></div>
+        <div class="ohlc-item"><span class="k" title="全合约合计">持仓量</span><span class="v">${last.oi?last.oi.toLocaleString():'—'} 手</span></div>
+        <div class="ohlc-item"><span class="k" title="全合约合计">当日增仓</span><span class="v" style="color:${oiDelta==null||oiDelta===0?'var(--muted)':oiDelta>0?'var(--sig-bull)':'var(--sig-bear)'}">${oiDelta!=null?(oiDelta>0?'+':'')+oiDelta.toLocaleString()+' 手':'—'}</span></div>
+        <div class="ohlc-item"><span class="k">涨跌幅</span><span class="v ${chgDir}">${chgPct.toFixed(2)}%</span></div>
         <div class="ohlc-item"><span class="k">保证金</span><span class="v">${D.quick_stats[code==='TZL.CFE'?'t_margin':'tl_margin']} 元/手</span></div>
       </div></div>`;
   }
@@ -22188,12 +22199,13 @@ function renderAll() {
           ${zsSig.sigs.map(s => `<div class="ind-card" title="${s.detail||''}"><div class="ind-label">${s.name}</div><div class="ind-value" style="color:${s.bull?'var(--sig-bull)':s.bear?'var(--sig-bear)':'var(--muted)'}">${s.val}</div><div class="ind-sub">${s.detail||'—'}</div></div>`).join('')}
         </div>
         <div class="section-title">期现关系</div>
-        <div class="ctd-box"><div class="ctd-label">最便宜可交割债券 CTD</div><div class="ctd-code">${ind.ctd_bond || '—'}</div></div>
+        <div class="ctd-box"><div class="ctd-label" title="最便宜可交割债券：交割时卖方成本最低的券，是期现定价的锚">最便宜可交割债券 CTD</div><div class="ctd-code">${ind.ctd_bond || '—'}</div></div>
         <div class="ind-row">
-          <div class="ind-card"><div class="ind-label">IRR 隐含回购利率</div><div class="ind-value">${ind.irr != null ? ind.irr.toFixed(2)+'%' : '—'}</div></div>
-          <div class="ind-card"><div class="ind-label">净基差 BNOC</div><div class="ind-value">${ind.bnoc != null ? ind.bnoc.toFixed(4) : '—'}</div></div>
-          <div class="ind-card"><div class="ind-label">期现价差</div><div class="ind-value">${ind.basis != null ? ind.basis : '—'}</div></div>
+          <div class="ind-card" title="买入 CTD、卖出期货并持有到交割的隐含回购利率"><div class="ind-label">IRR 隐含回购利率</div><div class="ind-value">${ind.irr != null ? ind.irr.toFixed(2)+'%' : '—'}</div></div>
+          <div class="ind-card" title="基差扣除持有收益后的部分；为正通常表示期货相对现券偏贵"><div class="ind-label">净基差 BNOC</div><div class="ind-value">${ind.bnoc != null ? ind.bnoc.toFixed(4) : '—'}</div></div>
+          <div class="ind-card" title="现券价格与经转换因子调整后的期货价格之差"><div class="ind-label">期现价差</div><div class="ind-value">${ind.basis != null ? ind.basis : '—'}</div></div>
         </div>
+        <p class="note" style="margin:6px 0 0">CTD、IRR、净基差与期现价差需要可交割券和现券行情；当前数据源暂不提供，以上字段保留占位，显示「—」不代表读数为零。</p>
         <div class="section-title">中信期货持仓</div>
         <div class="ind-row">
           <div class="ind-card"><div class="ind-label">多头持仓</div><div class="ind-value">${(ind.member_long||0).toLocaleString()}</div></div>
@@ -22221,10 +22233,10 @@ function renderAll() {
     const isL = date===allDates[allDates.length-1];
     thtml += `<tr><td>${date}</td>
       <td>${t.o||'—'}</td><td>${t.h||'—'}</td><td>${t.l||'—'}</td><td${isL?' class="cur"':''}>${t.c||'—'}</td>
-      <td class="${tc>0?'up':tc<0?'down':''}">${tc!=null?tc.toFixed(4)+'%':'—'}</td>
+      <td class="${tc>0?'up':tc<0?'down':''}">${tc!=null?(tc>0?'+':'')+tc.toFixed(2)+'%':'—'}</td>
       <td>${t.v?t.v.toLocaleString():'—'}</td><td>${t.oi?t.oi.toLocaleString():'—'}</td>
       <td>${tl.o||'—'}</td><td>${tl.h||'—'}</td><td>${tl.l||'—'}</td><td${isL?' class="cur"':''}>${tl.c||'—'}</td>
-      <td class="${tlc>0?'up':tlc<0?'down':''}">${tlc!=null?tlc.toFixed(4)+'%':'—'}</td>
+      <td class="${tlc>0?'up':tlc<0?'down':''}">${tlc!=null?(tlc>0?'+':'')+tlc.toFixed(2)+'%':'—'}</td>
       <td>${tl.v?tl.v.toLocaleString():'—'}</td><td>${tl.oi?tl.oi.toLocaleString():'—'}</td></tr>`;
   });
   document.getElementById('trendTable').innerHTML = thtml + '</tbody>';
@@ -22249,7 +22261,7 @@ window.addEventListener('resize', () => {
 });
 </script>
 <!--FOOTER_START-->
-<footer class="site-footer"><div class="site-wrap"><span>数据来源 中国货币网 / 同花顺 iFinD / 中债登</span><span>每日 09:00 自动更新</span></div></footer>
+<footer class="site-footer"><div class="site-wrap"><span>数据来源 中国货币网 / 同花顺 iFinD / 中债登</span><span class="site-footer-actions"><span>每日 09:00 自动更新</span><button class="glossary-open" type="button">术语与口径</button></span></div></footer>
 <!--FOOTER_END-->
 </body>
 </html>
