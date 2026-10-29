@@ -47,10 +47,12 @@
   --t-small:13px;
 
   --hair:0.5px;
-  --site-max:1200px;
-  --site-gutter:40px;
-  --site-topbar:30px;
-  --site-nav-h:56px;
+  /* 版心与密度（2026-10-29 调宽收紧）：1536 逻辑像素下两侧留白由 168px 降到约 28px；
+     1440 以下仍保持至少 28px 边距，窄屏不变 */
+  --site-max:1680px;
+  --site-gutter:28px;
+  --site-topbar:28px;
+  --site-nav-h:52px;
 }
 
 /* ===== 顶部信息条 ===== */
@@ -120,7 +122,7 @@ body[data-site="inner"] .site-utility .site-name{display:block}
   flex:none;
   color:var(--muted);text-decoration:none;
   font-size:var(--t-body);line-height:1.4;
-  padding:18px 0 16px;white-space:nowrap;
+  padding:14px 0 13px;white-space:nowrap;
   transition:color .15s ease;
   border-bottom:2px solid transparent;
 }
@@ -129,9 +131,9 @@ body[data-site="inner"] .site-utility .site-name{display:block}
 
 /* ===== 页脚 ===== */
 .site-footer{
-  margin-top:44px;
+  margin-top:28px;
   border-top:var(--hair) solid var(--rule-strong);
-  padding:16px 0 36px;
+  padding:12px 0 24px;
   font-family:var(--serif);font-weight:500;
   font-size:var(--t-small);color:var(--muted);
 }
@@ -159,7 +161,7 @@ body[data-site="inner"] > .wrap{
 /* 页头：去掉深蓝渐变，回到纸面 + 细线 */
 .header{
   background:var(--paper);background-image:none;color:var(--ink);
-  padding:32px max(var(--site-gutter), calc((100vw - var(--site-max)) / 2)) 20px;
+  padding:20px max(var(--site-gutter), calc((100vw - var(--site-max)) / 2)) 14px;
   border-bottom:var(--hair) solid var(--rule-strong);
   text-align:left;
 }
@@ -170,15 +172,15 @@ body[data-site="inner"] h1{
   line-height:1.3;letter-spacing:0;color:var(--ink);
 }
 .header h1{font-size:var(--t-display);margin:0}
-.header p{margin-top:6px}
+.header p{margin-top:4px}
 
 /* 面板 / 卡片：去圆角、去阴影，只留 0.5px 边 */
 .panel{
   background:var(--paper-2);border:var(--hair) solid var(--rule);
   border-radius:0;box-shadow:none;
-  padding:18px 20px;margin-bottom:14px;
+  padding:14px 18px;margin-bottom:10px;
 }
-.panel h2{font-family:var(--serif);font-size:var(--t-body);font-weight:600;color:var(--ink);margin-bottom:12px}
+.panel h2{font-family:var(--serif);font-size:var(--t-body);font-weight:600;color:var(--ink);margin-bottom:10px}
 .panel h2 .sub{font-family:var(--sans);font-size:var(--t-small);font-weight:400;color:var(--muted)}
 .card{
   background:var(--paper-2);border:var(--hair) solid var(--rule);
@@ -193,7 +195,7 @@ body[data-site="inner"] h1{
 .stats-row{border-top:var(--hair) solid var(--rule-strong);border-bottom:var(--hair) solid var(--rule);gap:0}
 .stat-card{
   background:none;border:0;border-left:var(--hair) solid var(--rule);
-  border-radius:0;box-shadow:none;padding:12px 18px 11px;
+  border-radius:0;box-shadow:none;padding:10px 16px 9px;
 }
 .stat-card:first-child{border-left:0;padding-left:0}
 .stat-card .label{font-family:var(--serif);font-weight:500;font-size:var(--t-small);color:var(--muted)}
