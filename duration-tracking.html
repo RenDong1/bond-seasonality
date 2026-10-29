@@ -55,14 +55,14 @@ input[type=date]{border:var(--hair) solid var(--rule);border-radius:0;background
 </head>
 <body data-site="inner" data-page="duration-tracking">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 09:55</span></div></div>
-<nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html" class="active" aria-current="page">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></div></nav>
-<script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-10-29 14:39</span><span class="site-stamp site-stamp-data">数据截至 2026-10-27</span></span></div></div>
+<nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html" class="active" aria-current="page">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html" class="active" aria-current="page">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
+<script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
 <div class="container">
 <header class="page-head">
 <h1>久期跟踪</h1>
-<div class="sub" id="data-info">数据范围：加载中 | 点测久期 = -T日复权净值增长率(%) ÷ 收益率变动(bp) × 100</div>
+<div class="sub" id="data-info">数据范围 加载中｜点测久期 = −当日复权净值增长率(%) ÷ 收益率变动(bp) × 100</div>
 </header>
 <div class="stats-row" id="stats"></div>
 <div class="panel" style="padding:12px 20px;display:flex;align-items:center;flex-wrap:wrap">
@@ -103,10 +103,10 @@ const REL_RANGE_BP=2.5;  // 高可信度阈值：当日该券种收益率变动�
 
 (function(){
   var dr=[DATA.series[0].date, DATA.series[DATA.series.length-1].date];
-  document.getElementById('data-info').textContent='数据范围：'+dr[0]+' ~ '+dr[1]+' | 点测久期 = -T日复权净值增长率(%) ÷ 收益率变动(bp) × 100 | 更新于 '+DATA.updated;
+  document.getElementById('data-info').textContent='数据范围 '+dr[0]+' 至 '+dr[1]+'｜点测久期 = −当日复权净值增长率(%) ÷ 收益率变动(bp) × 100｜更新于 '+DATA.updated.replace('T',' ').slice(0,16);
 })();
 
-function fmt(v){return v==null?'—':v.toFixed(3);}
+function fmt(v){return v==null?'—':v.toFixed(2);}
 
 // 统计卡
 (function(){
@@ -175,7 +175,7 @@ function getFiltered(){
         emphasis:{focus:'series'}});
     });
     chart.setOption({
-      tooltip:{trigger:'axis',valueFormatter:function(v){return v==null?'—':v.toFixed(3)+' 年';}},
+      tooltip:{trigger:'axis',valueFormatter:function(v){return v==null?'—':v.toFixed(2)+' 年';}},
       legend:{data:CATS,top:5},
       grid:{left:55,right:20,top:58,bottom:45},
       xAxis:{type:'category',data:dates,boundaryGap:false},
@@ -206,7 +206,7 @@ function getFiltered(){
         lineStyle:{width:2,color:BCOLOR[b]},itemStyle:{color:BCOLOR[b]}};
     });
     chart.setOption({
-      tooltip:{trigger:'axis',valueFormatter:function(v){return v==null?'—':v.toFixed(3);}},
+      tooltip:{trigger:'axis',valueFormatter:function(v){return v==null?'—':v.toFixed(2);}},
       legend:{data:BONDS.map(function(b){return BLABEL[b];}),top:5},
       grid:{left:55,right:20,top:58,bottom:45},
       xAxis:{type:'category',data:dates,boundaryGap:false},
@@ -280,7 +280,7 @@ function getFiltered(){
 })();
 </script>
 <!--FOOTER_START-->
-<footer class="site-footer"><div class="site-wrap"><span>数据来源 中国货币网 / 同花顺 iFinD / 中债登</span><span>每日 09:00 自动更新</span></div></footer>
+<footer class="site-footer"><div class="site-wrap"><span>数据来源 中国货币网 / 同花顺 iFinD / 中债登</span><span class="site-footer-actions"><span>每日 09:00 自动更新</span><button class="glossary-open" type="button">术语与口径</button></span></div></footer>
 <!--FOOTER_END-->
 </body>
 </html>
