@@ -21,7 +21,8 @@
   .signal-bar{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0 14px}
   .signal-card{background:var(--paper-2);border:var(--hair) solid var(--rule);
     border-top:2px solid var(--columbia);border-radius:0;padding:16px 18px 12px;box-shadow:none}
-  .signal-card.bullish{border-top-color:var(--violet)}
+  .signal-card.long{border-top-color:var(--sig-bull-mark)}
+  .signal-card.short{border-top-color:var(--sig-bear-mark)}
   .signal-header{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:10px}
   .signal-header .contract-name{font-family:var(--serif);font-size:var(--t-body);font-weight:600;
     color:var(--ink);line-height:1.4}
@@ -32,8 +33,8 @@
     border:var(--hair) solid var(--rule);border-radius:0;background:var(--paper-3);
     font-family:var(--serif);font-size:var(--t-body);font-weight:600;letter-spacing:.04em;
     color:var(--ink);white-space:nowrap}
-  .signal-badge.long{border-color:var(--violet);color:var(--violet);background:var(--paper-2)}
-  .signal-badge.short{border-color:var(--columbia);color:var(--ink-2)}
+  .signal-badge.long{border-color:var(--sig-bull);color:var(--sig-bull);background:var(--paper-2)}
+  .signal-badge.short{border-color:var(--sig-bear);color:var(--sig-bear);background:var(--paper-2)}
   .signal-badge.neutral{color:var(--muted)}
   .signal-badge .dot{width:6px;height:6px;border-radius:50%;display:inline-block;background:currentColor}
   .signal-code{font-size:var(--t-small);color:var(--muted);margin-top:5px;font-variant-numeric:tabular-nums}
@@ -42,8 +43,8 @@
   .sig-item{display:flex;align-items:center;gap:6px;padding:5px 0;min-width:0;
     background:none;border-radius:0;border-bottom:var(--hair) solid var(--rule);font-size:var(--t-small)}
   .sig-item .sig-dot{width:5px;height:5px;border-radius:50%;flex:none}
-  .sig-item .sig-dot.bull{background:var(--violet)}
-  .sig-item .sig-dot.bear{background:var(--asparagus)}
+  .sig-item .sig-dot.bull{background:var(--sig-bull-mark)}
+  .sig-item .sig-dot.bear{background:var(--sig-bear-mark)}
   .sig-item .sig-dot.neut{background:#C3C7C0}
   .sig-item .sig-name{color:var(--muted);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .sig-item .sig-val{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -52,8 +53,8 @@
   .quick-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:14px;
     border-top:var(--hair) solid var(--rule-strong);border-bottom:var(--hair) solid var(--rule)}
   .stat-card .change{font-size:var(--t-small);color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
-  .stat-card .change.up{color:var(--violet)}
-  .stat-card .change.down{color:var(--ink-2)}
+  .stat-card .change.up{color:var(--sig-bull)}
+  .stat-card .change.down{color:var(--sig-bear)}
 
   /* 合约面板 */
   .main-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px}
@@ -69,8 +70,8 @@
     border-bottom:var(--hair) solid var(--rule)}
   .ohlc-item .k{font-size:var(--t-small);color:var(--muted)}
   .ohlc-item .v{font-size:var(--t-small);font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
-  .ohlc-item .v.red{color:var(--violet)}
-  .ohlc-item .v.green{color:var(--ink-2)}
+  .ohlc-item .v.red{color:var(--sig-bull)}
+  .ohlc-item .v.green{color:var(--sig-bear)}
   .mini-chart-wrap{width:100%;height:200px;margin:8px 0 0;position:relative;
     background:var(--paper-2);border-radius:0;border:var(--hair) solid var(--rule)}
   .mini-chart-wrap canvas{width:100%;height:100%}
@@ -116,8 +117,8 @@
   .trend-table td{text-align:right;padding:6px 8px;border-bottom:var(--hair) solid var(--rule)}
   .trend-table td:first-child{text-align:left;color:var(--muted)}
   .trend-table tr:hover td{background:var(--paper-3)}
-  .trend-table .up{color:var(--violet)}
-  .trend-table .down{color:var(--ink-2)}
+  .trend-table .up{color:var(--sig-bull)}
+  .trend-table .down{color:var(--sig-bear)}
   .trend-table .cur{font-weight:700;color:var(--ink)}
 
   /* K 线区块 */
@@ -198,7 +199,7 @@
 <body data-site="inner" data-page="treasury-futures">
 
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-28 21:48</span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 09:41</span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性全景复盘</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货日报</a><a href="stock-bond-monitor.html">股债联动</a><a href="yield-seasonality.html">收益率与期限利差季节图</a><a href="bond-flow-lead.html">净买入领先分析</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">债市信号评价</a><a href="bond-alert.html">债市预警</a></div></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
 <!--NAV_END-->
@@ -269,21 +270,11 @@
 <script>
 // ====== DATA INJECTION ======
 const FUTURES_DATA = {
-  "date": "2026-10-27",
-  "day_of_week": "周二",
+  "date": "2026-10-28",
+  "day_of_week": "周三",
   "status": "已收盘",
   "oi_source": "total",
   "data_t": [
-    {
-      "date": "2021-10-29",
-      "o": 99.3,
-      "h": 99.365,
-      "l": 99.115,
-      "c": 99.185,
-      "v": 58105.0,
-      "oi": 165161.0,
-      "oi_main": 146116.0
-    },
     {
       "date": "2021-11-01",
       "o": 99.265,
@@ -12373,6 +12364,16 @@ const FUTURES_DATA = {
       "v": 109175.0,
       "oi": 451775.0,
       "oi_main": 422552.0
+    },
+    {
+      "date": "2026-10-28",
+      "o": 109.995,
+      "h": 110.015,
+      "l": 109.925,
+      "c": 110.005,
+      "v": 89620.0,
+      "oi": 453462.0,
+      "oi_main": 423633.0
     }
   ],
   "data_tl": [
@@ -20875,99 +20876,109 @@ const FUTURES_DATA = {
       "v": 144856.0,
       "oi": 269572.0,
       "oi_main": 236250.0
+    },
+    {
+      "date": "2026-10-28",
+      "o": 118.51,
+      "h": 118.66,
+      "l": 118.36,
+      "c": 118.56,
+      "v": 107821.0,
+      "oi": 268865.0,
+      "oi_main": 234779.0
     }
   ],
   "indicators_t": {
-    "macd_diff": 0.1255,
+    "macd_diff": 0.1312,
     "macd_sub": "正区间，偏多",
-    "kdj_k": 83.15,
-    "kdj_sub": "偏强区间",
+    "kdj_k": 87.79,
+    "kdj_sub": "超买区间",
     "rsi_6": 74.62,
     "rsi_sub": "中性偏多",
-    "boll_mid": 109.695,
+    "boll_mid": 109.7145,
     "boll_sub": "价格贴近中轨",
-    "atr_14": 0.1235,
+    "atr_14": 0.1211,
     "atr_sub": "低波环境",
-    "obv": 573.24,
+    "obv": 566.8,
     "obv_sub": "万手，年化",
-    "volatility": 0.0933,
+    "volatility": 0.0924,
     "vol_sub": "高波动",
-    "cci": 94.32,
+    "cci": 97.76,
     "cci_sub": "正常区间",
-    "psy": 66.67,
+    "psy": 58.33,
     "psy_sub": "偏多情绪",
-    "bias": 0.0781,
+    "bias": 0.0766,
     "bias_sub": "贴近均线",
-    "vr": 155.36,
+    "vr": 143.12,
     "vr_sub": "正常量能",
-    "dma": 0.2974,
+    "dma": 0.3184,
     "dma_sub": "短均>长均，偏多",
-    "trix": 0.0164,
+    "trix": 0.0174,
     "trix_sub": "温和上升",
-    "mtm": 0.345,
+    "mtm": 0.325,
     "mtm_sub": "强上涨动能",
-    "mfi": 65.91,
+    "mfi": 73.27,
     "mfi_sub": "资金流入偏多",
     "ctd_bond": null,
     "irr": null,
     "bnoc": null,
     "basis": null,
-    "member_long": 67118,
-    "member_short": 71195,
-    "member_net": -4077
+    "member_long": 66994,
+    "member_short": 72705,
+    "member_net": -5711
   },
   "indicators_tl": {
-    "macd_diff": 0.4466,
+    "macd_diff": 0.4674,
     "macd_sub": "正区间，强多头",
-    "kdj_k": 61.84,
-    "kdj_sub": "中性区间",
-    "rsi_6": 68.22,
+    "kdj_k": 71.58,
+    "kdj_sub": "偏强区间",
+    "rsi_6": 68.78,
     "rsi_sub": "中性偏多",
-    "boll_mid": 117.6415,
+    "boll_mid": 117.718,
     "boll_sub": "价格在中轨上方",
-    "atr_14": 0.4916,
+    "atr_14": 0.4779,
     "atr_sub": "高波环境",
-    "obv": 385.87,
+    "obv": 396.65,
     "obv_sub": "万手，年化",
-    "volatility": 0.3372,
+    "volatility": 0.3335,
     "vol_sub": "高波动",
-    "cci": 135.8,
+    "cci": 171.39,
     "cci_sub": "超买区间",
     "psy": 58.33,
     "psy_sub": "偏多情绪",
-    "bias": 0.3853,
+    "bias": 0.3938,
     "bias_sub": "小幅正偏离",
-    "vr": 147.16,
-    "vr_sub": "正常量能",
-    "dma": 1.2362,
+    "vr": 173.28,
+    "vr_sub": "放量活跃",
+    "dma": 1.2364,
     "dma_sub": "短均远高于长均",
-    "trix": 0.0585,
+    "trix": 0.059,
     "trix_sub": "温和上升",
-    "mtm": 0.74,
+    "mtm": 0.53,
     "mtm_sub": "强上涨动能",
-    "mfi": 57.52,
+    "mfi": 63.09,
     "mfi_sub": "资金流入偏多",
     "ctd_bond": null,
     "irr": null,
     "bnoc": null,
     "basis": null,
-    "member_long": 48908,
-    "member_short": 28158,
-    "member_net": 20750
+    "member_long": 47704,
+    "member_short": 27506,
+    "member_net": 20198
   },
   "quick_stats": {
     "t_close": 110.005,
-    "t_change": 0.1047,
+    "t_change": 0.0,
     "t_direction": "up",
-    "tl_close": 118.53,
-    "tl_change": 0.4492,
+    "tl_close": 118.56,
+    "tl_change": 0.0253,
     "tl_direction": "up",
     "t_margin": "22,001",
-    "tl_margin": "41,486",
-    "t_fund": 198.8,
-    "t_fund_change": 0.8,
-    "tl_fund": 223.7,
-    "tl_fund_change": 11.5
+    "tl_margin": "41,496",
+    "t_fund": 199.5,
+    "t_fund_change": 0.7,
+    "tl_fund": 223.1,
+    "tl_fund_change": -0.5
   }
 };
 
@@ -21650,7 +21661,7 @@ function computeFib(data) {
 // 弃用 ECharts 蜡烛图（悬停触发整图重绘、在部分 GPU 上卡死），改用 lightweight-charts：
 // 单 canvas 增量渲染，十字光标只在覆盖层绘制，不重绘主图，从根本上消除悬停卡顿。
 // 主图 + MACD/RSI/增仓 三副图 = 4 个纵向堆叠的轻量 chart（日期轴天然对齐，无 pan/zoom，区间由顶部按钮控制）。
-const KUP = '#c62828', KDOWN = '#2e7d32';
+const KUP = '#C23531', KDOWN = '#2E8B57';
 
 function toBD(dateStr) {
   const p = dateStr.split('-').map(Number);
@@ -21692,8 +21703,8 @@ function buildContractChart(prefix, name) {
   const vol = cMain.addHistogramSeries({ priceScaleId: 'vol', priceFormat: { type: 'volume' }, lastValueVisible: false, priceLineVisible: false, title: 'VOL', visible: false });
   cMain.priceScale('vol').applyOptions({ scaleMargins: { top: 0.80, bottom: 0 } });
   const ma5  = cMain.addLineSeries({ color: '#5D4C68', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'MA5', visible: false });
-  const ma10 = cMain.addLineSeries({ color: '#749AB2', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'MA10', visible: false });
-  const ma20 = cMain.addLineSeries({ color: '#769365', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'MA20', visible: false });
+  const ma10 = cMain.addLineSeries({ color: '#3E6B8C', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'MA10', visible: false });
+  const ma20 = cMain.addLineSeries({ color: '#5A7448', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'MA20', visible: false });
   const bollU = cMain.addLineSeries({ color: '#C6D6E5', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false, lastValueVisible: false, title: 'BOLL上', visible: false });
   const bollM = cMain.addLineSeries({ color: '#5B5B51', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'BOLL中', visible: false });
   const bollL = cMain.addLineSeries({ color: '#C6D6E5', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false, lastValueVisible: false, title: 'BOLL下', visible: false });
@@ -21701,11 +21712,11 @@ function buildContractChart(prefix, name) {
   // —— MACD 副图（默认隐藏） ——
   const macdBar  = cMacd.addHistogramSeries({ priceLineVisible: false, lastValueVisible: false, title: 'MACD' });
   const macdDiff = cMacd.addLineSeries({ color: '#5D4C68', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'DIFF' });
-  const macdDea  = cMacd.addLineSeries({ color: '#769365', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'DEA' });
+  const macdDea  = cMacd.addLineSeries({ color: '#5A7448', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'DEA' });
 
   // —— RSI 副图 + 70/30 参考线（默认隐藏） ——
   const rsi6  = cRsi.addLineSeries({ color: '#5D4C68', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'RSI6' });
-  const rsi12 = cRsi.addLineSeries({ color: '#749AB2', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'RSI12' });
+  const rsi12 = cRsi.addLineSeries({ color: '#3E6B8C', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, title: 'RSI12' });
   rsi6.createPriceLine({ price: 70, color: '#C6D6E5', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: false, title: '' });
   rsi6.createPriceLine({ price: 30, color: '#C6D6E5', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: false, title: '' });
 
@@ -21789,13 +21800,13 @@ function buildContractChart(prefix, name) {
   const legendEl = document.getElementById('legend' + (prefix === 'kT' ? 'T' : 'TL'));
   const legendItems = [
     { label: 'MA5', color: '#5D4C68', series: ma5 },
-    { label: 'MA10', color: '#749AB2', series: ma10 },
-    { label: 'MA20', color: '#769365', series: ma20 },
+    { label: 'MA10', color: '#3E6B8C', series: ma10 },
+    { label: 'MA20', color: '#5A7448', series: ma20 },
     { label: 'BOLL', color: '#C6D6E5', series: [bollU, bollM, bollL] },
     { label: 'VOL', color: '#75756A', vol: true },
     { label: 'MACD', color: '#5D4C68', panel: prefix + '-macd', chart: cMacd },
-    { label: 'RSI', color: '#749AB2', panel: prefix + '-rsi', chart: cRsi },
-    { label: '增仓', color: '#769365', panel: prefix + '-oi', chart: cOi },
+    { label: 'RSI', color: '#3E6B8C', panel: prefix + '-rsi', chart: cRsi },
+    { label: '增仓', color: '#5A7448', panel: prefix + '-oi', chart: cOi },
     { label: '斐波那契', color: '#75756A', fib: true }
   ];
 
@@ -22058,8 +22069,8 @@ function renderAll() {
   document.getElementById('quickStats').innerHTML = `
     <div class="stat-card"><div class="label">十年期 T 收盘</div><div class="value">${qs.t_close}</div><div class="change ${qs.t_direction}">${qs.t_change>0?'▲':'▼'} ${Math.abs(qs.t_change).toFixed(3)}%</div></div>
     <div class="stat-card"><div class="label">三十年期 TL 收盘</div><div class="value">${qs.tl_close}</div><div class="change ${qs.tl_direction}">${qs.tl_change>0?'▲':'▼'} ${Math.abs(qs.tl_change).toFixed(3)}%</div></div>
-    <div class="stat-card"><div class="label">T 沉淀资金（全合约）</div><div class="value">${qs.t_fund}<span class="unit">亿</span></div><div class="change down">较前日 ${qs.t_fund_change>0?'+':''}${qs.t_fund_change}亿</div></div>
-    <div class="stat-card"><div class="label">TL 沉淀资金（全合约）</div><div class="value">${qs.tl_fund}<span class="unit">亿</span></div><div class="change down">较前日 ${qs.tl_fund_change>0?'+':''}${qs.tl_fund_change}亿</div></div>`;
+    <div class="stat-card"><div class="label">T 沉淀资金（全合约）</div><div class="value">${qs.t_fund}<span class="unit">亿</span></div><div class="change">较前日 ${qs.t_fund_change>0?'+':''}${qs.t_fund_change}亿</div></div>
+    <div class="stat-card"><div class="label">TL 沉淀资金（全合约）</div><div class="value">${qs.tl_fund}<span class="unit">亿</span></div><div class="change">较前日 ${qs.tl_fund_change>0?'+':''}${qs.tl_fund_change}亿</div></div>`;
 
   // Signal Bar — 合并浙商8维信号 + MCP扩展指标信号
   const tIndSigs = getIndicatorSignals(D.indicators_t);
@@ -22073,7 +22084,7 @@ function renderAll() {
 
   function sigCard(name, code, zsSig, allSigs, bullN, bearN) {
     const total = bullN + bearN;
-    return `<div class="signal-card ${zsSig.signalClass==='neutral'?'neutral':'bullish'}">
+    return `<div class="signal-card ${zsSig.signalClass}">
       <div class="signal-header">
         <div><div class="contract-name">${name}</div>
           <div class="signal-info">全指标共振 <strong>${bullN}</strong> 多 / <strong>${bearN}</strong> 空，有效信号 <strong>${total}</strong> 个</div></div>
@@ -22095,7 +22106,7 @@ function renderAll() {
     const chgArrow = chgPct >= 0 ? '▲' : '▼';
     const oiDelta = (prev && last.oi != null && prev.oi != null) ? last.oi - prev.oi : null;
     const memberNet = ind.member_net;
-    const netColor = memberNet > 0 ? 'var(--violet)' : 'var(--ink-2)';
+    const netColor = memberNet == null ? 'var(--muted)' : memberNet > 0 ? 'var(--sig-bull)' : memberNet < 0 ? 'var(--sig-bear)' : 'var(--ink-2)';
     const netLabel = memberNet > 5000 ? '明显净多头' : (memberNet < -5000 ? '明显净空头' : (Math.abs(memberNet) < 500 ? '几乎完全对冲' : (memberNet > 0 ? '小幅净多' : '小幅净空')));
 
     return `<div class="contract-panel">
@@ -22108,13 +22119,13 @@ function renderAll() {
           <div class="ohlc-item"><span class="k">最低价</span><span class="v">${last.l||'—'}</span></div>
           <div class="ohlc-item"><span class="k">成交量</span><span class="v">${last.v?last.v.toLocaleString():'—'} 手</span></div>
           <div class="ohlc-item"><span class="k">持仓量（全合约）</span><span class="v">${last.oi?last.oi.toLocaleString():'—'} 手</span></div>
-          <div class="ohlc-item"><span class="k">当日增仓（全合约）</span><span class="v" style="color:${oiDelta==null?'var(--muted)':oiDelta>0?'var(--violet)':oiDelta<0?'var(--ink-2)':'var(--muted)'}">${oiDelta!=null?(oiDelta>0?'+':'')+oiDelta.toLocaleString()+' 手':'—'}</span></div>
+          <div class="ohlc-item"><span class="k">当日增仓（全合约）</span><span class="v" style="color:${oiDelta==null||oiDelta===0?'var(--muted)':oiDelta>0?'var(--sig-bull)':'var(--sig-bear)'}">${oiDelta!=null?(oiDelta>0?'+':'')+oiDelta.toLocaleString()+' 手':'—'}</span></div>
           <div class="ohlc-item"><span class="k">涨跌幅</span><span class="v ${chgDir}">${chgPct.toFixed(4)}%</span></div>
           <div class="ohlc-item"><span class="k">保证金</span><span class="v">${D.quick_stats[code==='TZL.CFE'?'t_margin':'tl_margin']} 元/手</span></div>
         </div>
         <div class="section-title">技术指标</div>
         <div class="ind-row-5">
-          <div class="ind-card"><div class="ind-label">增仓信号（≥1.5万手）</div><div class="ind-value" style="color:${oiDelta==null?'var(--muted)':oiDelta>=OI_SURGE_THRESHOLD?'var(--violet)':oiDelta<=-OI_SURGE_THRESHOLD?'var(--ink-2)':'var(--muted)'}">${oiDelta!=null?(oiDelta>=0?'+':'')+fmtWan(oiDelta):'—'}</div><div class="ind-sub">${oiDelta==null?'—':oiDelta>=OI_SURGE_THRESHOLD?'大幅增仓':oiDelta<=-OI_SURGE_THRESHOLD?'大幅减仓':'正常波动'}</div></div>
+          <div class="ind-card"><div class="ind-label">增仓信号（≥1.5万手）</div><div class="ind-value" style="color:${oiDelta==null?'var(--muted)':oiDelta>=OI_SURGE_THRESHOLD?'var(--sig-bull)':oiDelta<=-OI_SURGE_THRESHOLD?'var(--sig-bear)':'var(--muted)'}">${oiDelta!=null?(oiDelta>=0?'+':'')+fmtWan(oiDelta):'—'}</div><div class="ind-sub">${oiDelta==null?'—':oiDelta>=OI_SURGE_THRESHOLD?'大幅增仓':oiDelta<=-OI_SURGE_THRESHOLD?'大幅减仓':'正常波动'}</div></div>
           <div class="ind-card"><div class="ind-label">MACD (DIFF)</div><div class="ind-value">${ind.macd_diff}</div><div class="ind-sub">${ind.macd_sub}</div></div>
           <div class="ind-card"><div class="ind-label">KDJ (K值)</div><div class="ind-value">${ind.kdj_k}</div><div class="ind-sub">${ind.kdj_sub}</div></div>
           <div class="ind-card"><div class="ind-label">RSI (6日)</div><div class="ind-value">${ind.rsi_6}</div><div class="ind-sub">${ind.rsi_sub}</div></div>
