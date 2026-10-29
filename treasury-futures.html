@@ -72,6 +72,7 @@
   .ohlc-item .v{font-size:var(--t-small);font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
   .ohlc-item .v.red{color:var(--sig-bull)}
   .ohlc-item .v.green{color:var(--sig-bear)}
+  .signal-card .ohlc-grid{margin:12px 0 0;padding-top:10px;border-top:var(--hair) solid var(--rule)}
   .mini-chart-wrap{width:100%;height:200px;margin:8px 0 0;position:relative;
     background:var(--paper-2);border-radius:0;border:var(--hair) solid var(--rule)}
   .mini-chart-wrap canvas{width:100%;height:100%}
@@ -85,6 +86,9 @@
   .ind-card .ind-value{font-size:var(--t-body);font-weight:600;color:var(--ink);
     margin:2px 0;font-variant-numeric:tabular-nums;line-height:1.4}
   .ind-card .ind-sub{font-size:var(--t-small);color:var(--faint);line-height:1.4}
+  .ind-group-label{font-family:var(--serif);font-size:var(--t-small);color:var(--faint);
+    letter-spacing:.04em;margin:14px 0 6px}
+  .struct-row .ind-value{font-size:var(--t-small)}
   .ctd-box{background:var(--paper-3);border:var(--hair) solid var(--rule);
     border-left:2px solid var(--violet);border-radius:0;padding:10px 14px;margin-bottom:8px}
   .ctd-box .ctd-label{font-family:var(--serif);font-size:var(--t-small);color:var(--muted);margin-bottom:2px}
@@ -199,7 +203,7 @@
 <body data-site="inner" data-page="treasury-futures">
 
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 09:55</span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 13:31</span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性全景复盘</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货日报</a><a href="stock-bond-monitor.html">股债联动</a><a href="yield-seasonality.html">收益率与期限利差季节图</a><a href="bond-flow-lead.html">净买入领先分析</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">债市信号评价</a><a href="bond-alert.html">债市预警</a></div></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
 <!--NAV_END-->
@@ -212,7 +216,6 @@
 <div class="container">
 
 <div class="signal-bar" id="signalBar"></div>
-<div class="quick-stats" id="quickStats"></div>
 
 <div class="full-panel">
   <div class="kline-header">
@@ -22066,14 +22069,6 @@ function renderAll() {
     + (D.oi_source === 'total' ? '持仓为全合约合计' : '持仓口径部分回退主力连续')
     + '，交易性择时多空信号跟踪';
 
-  // Quick Stats
-  const qs = D.quick_stats;
-  document.getElementById('quickStats').innerHTML = `
-    <div class="stat-card"><div class="label">十年期 T 收盘</div><div class="value">${qs.t_close}</div><div class="change ${qs.t_direction}">${qs.t_change>0?'▲':'▼'} ${Math.abs(qs.t_change).toFixed(3)}%</div></div>
-    <div class="stat-card"><div class="label">三十年期 TL 收盘</div><div class="value">${qs.tl_close}</div><div class="change ${qs.tl_direction}">${qs.tl_change>0?'▲':'▼'} ${Math.abs(qs.tl_change).toFixed(3)}%</div></div>
-    <div class="stat-card"><div class="label">T 沉淀资金（全合约）</div><div class="value">${qs.t_fund}<span class="unit">亿</span></div><div class="change">较前日 ${qs.t_fund_change>0?'+':''}${qs.t_fund_change}亿</div></div>
-    <div class="stat-card"><div class="label">TL 沉淀资金（全合约）</div><div class="value">${qs.tl_fund}<span class="unit">亿</span></div><div class="change">较前日 ${qs.tl_fund_change>0?'+':''}${qs.tl_fund_change}亿</div></div>`;
-
   // Signal Bar — 合并浙商8维信号 + MCP扩展指标信号
   const tIndSigs = getIndicatorSignals(D.indicators_t);
   const tlIndSigs = getIndicatorSignals(D.indicators_tl);
@@ -22084,28 +22079,40 @@ function renderAll() {
   const tlBull = tlAllSigs.filter(s => s.bull).length;
   const tlBear = tlAllSigs.filter(s => s.bear).length;
 
-  function sigCard(name, code, zsSig, allSigs, bullN, bearN) {
+  function sigCard(name, code, data, zsSig, bullN, bearN) {   // 顶部只留综合结论 + 行情要素（指标明细下移到技术指标卡）
     const total = bullN + bearN;
+    const last = data[data.length-1];
+    const prev = data.length > 1 ? data[data.length-2] : null;
+    const chgPct = prev ? ((last.c-prev.c)/prev.c*100) : 0;
+    const chgDir = chgPct >= 0 ? 'red' : 'green';
+    const chgArrow = chgPct >= 0 ? '▲' : '▼';
+    const oiDelta = (prev && last.oi != null && prev.oi != null) ? last.oi - prev.oi : null;
     return `<div class="signal-card ${zsSig.signalClass}">
       <div class="signal-header">
         <div><div class="contract-name">${name}</div>
           <div class="signal-info">全指标共振 <strong>${bullN}</strong> 多 / <strong>${bearN}</strong> 空，有效信号 <strong>${total}</strong> 个</div></div>
         <div class="signal-side"><span class="signal-badge ${zsSig.signalClass}"><span class="dot"></span>${zsSig.signalLabel}</span>
           <div class="signal-code">${code}</div></div></div>
-      <div class="sig-grid">${allSigs.map(s =>
-        `<div class="sig-item" title="${s.detail||''}"><span class="sig-dot ${s.bull?'bull':'bear'}"></span><span class="sig-name">${s.name}</span><span class="sig-val">${s.val}</span></div>`).join('')}</div></div>`;
+      <div class="ohlc-grid">
+        <div class="ohlc-item"><span class="k">开盘价</span><span class="v">${last.o||'—'}</span></div>
+        <div class="ohlc-item"><span class="k">收盘价</span><span class="v ${chgDir}">${last.c} ${chgArrow}</span></div>
+        <div class="ohlc-item"><span class="k">最高价</span><span class="v">${last.h||'—'}</span></div>
+        <div class="ohlc-item"><span class="k">最低价</span><span class="v">${last.l||'—'}</span></div>
+        <div class="ohlc-item"><span class="k">成交量</span><span class="v">${last.v?last.v.toLocaleString():'—'} 手</span></div>
+        <div class="ohlc-item"><span class="k">持仓量（全合约）</span><span class="v">${last.oi?last.oi.toLocaleString():'—'} 手</span></div>
+        <div class="ohlc-item"><span class="k">当日增仓（全合约）</span><span class="v" style="color:${oiDelta==null||oiDelta===0?'var(--muted)':oiDelta>0?'var(--sig-bull)':'var(--sig-bear)'}">${oiDelta!=null?(oiDelta>0?'+':'')+oiDelta.toLocaleString()+' 手':'—'}</span></div>
+        <div class="ohlc-item"><span class="k">涨跌幅</span><span class="v ${chgDir}">${chgPct.toFixed(4)}%</span></div>
+        <div class="ohlc-item"><span class="k">保证金</span><span class="v">${D.quick_stats[code==='TZL.CFE'?'t_margin':'tl_margin']} 元/手</span></div>
+      </div></div>`;
   }
   document.getElementById('signalBar').innerHTML =
-    sigCard('十年期国债期货', 'TZL.CFE', tSignal, tAllSigs, tBull, tBear) +
-    sigCard('三十年期国债期货', 'TLZL2.CFE', tlSignal, tlAllSigs, tlBull, tlBear);
+    sigCard('十年期国债期货', 'TZL.CFE', tData, tSignal, tBull, tBear) +
+    sigCard('三十年期国债期货', 'TLZL2.CFE', tlData, tlSignal, tlBull, tlBear);
 
   // Contract panels
-  function contractPanel(_icon, name, code, data, ind) {
+  function contractPanel(name, code, data, ind, zsSig) {
     const last = data[data.length-1];
     const prev = data.length > 1 ? data[data.length-2] : null;
-    const chgPct = prev ? ((last.c-prev.c)/prev.c*100) : 0;
-    const chgDir = chgPct >= 0 ? 'red' : 'green';
-    const chgArrow = chgPct >= 0 ? '▲' : '▼';
     const oiDelta = (prev && last.oi != null && prev.oi != null) ? last.oi - prev.oi : null;
     const memberNet = ind.member_net;
     const netColor = memberNet == null ? 'var(--muted)' : memberNet > 0 ? 'var(--sig-bull)' : memberNet < 0 ? 'var(--sig-bear)' : 'var(--ink-2)';
@@ -22114,17 +22121,6 @@ function renderAll() {
     return `<div class="contract-panel">
       <div class="contract-header"><h2>${name}</h2><span class="code">${code}</span></div>
       <div class="contract-body">
-        <div class="ohlc-grid">
-          <div class="ohlc-item"><span class="k">开盘价</span><span class="v">${last.o||'—'}</span></div>
-          <div class="ohlc-item"><span class="k">收盘价</span><span class="v ${chgDir}">${last.c} ${chgArrow}</span></div>
-          <div class="ohlc-item"><span class="k">最高价</span><span class="v">${last.h||'—'}</span></div>
-          <div class="ohlc-item"><span class="k">最低价</span><span class="v">${last.l||'—'}</span></div>
-          <div class="ohlc-item"><span class="k">成交量</span><span class="v">${last.v?last.v.toLocaleString():'—'} 手</span></div>
-          <div class="ohlc-item"><span class="k">持仓量（全合约）</span><span class="v">${last.oi?last.oi.toLocaleString():'—'} 手</span></div>
-          <div class="ohlc-item"><span class="k">当日增仓（全合约）</span><span class="v" style="color:${oiDelta==null||oiDelta===0?'var(--muted)':oiDelta>0?'var(--sig-bull)':'var(--sig-bear)'}">${oiDelta!=null?(oiDelta>0?'+':'')+oiDelta.toLocaleString()+' 手':'—'}</span></div>
-          <div class="ohlc-item"><span class="k">涨跌幅</span><span class="v ${chgDir}">${chgPct.toFixed(4)}%</span></div>
-          <div class="ohlc-item"><span class="k">保证金</span><span class="v">${D.quick_stats[code==='TZL.CFE'?'t_margin':'tl_margin']} 元/手</span></div>
-        </div>
         <div class="section-title">技术指标</div>
         <div class="ind-row-5">
           <div class="ind-card"><div class="ind-label">增仓信号（≥1.5万手）</div><div class="ind-value" style="color:${oiDelta==null?'var(--muted)':oiDelta>=OI_SURGE_THRESHOLD?'var(--sig-bull)':oiDelta<=-OI_SURGE_THRESHOLD?'var(--sig-bear)':'var(--muted)'}">${oiDelta!=null?(oiDelta>=0?'+':'')+fmtWan(oiDelta):'—'}</div><div class="ind-sub">${oiDelta==null?'—':oiDelta>=OI_SURGE_THRESHOLD?'大幅增仓':oiDelta<=-OI_SURGE_THRESHOLD?'大幅减仓':'正常波动'}</div></div>
@@ -22144,6 +22140,10 @@ function renderAll() {
           <div class="ind-card"><div class="ind-label">MTM 动量</div><div class="ind-value">${ind.mtm != null ? ind.mtm : '—'}</div><div class="ind-sub">${ind.mtm_sub || '—'}</div></div>
           <div class="ind-card"><div class="ind-label">MFI 资金流</div><div class="ind-value">${ind.mfi != null ? ind.mfi : '—'}</div><div class="ind-sub">${ind.mfi_sub || '—'}</div></div>
         </div>
+        <div class="ind-group-label">结构信号（浙商 8 维）</div>
+        <div class="ind-row-5 struct-row">
+          ${zsSig.sigs.map(s => `<div class="ind-card" title="${s.detail||''}"><div class="ind-label">${s.name}</div><div class="ind-value" style="color:${s.bull?'var(--sig-bull)':s.bear?'var(--sig-bear)':'var(--muted)'}">${s.val}</div><div class="ind-sub">${s.detail||'—'}</div></div>`).join('')}
+        </div>
         <div class="section-title">期现关系</div>
         <div class="ctd-box"><div class="ctd-label">最便宜可交割债券 CTD</div><div class="ctd-code">${ind.ctd_bond || '—'}</div></div>
         <div class="ind-row">
@@ -22160,8 +22160,8 @@ function renderAll() {
       </div></div>`;
   }
   document.getElementById('contractsGrid').innerHTML =
-    contractPanel('', '十年期国债期货', 'TZL.CFE', tData, D.indicators_t) +
-    contractPanel('', '三十年期国债期货', 'TLZL2.CFE', tlData, D.indicators_tl);
+    contractPanel('十年期国债期货', 'TZL.CFE', tData, D.indicators_t, tSignal) +
+    contractPanel('三十年期国债期货', 'TLZL2.CFE', tlData, D.indicators_tl, tlSignal);
 
   // Risk Grid
   document.getElementById('riskGrid').innerHTML = risks.map(r =>
