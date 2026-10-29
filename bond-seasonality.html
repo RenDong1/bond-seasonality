@@ -95,8 +95,12 @@ select:focus{outline:none;border-color:var(--violet)}
 .stat-card .value{font-family:var(--sans);font-size:var(--t-figure);font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums}
 .modal .value.down{color:var(--sig-bull)}
 .modal .value.up{color:var(--sig-bear)}
-.charts-row{display:flex;gap:20px;flex-wrap:wrap}
+.charts-row{display:flex;gap:20px;flex-wrap:wrap;position:relative}
 .charts-row>div{flex:1;min-width:360px}
+.trend-loading{height:100%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:var(--t-small);color:var(--muted)}
+#modal-load{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;
+  background:rgba(251,252,253,.94);font-family:var(--serif);font-size:var(--t-small);color:var(--muted)}
 .hidden{display:none!important}
 @media(max-width:700px){
   .upcoming-head{align-items:flex-start}
@@ -125,7 +129,7 @@ select:focus{outline:none;border-color:var(--violet)}
 </head>
 <body data-site="inner" data-page="bond-seasonality">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 10:13</span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 10:43</span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html" class="active" aria-current="page">季节性全景复盘</a><a href="treasury-futures.html">国债期货日报</a><a href="stock-bond-monitor.html">股债联动</a><a href="yield-seasonality.html">收益率与期限利差季节图</a><a href="bond-flow-lead.html">净买入领先分析</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">债市信号评价</a><a href="bond-alert.html">债市预警</a></div></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
 <!--NAV_END-->
@@ -232,6 +236,137 @@ select:focus{outline:none;border-color:var(--violet)}
 <script src="bond-seasonality-data.js"></script>
 <script>
 
+// ===== 数据展开（紧凑格式 v3，见 scripts/rebuild_html.py）=====
+// 首屏只下发 core：统计量按交易日键压成定长数组，heatmap 单元格与事件表由它现算；
+// 各年走势序列（yields/spreads）与 heatmap 的逐年数值放在 bond-seasonality-series.js，
+// 首屏渲染后异步加载。逐年数值不单独下发：它等于「当日未来 10 个交易日变化」在
+// 自然日上 ffill（见 applySeries），可由序列现算，与 compute_seasonality 逐格一致
+// （rebuild_html.py 末尾有同算法的离线自检）。
+(function(d){
+  if(!d||d.v!==3||!d.stats)return;
+  var M=d.mds, st=d.stats, out={};
+  for(var s in st){
+    var dst={};
+    for(var i=0;i<M.length;i++){
+      var e=st[s][i];
+      if(e) dst[M[i]]={a:e[0],m:e[1],d:e[2],u:e[3],n:e[4],y:null};
+    }
+    out[s]=dst;
+  }
+  d.heatmap=out;
+  // 事件表规则与 compute_seasonality.py 一致；排序用稳定排序，同概率时次序与原版相同
+  var ev=[];
+  for(var c in out) for(var k in out[c]){
+    var t=out[c][k];
+    if(t.n<5)continue;
+    if(t.d>=0.70) ev.push({series:c,date:k,direction:'下行',probability:t.d,avg_change:t.a,median_change:t.m,n_years:t.n});
+    else if(t.u>=0.70) ev.push({series:c,date:k,direction:'上行',probability:t.u,avg_change:t.a,median_change:t.m,n_years:t.n});
+  }
+  ev.sort(function(a,b){return b.probability-a.probability;});
+  d.events=ev;
+})(window.DATA);
+
+var __seriesP=null;
+function ensureSeries(){
+  if(window.DATA_SERIES){ applySeries(); return Promise.resolve(); }
+  if(!__seriesP){
+    __seriesP=new Promise(function(res,rej){
+      var sc=document.createElement('script');
+      sc.src='bond-seasonality-series.js';
+      sc.onload=function(){ try{applySeries();}catch(e){} res(); };
+      sc.onerror=function(){ __seriesP=null; rej(new Error('series load failed')); };
+      document.head.appendChild(sc);
+    });
+  }
+  return __seriesP;
+}
+
+// 2 位小数、半向 +∞——与 Python round_half_up 同口径
+function jsR2(x){return (x>=0?Math.floor(x*100+0.5):-Math.floor(-x*100+0.5))/100;}
+
+function applySeries(){
+  var S=window.DATA_SERIES, d=window.DATA;
+  if(!S||S.v!==3||d.__seriesDone)return;
+  d.__seriesDone=true;
+
+  // 1) 并集交易日历（收益率与利差共用）
+  var yrs=[];
+  for(var yk in S.cal) yrs.push(+yk);
+  yrs.sort(function(a,b){return a-b;});
+  var tU=[], uIdx={};
+  yrs.forEach(function(y){
+    S.cal[String(y)].forEach(function(md){
+      uIdx[y+'-'+md]=tU.length;
+      tU.push(Date.UTC(y,+md.slice(0,2)-1,+md.slice(3)));
+    });
+  });
+
+  // 2) 按年序列展开成 [mm-dd, 值] 数组（弹层走势图用）
+  function expand(src){
+    var out={};
+    for(var col in src){
+      out[col]={};
+      for(var yr in src[col]){
+        var arr=src[col][yr], cal=S.cal[yr];
+        var pos={}; for(var j=0;j<cal.length;j++) pos[cal[j]]=j;
+        var st=pos[arr[0]], pts=[];
+        for(var i=1;i<arr.length;i++) pts.push([cal[st+i-1],arr[i]]);
+        out[col][yr]=pts;
+      }
+    }
+    return out;
+  }
+  d.yields_by_year=expand(S.yields_by_year);
+  d.spreads_by_year=expand(S.spreads_by_year);
+
+  // 3) heatmap 逐年数值 y：并集日历上 shift(-10) 得每日变化，再按自然日 ffill
+  //    （等价于「该日未来 10 个交易日变化」；收益率 ×100 转 bp，利差本身是 bp）
+  function colChanges(col,src,isYld){
+    var rows=src[col], vals=new Float64Array(tU.length); vals.fill(NaN);
+    for(var yr in rows){
+      var arr=rows[yr], cal=S.cal[yr], st=cal.indexOf(arr[0]);
+      for(var i=1;i<arr.length;i++) vals[uIdx[yr+'-'+cal[st+i-1]]]=arr[i];
+    }
+    var ct=[], cv=[], first=NaN, last=NaN;
+    var i, v;
+    for(i=0;i<tU.length;i++){v=vals[i];if(v===v){if(first!==first)first=tU[i];last=tU[i];}}
+    for(i=0;i+10<tU.length;i++){
+      var a=vals[i], b=vals[i+10];
+      if(a!==a||b!==b)continue;
+      ct.push(tU[i]); cv.push(isYld?(b-a)*100:(b-a));
+    }
+    return {t:ct,v:cv,first:first,last:last};
+  }
+  function at(ch,t){      // 最后一个变化日 ≤ t 的取值（ffill）
+    var lo=0,hi=ch.t.length-1,r=-1;
+    while(lo<=hi){var mid=(lo+hi)>>1;if(ch.t[mid]<=t){r=mid;lo=mid+1;}else hi=mid-1;}
+    return r<0?null:ch.v[r];
+  }
+  Object.keys(d.heatmap).forEach(function(key){
+    var base=key.replace(/_chg10$/,'');
+    var isYld=!!S.yields_by_year[base];
+    var src=isYld?S.yields_by_year[base]:S.spreads_by_year[base];
+    if(!src)return;
+    var ch=colChanges(base,isYld?S.yields_by_year:S.spreads_by_year,isYld);
+    if(!ch.t.length)return;
+    var grid=d.heatmap[key];
+    for(var k=0;k<d.mds.length;k++){
+      var md=d.mds[k], cell=grid[md];
+      if(!cell)continue;
+      var em=+md.slice(0,2), ed=+md.slice(3), yy={};
+      for(var yi=0;yi<d.years.length;yi++){
+        var y=d.years[yi], tt=Date.UTC(y,em-1,ed);
+        var dt=new Date(tt);
+        if(dt.getUTCMonth()!==em-1||dt.getUTCDate()!==ed)continue;   // 2-29 非闰年
+        if(tt<ch.first||tt>ch.last)continue;
+        var vv=at(ch,tt);
+        if(vv!==null)yy[y]=jsR2(vv);
+      }
+      cell.y=yy;
+    }
+  });
+}
+
 // 动态更新数据范围显示
 (function(){
   var m=DATA.metadata||{};
@@ -258,6 +393,7 @@ function classifyEvent(s){
 }
 
 let curCat='all',curMonth=0,curProb=0.7,curDir='all',curSeriesFilter='all';
+var curModal=null;   // 当前弹层目标：走势数据异步到达后，据此判断是否还要画
 
 function filterEvents(){
     return DATA.events.filter(e=>{
@@ -409,6 +545,28 @@ function showDetail(series,mdKey){
         '<div class="stat-card"><div class="label">上行概率</div><div class="value up">'+(s.u*100).toFixed(0)+'%</div></div>'+
         '<div class="stat-card"><div class="label">平均变化</div><div class="value '+(s.a<0?'down':s.a>0?'up':'')+'">'+sgn(s.a,1)+'bp</div></div>'+
         '<div class="stat-card"><div class="label">样本年数</div><div class="value">'+s.n+'</div></div>';
+    curModal={series:series,mdKey:mdKey};
+    var ld=document.getElementById('modal-load');
+    if(ld)ld.parentNode.removeChild(ld);
+    // 走势序列还在后台加载：先遮一层提示，到齐后再画两张图
+    if(!s.y||!Object.keys(s.y).length){
+        var row=document.querySelector('#modal .charts-row');
+        ld=document.createElement('div');ld.id='modal-load';ld.textContent='各年走势加载中…';
+        row.appendChild(ld);
+        ensureSeries().then(function(){
+            if(curModal&&curModal.series===series&&curModal.mdKey===mdKey) drawModalCharts(series,mdKey);
+        },function(){
+            if(ld.parentNode)ld.textContent='走势数据加载失败，请稍后重试';
+        });
+        return;
+    }
+    drawModalCharts(series,mdKey);
+}
+
+function drawModalCharts(series,mdKey){
+    var ld=document.getElementById('modal-load');
+    if(ld&&ld.parentNode)ld.parentNode.removeChild(ld);
+    var s=DATA.heatmap[series][mdKey];
     var yrs=Object.keys(s.y).sort();
     var vals=yrs.map(function(y){return s.y[y];});
     var c1=echarts.init(document.getElementById('modal-chart'));
@@ -424,97 +582,100 @@ function showDetail(series,mdKey){
             label:{show:true,fontSize:10,color:'#66665B',formatter:function(p){return sgn(p.value,1);}}}],
         grid:{left:55,right:15,top:35,bottom:25}
     },true);   // notMerge：弹层复用时清掉上一次的系列，避免不同曲线的年份残留
+    drawTrendChart(series,mdKey);
+}
+
+function drawTrendChart(series,mdKey){
     var base=series.replace('_chg10','');
     var yd=DATA.yields_by_year[base]||DATA.spreads_by_year[base];
-    if(yd){
-        /* 以所选日为基准：各年取离该日最近的交易日为 0 点，画前后各 20 个交易日的累计变化（bp）。
-           收益率序列单位为 %（×100 转 bp），利差序列本身就是 bp。 */
-        var isYld=!!DATA.yields_by_year[base];
-        var scale=isYld?100:1;
-        var tp=mdKey.split('-'), tM=parseInt(tp[0]), tD=parseInt(tp[1]);
-        var allYrs=Object.keys(yd).sort();
-        var y0=parseInt(allYrs[0]), y1=parseInt(allYrs[allYrs.length-1]);
-        var violetAt=function(t){t=Math.max(0,Math.min(1,t));
-            var a=[201,193,206],b=[74,62,82];
-            return 'rgb('+Math.round(a[0]+(b[0]-a[0])*t)+','+Math.round(a[1]+(b[1]-a[1])*t)+','+Math.round(a[2]+(b[2]-a[2])*t)+')';};
-        // 拼成跨年全序列，便于 1 月/12 月的窗口越过年初年末
-        var full=[];
-        allYrs.forEach(function(yr){
-            yd[yr].forEach(function(p){
-                var md=p[0].split('-');
-                full.push({d:yr+'-'+p[0],y:parseInt(yr),
-                    t:Date.UTC(parseInt(yr),parseInt(md[0])-1,parseInt(md[1])),v:p[1]});
-            });
+    if(!yd)return;
+    /* 以所选日为基准：各年取离该日最近的交易日为 0 点，画前后各 20 个交易日的累计变化（bp）。
+       收益率序列单位为 %（×100 转 bp），利差序列本身就是 bp。 */
+    var isYld=!!DATA.yields_by_year[base];
+    var scale=isYld?100:1;
+    var tp=mdKey.split('-'), tM=parseInt(tp[0]), tD=parseInt(tp[1]);
+    var allYrs=Object.keys(yd).sort();
+    var y0=parseInt(allYrs[0]), y1=parseInt(allYrs[allYrs.length-1]);
+    var violetAt=function(t){t=Math.max(0,Math.min(1,t));
+        var a=[201,193,206],b=[74,62,82];
+        return 'rgb('+Math.round(a[0]+(b[0]-a[0])*t)+','+Math.round(a[1]+(b[1]-a[1])*t)+','+Math.round(a[2]+(b[2]-a[2])*t)+')';};
+    // 拼成跨年全序列，便于 1 月/12 月的窗口越过年初年末
+    var full=[];
+    allYrs.forEach(function(yr){
+        yd[yr].forEach(function(p){
+            var md=p[0].split('-');
+            full.push({d:yr+'-'+p[0],y:parseInt(yr),
+                t:Date.UTC(parseInt(yr),parseInt(md[0])-1,parseInt(md[1])),v:p[1]});
         });
-        var X=[];
-        for(var o=-20;o<=20;o++)X.push(String(o));
-        var curYear=String(new Date().getFullYear());
-        var tSeries=[],legendYrs=[],datesByYear={};
-        allYrs.forEach(function(yr){
-            var yi=parseInt(yr);
-            var start=-1,end=-1;
-            for(var i=0;i<full.length;i++){if(full[i].y===yi){if(start<0)start=i;end=i;}}
-            if(start<0)return;
-            // 当年内离目标月日最近的交易日；等距时取较早的（与原统计的 ffill 口径一致）
-            var target=Date.UTC(yi,tM-1,tD);
-            var bi=start,best=Math.abs(full[start].t-target);
-            for(i=start+1;i<=end;i++){
-                var dist=Math.abs(full[i].t-target);
-                if(dist<best){best=dist;bi=i;}
-            }
-            // 该年数据离目标日太远（如数据从这个月才开始、或当年数据尚未到该月）则不画，
-            // 否则会把年中/年末的缺口误当成基准日
-            if(best>10*86400000)return;
-            var vals=new Array(X.length).fill(null),drows={},has=false;
-            for(var k=Math.max(0,bi-20);k<=Math.min(full.length-1,bi+20);k++){
-                var off=k-bi;
-                vals[off+20]=Math.round((full[k].v-full[bi].v)*scale*100)/100;
-                drows[off+20]=full[k].d;
-                has=true;
-            }
-            if(!has)return;
-            legendYrs.push(yr);datesByYear[yr]=drows;
-            tSeries.push({name:yr,type:'line',data:vals,connectNulls:false,
-                lineStyle:{width:yr===curYear?2.5:1},
-                itemStyle:{color:yr===curYear?'#42423A':violetAt((yi-y0)/Math.max(1,y1-y0))},
-                symbol:'none',emphasis:{lineStyle:{width:2.5},focus:'series'}});
-        });
-        if(tSeries.length){
-            tSeries[0].markLine={silent:true,symbol:'none',label:{show:false},
-                lineStyle:{color:'#B9C5CF',width:0.5,type:'dashed'},
-                data:[{yAxis:0},{xAxis:'0'}]};
+    });
+    var X=[];
+    for(var o=-20;o<=20;o++)X.push(String(o));
+    var curYear=String(new Date().getFullYear());
+    var tSeries=[],legendYrs=[],datesByYear={};
+    allYrs.forEach(function(yr){
+        var yi=parseInt(yr);
+        var start=-1,end=-1;
+        for(var i=0;i<full.length;i++){if(full[i].y===yi){if(start<0)start=i;end=i;}}
+        if(start<0)return;
+        // 当年内离目标月日最近的交易日；等距时取较早的（与原统计的 ffill 口径一致）
+        var target=Date.UTC(yi,tM-1,tD);
+        var bi=start,best=Math.abs(full[start].t-target);
+        for(i=start+1;i<=end;i++){
+            var dist=Math.abs(full[i].t-target);
+            if(dist<best){best=dist;bi=i;}
         }
-        var c2=echarts.init(document.getElementById('modal-trend'));
-        c2.setOption({
-            title:{text:formatName(base)+' 前后 20 个交易日变化（基准：'+mdLabel(mdKey)+'）',textStyle:{fontSize:13,fontWeight:600,color:'#42423A'}},
-            tooltip:{trigger:'axis',axisPointer:{type:'line'},confine:true,
-                formatter:function(ps){
-                    if(!ps||!ps.length)return '';
-                    var idx=ps[0].dataIndex,cells=[];
-                    ps.forEach(function(p){
-                        if(p.value==null)return;
-                        var dt=(datesByYear[p.seriesName]||{})[idx]||'';
-                        var v=p.value;
-                        var col=v>0?'#1E6B43':v<0?'#B8352C':'#66665B';
-                        cells.push(dt+' <b style="color:'+col+'">'+(v>0?'+':'')+v.toFixed(2)+'bp</b>');
-                    });
-                    // 双列表格：20 年也压在 10 行内，且不受 tooltip 默认 nowrap 影响
-                    var html='<table style="font-size:11px;line-height:1.65;border-collapse:collapse">';
-                    for(var i=0;i<cells.length;i+=2){
-                        html+='<tr><td style="padding-right:16px;white-space:nowrap">'+cells[i]+'</td><td style="white-space:nowrap">'+(cells[i+1]||'')+'</td></tr>';
-                    }
-                    return html+'</table>';
-                }},
-            legend:{data:legendYrs.slice().reverse(),type:'scroll',orient:'vertical',right:4,top:28,
-                pageButtonPosition:'start',itemWidth:14,itemHeight:8,itemGap:6,textStyle:{fontSize:10}},
-            xAxis:{type:'category',data:X,boundaryGap:false,
-                // 函数间隔：固定每 5 个标签显示一次（-20、-15…基准…+20），避免轴自适应挑出 -9/+2 这类怪标签
-                axisLabel:{interval:function(i){return i%5===0;},fontSize:11,
-                    formatter:function(v){var n=parseInt(v);return n===0?'基准':(n>0?'+'+n:String(n));}}},
-            yAxis:{type:'value',name:'bp',scale:true},
-            series:tSeries,grid:{left:55,right:90,top:35,bottom:28}
-        },true);   // notMerge：换曲线/换年份集合时不合并旧系列
+        // 该年数据离目标日太远（如数据从这个月才开始、或当年数据尚未到该月）则不画，
+        // 否则会把年中/年末的缺口误当成基准日
+        if(best>10*86400000)return;
+        var vals=new Array(X.length).fill(null),drows={},has=false;
+        for(var k=Math.max(0,bi-20);k<=Math.min(full.length-1,bi+20);k++){
+            var off=k-bi;
+            vals[off+20]=Math.round((full[k].v-full[bi].v)*scale*100)/100;
+            drows[off+20]=full[k].d;
+            has=true;
+        }
+        if(!has)return;
+        legendYrs.push(yr);datesByYear[yr]=drows;
+        tSeries.push({name:yr,type:'line',data:vals,connectNulls:false,
+            lineStyle:{width:yr===curYear?2.5:1},
+            itemStyle:{color:yr===curYear?'#42423A':violetAt((yi-y0)/Math.max(1,y1-y0))},
+            symbol:'none',emphasis:{lineStyle:{width:2.5},focus:'series'}});
+    });
+    if(tSeries.length){
+        tSeries[0].markLine={silent:true,symbol:'none',label:{show:false},
+            lineStyle:{color:'#B9C5CF',width:0.5,type:'dashed'},
+            data:[{yAxis:0},{xAxis:'0'}]};
     }
+    var c2=echarts.init(document.getElementById('modal-trend'));
+    c2.setOption({
+        title:{text:formatName(base)+' 前后 20 个交易日变化（基准：'+mdLabel(mdKey)+'）',textStyle:{fontSize:13,fontWeight:600,color:'#42423A'}},
+        tooltip:{trigger:'axis',axisPointer:{type:'line'},confine:true,
+            formatter:function(ps){
+                if(!ps||!ps.length)return '';
+                var idx=ps[0].dataIndex,cells=[];
+                ps.forEach(function(p){
+                    if(p.value==null)return;
+                    var dt=(datesByYear[p.seriesName]||{})[idx]||'';
+                    var v=p.value;
+                    var col=v>0?'#1E6B43':v<0?'#B8352C':'#66665B';
+                    cells.push(dt+' <b style="color:'+col+'">'+(v>0?'+':'')+v.toFixed(2)+'bp</b>');
+                });
+                // 双列表格：20 年也压在 10 行内，且不受 tooltip 默认 nowrap 影响
+                var html='<table style="font-size:11px;line-height:1.65;border-collapse:collapse">';
+                for(var i=0;i<cells.length;i+=2){
+                    html+='<tr><td style="padding-right:16px;white-space:nowrap">'+cells[i]+'</td><td style="white-space:nowrap">'+(cells[i+1]||'')+'</td></tr>';
+                }
+                return html+'</table>';
+            }},
+        legend:{data:legendYrs.slice().reverse(),type:'scroll',orient:'vertical',right:4,top:28,
+            pageButtonPosition:'start',itemWidth:14,itemHeight:8,itemGap:6,textStyle:{fontSize:10}},
+        xAxis:{type:'category',data:X,boundaryGap:false,
+            // 函数间隔：固定每 5 个标签显示一次（-20、-15…基准…+20），避免轴自适应挑出 -9/+2 这类怪标签
+            axisLabel:{interval:function(i){return i%5===0;},fontSize:11,
+                formatter:function(v){var n=parseInt(v);return n===0?'基准':(n>0?'+'+n:String(n));}}},
+        yAxis:{type:'value',name:'bp',scale:true},
+        series:tSeries,grid:{left:55,right:90,top:35,bottom:28}
+    },true);   // notMerge：换曲线/换年份集合时不合并旧系列
 }
 
 function closeModal(){document.getElementById('modal').classList.remove('show');}
@@ -647,6 +808,8 @@ function renderCalendar(){
     document.getElementById('modal').addEventListener('click',function(e){if(e.target===e.currentTarget)closeModal();});
     updateSeriesDropdown();
     renderEvents();
+    // 首屏渲染完成后再拉各年走势序列（约 1MB，不阻塞首屏）；点开详情时若还没到就等它
+    setTimeout(function(){ensureSeries();},600);
 })();
 
 </script>
