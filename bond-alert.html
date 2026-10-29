@@ -23,6 +23,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 .stat-card .value.bear{color:#1b5e20}
 .stat-card .value.neu{color:#546e7a}
 .stat-card .delta{font-size:11.5px;color:#888;margin-top:6px;line-height:1.5}
+.stat-card .delta .bull{color:#b71c1c;font-weight:600}
+.stat-card .delta .bear{color:#1b5e20;font-weight:600}
 .panel{background:white;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:16px}
 .panel h2{font-size:15px;margin-bottom:14px;color:#1a237e}
 .panel h3.sub{font-size:13px;margin:16px 0 8px;color:#37474f}
@@ -67,7 +69,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 </head>
 <body data-site="inner" data-page="bond-alert">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-10-29 14:39</span><span class="site-stamp site-stamp-data">数据截至 2026-10-27</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-10-29 15:12</span><span class="site-stamp site-stamp-data">数据截至 2026-10-27</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html" class="active" aria-current="page">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html" class="active" aria-current="page">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -115,7 +117,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 
 <div class="panel method">
 <h2>模型与数据说明</h2>
-<p><b>超涨超跌</b>：指标 1 = 利率债全价(7-10年) 20日涨幅 − 信用债总全价 20日涨幅；指标 2 = 长期债券全价 20日涨幅 − 中短期债券全价 20日涨幅；指标 3 = 债券综合全价 20日涨幅；指标 4 同指标 3 的 40 日涨幅（仅展示，不参与综合）。每个指标取最近 <code>1197</code> 个观测的 98% / 3% 分位作为阈值，突破上阈记为看空（超涨回调），跌破下阈记为看多（超跌反弹）；综合信号分“任一指标触发”与“≥2 个指标同向触发”两档。</p>
+<p><b>超涨超跌</b>：利率债-信用债指数（20日）= 利率债全价(7-10年) 20日涨幅 − 信用债总全价 20日涨幅；中长债-短债指数（20日）= 长期债券全价 20日涨幅 − 中短期债券全价 20日涨幅；债券综合指数（20日）= 债券综合全价 20日涨幅；债券综合指数（40日）= 债券综合全价 40 日涨幅（仅展示，不参与综合）。每个指标取最近 <code>1197</code> 个观测的 98% / 3% 分位作为阈值，突破上阈记为看空（超涨回调），跌破下阈记为看多（超跌反弹）；综合信号分“任一指标触发”与“≥2 个指标同向触发”两档。</p>
 <p><b>利率拐点</b>：六个指标分别为降息预期（FR007 IRS 1Y 20日均值 − FR007 20日均值）、10债-OMO 利差、隔夜杠杆（R001 成交量占比 20日均值，阈值反向）、10债-股息率分位差 10日均值、10债-大宗分位差 10日均值、风险偏好（创业板20日涨幅 − 红利20日涨幅 10日均值）。阈值冻结为 2016–2023 年 5% / 95% 分位；六个指标中≥2 个同向触发才给出综合信号。</p>
 <p><b>数据源</b>：中债登全价指数；本地收益率库（国债/国开/存单/资金利率）；中国货币网（FR007、回购成交、IRS）；天软 cjpy（创业板、红利指数）；中证指数（商品 CFCI、沪深300 股息率）。运行时 <b>零 Wind / 零 iFinD 额度</b>，每日 09:00 自动增量更新并重建本页。</p>
 <p><b>与 Excel 对账</b>：超涨超跌模型的指标值、分位、98%/3% 阈值与桌面 Excel 种子逐日完全一致（0 差异）；利率拐点模型的最新值、阈值、信号与 Excel 一致，历史少数日期的 Excel 缓存标记存在已知的公式拖拽错位，本页按实时重算结果展示。</p>
@@ -131,6 +133,11 @@ const fmt = (x, n=2) => (x === null || x === undefined || isNaN(x)) ? '—' : Nu
 const pct = x => (x === null || x === undefined) ? '—' : (x * 100).toFixed(1) + '%';
 const sig = s => s > 0 ? ['看多','bull'] : s < 0 ? ['看空','bear'] : ['中性','neu'];
 const badge = s => { const a = sig(s); return `<span class="badge ${a[1]}">${a[0]}</span>`; };
+const triggerNames = (inds, idx) => {
+  const hit = inds.map(x => ({name:x.name, flag:x.flags[idx]})).filter(x => x.flag !== 0);
+  if (!hit.length) return '无';
+  return hit.map(x => `${x.name} <b class="${sig(x.flag)[1]}">${sig(x.flag)[0]}</b>`).join('、');
+};
 const cls = v => v > 0 ? 'pos' : (v < 0 ? 'neg' : '');
 const charts = {};
 const zstate = {over:{start:0, end:100}, turn:{start:0, end:100}};
@@ -182,12 +189,12 @@ function renderSummary(){
   <div class="stat-card ${a1[1]}">
     <div class="label">超涨超跌，任一触发</div>
     <div class="value ${a1[1]}">${a1[0]}</div>
-    <div class="delta">≥2 确认：${sig(ge2)[0]}；历史累计看多 ${os.ge1.bull.count} / 看空 ${os.ge1.bear.count}</div>
+    <div class="delta">今日触发：${triggerNames(O.inds, oi)}<br>≥2 确认：${sig(ge2)[0]}；历史累计看多 ${os.ge1.bull.count} / 看空 ${os.ge1.bear.count}</div>
   </div>
   <div class="stat-card ${a2[1]}">
     <div class="label">利率拐点，综合（6选≥2）</div>
     <div class="value ${a2[1]}">${a2[0]}</div>
-    <div class="delta">今日触发 ${tcnt}/6 个指标；历史累计看多 ${ts.comp.bull.count} / 看空 ${ts.comp.bear.count}</div>
+    <div class="delta">今日触发 ${tcnt}/6：${triggerNames(T.inds, ti)}<br>历史累计看多 ${ts.comp.bull.count} / 看空 ${ts.comp.bear.count}</div>
   </div>
   <div class="stat-card">
     <div class="label">10Y 国债收益率</div>
@@ -208,7 +215,7 @@ function renderToday(){
   const oi = O.dates.length - 1, ti = T.dates.length - 1;
   let h = '<thead><tr><th>指标</th><th class="num">最新值</th><th class="num">分位</th><th class="num">98%阈值</th><th class="num">3%阈值</th><th>信号</th></tr></thead><tbody>';
   for (const x of O.inds){
-    h += `<tr title="${x.desc||''}"><td>${x.id}. ${x.name}</td>
+    h += `<tr title="${x.desc||''}"><td>${x.name}</td>
       <td class="num">${fmt(x.values[oi],3)}</td><td class="num">${pct(x.rank[oi])}</td>
       <td class="num">${fmt(x.hi[oi],3)}</td><td class="num">${fmt(x.lo[oi],3)}</td>
       <td>${badge(x.flags[oi])}</td></tr>`;
@@ -219,7 +226,7 @@ function renderToday(){
 
   h = '<thead><tr><th>指标</th><th class="num">最新D (bp)</th><th class="num">低阈</th><th class="num">高阈</th><th>信号</th></tr></thead><tbody>';
   for (const x of T.inds){
-    h += `<tr title="${x.formula||''}"><td>${x.id}. ${x.name}${x.reversed?'<span class="tag">反向</span>':''}</td>
+    h += `<tr title="${x.formula||''}"><td>${x.name}${x.reversed?'<span class="tag">反向</span>':''}</td>
       <td class="num">${fmt(x.values[ti],2)}</td><td class="num">${fmt(x.low,2)}</td>
       <td class="num">${fmt(x.high,2)}</td><td>${badge(x.flags[ti])}</td></tr>`;
   }
@@ -228,7 +235,8 @@ function renderToday(){
 }
 
 // ---------------- 超涨超跌 ----------------
-const OVER_SEL = [['1','指标1'],['2','指标2'],['3','指标3'],['4','指标4'],['c1','综合，任一'],['c2','综合，≥2']];
+const OVER_SEL = [...O.inds.map((x,i) => [String(i+1), x.name]),
+                  ['c1','综合，任一'],['c2','综合，≥2']];
 let overSel = '1';
 const overKey = k => k[0] === 'c' ? 'ge' + k[1] : k;
 const overFlags = k => k[0] === 'c' ? O.comp['ge'+k[1]].flags : O.inds[+k-1].flags;
@@ -326,7 +334,8 @@ function selectOver(k){
 }
 
 // ---------------- 利率拐点 ----------------
-const TURN_SEL = [['1','指标1'],['2','指标2'],['3','指标3'],['4','指标4'],['5','指标5'],['6','指标6'],['comp','综合，6选≥2']];
+const TURN_SEL = [...T.inds.map((x,i) => [String(i+1), x.name]),
+                  ['comp','综合，6选≥2']];
 let turnSel = '1';
 const turnFlags = k => k === 'comp' ? T.comp.flags : T.inds[+k-1].flags;
 const turnName = k => k === 'comp' ? '综合，6选≥2' : T.inds[+k-1].name;
