@@ -67,7 +67,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 </head>
 <body data-site="inner" data-page="bond-alert">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-28 21:49</span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 09:41</span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性全景复盘</a><a href="treasury-futures.html">国债期货日报</a><a href="stock-bond-monitor.html">股债联动</a><a href="yield-seasonality.html">收益率与期限利差季节图</a><a href="bond-flow-lead.html">净买入领先分析</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">债市信号评价</a><a href="bond-alert.html" class="active" aria-current="page">债市预警</a></div></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
 <!--NAV_END-->
@@ -192,7 +192,7 @@ function renderSummary(){
   <div class="stat-card">
     <div class="label">10Y 国债收益率</div>
     <div class="value" style="font-size:24px">${fmt(y0,4)}<span style="font-size:13px;color:#999;font-weight:400"> %</span></div>
-    <div class="delta">较前一交易日 <span class="${cls(dY)}">${dY===null?'—':(dY>0?'+':'')+fmt(dY,2)+' bp'}</span>，数据截至 ${O.dates[oi]}</div>
+    <div class="delta">较前一交易日 <span class="${cls(-dY)}">${dY===null?'—':(dY>0?'+':'')+fmt(dY,2)+' bp'}</span>，数据截至 ${O.dates[oi]}</div>
   </div>
   <div class="stat-card">
     <div class="label">数据更新</div>
@@ -260,10 +260,10 @@ function overChart(ind){
        lineStyle:{width:1,type:'dashed',color:'#749AB2'}, itemStyle:{color:'#749AB2'}},
       {name:'3%阈值', type:'line', data:ind.lo, showSymbol:false,
        lineStyle:{width:1,type:'dashed',color:'#769365'}, itemStyle:{color:'#769365'}},
-      {name:'看多信号', type:'scatter', symbol:'triangle', symbolSize:9,
-       data:ind.flags.map((f,i)=> f===1 ? [i, ind.values[i]] : null), itemStyle:{color:'#C23531'}},
-      {name:'看空信号', type:'scatter', symbol:'triangle', symbolRotate:180, symbolSize:9,
-       data:ind.flags.map((f,i)=> f===-1 ? [i, ind.values[i]] : null), itemStyle:{color:'#2E8B57'}}
+      {name:'看多信号', type:'scatter', symbol:'triangle', symbolSize:11,
+       data:ind.flags.map((f,i)=> f===1 ? [i, ind.values[i]] : null), itemStyle:{color:'#C23531',borderColor:'#FBFCFD',borderWidth:1}},
+      {name:'看空信号', type:'scatter', symbol:'triangle', symbolRotate:180, symbolSize:11,
+       data:ind.flags.map((f,i)=> f===-1 ? [i, ind.values[i]] : null), itemStyle:{color:'#2E8B57',borderColor:'#FBFCFD',borderWidth:1}}
     ]
   }, true);
 }
@@ -283,10 +283,10 @@ function yieldChart(id, dates, ys, flags, key){
     series:[
       {name:'10Y国债收益率', type:'line', data:ys, showSymbol:false,
        lineStyle:{width:1,color:'#546e7a'}, itemStyle:{color:'#546e7a'}},
-      {name:'看多信号', type:'scatter', symbol:'triangle', symbolSize:9,
-       data:flags.map((f,i)=> f===1 ? [i, ys[i]] : null), itemStyle:{color:'#C23531'}},
-      {name:'看空信号', type:'scatter', symbol:'triangle', symbolRotate:180, symbolSize:9,
-       data:flags.map((f,i)=> f===-1 ? [i, ys[i]] : null), itemStyle:{color:'#2E8B57'}}
+      {name:'看多信号', type:'scatter', symbol:'triangle', symbolSize:11,
+       data:flags.map((f,i)=> f===1 ? [i, ys[i]] : null), itemStyle:{color:'#C23531',borderColor:'#FBFCFD',borderWidth:1}},
+      {name:'看空信号', type:'scatter', symbol:'triangle', symbolRotate:180, symbolSize:11,
+       data:flags.map((f,i)=> f===-1 ? [i, ys[i]] : null), itemStyle:{color:'#2E8B57',borderColor:'#FBFCFD',borderWidth:1}}
     ]
   }, true);
 }
@@ -361,10 +361,10 @@ function turnChart(ind){
            {yAxis:ind.high, lineStyle:{type:'dashed',color:'#749AB2'},
             label:{formatter:'高阈 '+fmt(ind.high,2)}}
          ]}},
-      {name:'看多信号', type:'scatter', symbol:'triangle', symbolSize:9,
-       data:ind.flags.map((f,i)=> f===1 ? [i, ind.values[i]] : null), itemStyle:{color:'#C23531'}},
-      {name:'看空信号', type:'scatter', symbol:'triangle', symbolRotate:180, symbolSize:9,
-       data:ind.flags.map((f,i)=> f===-1 ? [i, ind.values[i]] : null), itemStyle:{color:'#2E8B57'}}
+      {name:'看多信号', type:'scatter', symbol:'triangle', symbolSize:11,
+       data:ind.flags.map((f,i)=> f===1 ? [i, ind.values[i]] : null), itemStyle:{color:'#C23531',borderColor:'#FBFCFD',borderWidth:1}},
+      {name:'看空信号', type:'scatter', symbol:'triangle', symbolRotate:180, symbolSize:11,
+       data:ind.flags.map((f,i)=> f===-1 ? [i, ind.values[i]] : null), itemStyle:{color:'#2E8B57',borderColor:'#FBFCFD',borderWidth:1}}
     ]
   }, true);
 }
