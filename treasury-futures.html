@@ -203,7 +203,7 @@
 <body data-site="inner" data-page="treasury-futures">
 
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 13:31</span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 13:43</span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性全景复盘</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货日报</a><a href="stock-bond-monitor.html">股债联动</a><a href="yield-seasonality.html">收益率与期限利差季节图</a><a href="bond-flow-lead.html">净买入领先分析</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">债市信号评价</a><a href="bond-alert.html">债市预警</a></div></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
 <!--NAV_END-->
@@ -21555,6 +21555,46 @@ function getIndicatorSignals(ind) {
   return sigs;
 }
 
+// ====== 技术指标卡片方向色（2026-10-29 用户要求：值按多空染红绿） ======
+// 判读口径与卡片下方 ind-sub 文字一致：多/强/上升/上方=红，空/弱/下降/下方=绿，中性/无方向不上色。
+// ATR、波动率是波动度指标，本身没有多空方向，保持中性色。
+function obvTrend(data, lookback) {
+  const lb = lookback || 20;
+  if (!data || data.length <= lb) return { dir: '', label: '—' };
+  let obv = 0;
+  const series = [];
+  for (let i = 1; i < data.length; i++) {
+    const c = data[i].c, pc = data[i - 1].c, v = data[i].v || 0;
+    if (c > pc) obv += v; else if (c < pc) obv -= v;
+    series.push(obv);
+  }
+  const cur = series[series.length - 1], past = series[series.length - 1 - lb];
+  const dir = cur > past ? 'bull' : cur < past ? 'bear' : '';
+  return { dir, label: dir === 'bull' ? '上行' : dir === 'bear' ? '下行' : '走平' };
+}
+
+function techDirs(ind, data) {
+  const d = {};
+  const num = v => (v == null || v === '' ? null : Number(v));
+  let v;
+  if ((v = num(ind.macd_diff)) != null) d.macd = v > 0 ? 'bull' : v > -0.1 ? '' : 'bear';
+  if ((v = num(ind.kdj_k)) != null) d.kdj = v > 85 ? 'bear' : v > 70 ? 'bull' : v > 30 ? '' : v > 15 ? 'bear' : 'bull';
+  if ((v = num(ind.rsi_6)) != null) d.rsi = v > 75 ? 'bear' : v > 60 ? 'bull' : v > 40 ? '' : v > 25 ? 'bear' : 'bull';
+  const bollSub = String(ind.boll_sub || '');
+  d.boll = /上方|远超中轨/.test(bollSub) ? 'bull' : /下方|远低/.test(bollSub) ? 'bear' : '';
+  d.atr = ''; d.vol = '';
+  if ((v = num(ind.cci)) != null) d.cci = v > 100 ? 'bear' : v < -100 ? 'bull' : '';
+  if ((v = num(ind.psy)) != null) d.psy = v > 75 ? 'bear' : v > 58 ? 'bull' : v < 25 ? 'bull' : v < 42 ? 'bear' : '';
+  if ((v = num(ind.bias)) != null) d.bias = v > 0.5 ? 'bear' : v > 0.15 ? 'bull' : v < -0.5 ? 'bull' : v < -0.15 ? 'bear' : '';
+  if ((v = num(ind.vr)) != null) d.vr = v > 300 ? 'bear' : v > 160 ? 'bull' : v < 60 ? 'bear' : '';
+  if ((v = num(ind.dma)) != null) d.dma = v > 0 ? 'bull' : v < 0 ? 'bear' : '';
+  if ((v = num(ind.trix)) != null) d.trix = v > 0 ? 'bull' : v < 0 ? 'bear' : '';
+  if ((v = num(ind.mtm)) != null) d.mtm = v > 0 ? 'bull' : v < 0 ? 'bear' : '';
+  if ((v = num(ind.mfi)) != null) d.mfi = v > 80 ? 'bear' : v > 50 ? 'bull' : v < 20 ? 'bull' : v < 50 ? 'bear' : '';
+  d.obv = obvTrend(data).dir;
+  return d;
+}
+
 // ====== RISK ASSESSMENT (浙商三层风险预警: 微观流动性+波动结构+趋势衰竭) ======
 function assessRisk(tSig, tlSig, tData, tlData) {
   const risks = [];
@@ -22117,6 +22157,9 @@ function renderAll() {
     const memberNet = ind.member_net;
     const netColor = memberNet == null ? 'var(--muted)' : memberNet > 0 ? 'var(--sig-bull)' : memberNet < 0 ? 'var(--sig-bear)' : 'var(--ink-2)';
     const netLabel = memberNet > 5000 ? '明显净多头' : (memberNet < -5000 ? '明显净空头' : (Math.abs(memberNet) < 500 ? '几乎完全对冲' : (memberNet > 0 ? '小幅净多' : '小幅净空')));
+    const dirs = techDirs(ind, data);                                  // 技术指标值按多空染色
+    const dc = k => dirs[k] === 'bull' ? ' style="color:var(--sig-bull)"' : dirs[k] === 'bear' ? ' style="color:var(--sig-bear)"' : '';
+    const obvT = obvTrend(data);
 
     return `<div class="contract-panel">
       <div class="contract-header"><h2>${name}</h2><span class="code">${code}</span></div>
@@ -22124,21 +22167,21 @@ function renderAll() {
         <div class="section-title">技术指标</div>
         <div class="ind-row-5">
           <div class="ind-card"><div class="ind-label">增仓信号（≥1.5万手）</div><div class="ind-value" style="color:${oiDelta==null?'var(--muted)':oiDelta>=OI_SURGE_THRESHOLD?'var(--sig-bull)':oiDelta<=-OI_SURGE_THRESHOLD?'var(--sig-bear)':'var(--muted)'}">${oiDelta!=null?(oiDelta>=0?'+':'')+fmtWan(oiDelta):'—'}</div><div class="ind-sub">${oiDelta==null?'—':oiDelta>=OI_SURGE_THRESHOLD?'大幅增仓':oiDelta<=-OI_SURGE_THRESHOLD?'大幅减仓':'正常波动'}</div></div>
-          <div class="ind-card"><div class="ind-label">MACD (DIFF)</div><div class="ind-value">${ind.macd_diff}</div><div class="ind-sub">${ind.macd_sub}</div></div>
-          <div class="ind-card"><div class="ind-label">KDJ (K值)</div><div class="ind-value">${ind.kdj_k}</div><div class="ind-sub">${ind.kdj_sub}</div></div>
-          <div class="ind-card"><div class="ind-label">RSI (6日)</div><div class="ind-value">${ind.rsi_6}</div><div class="ind-sub">${ind.rsi_sub}</div></div>
-          <div class="ind-card"><div class="ind-label">BOLL 中轨</div><div class="ind-value">${ind.boll_mid}</div><div class="ind-sub">${ind.boll_sub}</div></div>
-          <div class="ind-card"><div class="ind-label">ATR (14日)</div><div class="ind-value">${ind.atr_14}</div><div class="ind-sub">${ind.atr_sub}</div></div>
-          <div class="ind-card"><div class="ind-label">OBV 能量潮</div><div class="ind-value">${ind.obv}</div><div class="ind-sub">${ind.obv_sub}</div></div>
-          <div class="ind-card"><div class="ind-label">波动率</div><div class="ind-value">${ind.volatility != null ? ind.volatility : '—'}%</div><div class="ind-sub">${ind.vol_sub || '—'}</div></div>
-          <div class="ind-card"><div class="ind-label">CCI 顺势</div><div class="ind-value">${ind.cci != null ? ind.cci : '—'}</div><div class="ind-sub">${ind.cci_sub || '—'}</div></div>
-          <div class="ind-card"><div class="ind-label">PSY 心理线</div><div class="ind-value">${ind.psy != null ? ind.psy : '—'}</div><div class="ind-sub">${ind.psy_sub || '—'}</div></div>
-          <div class="ind-card"><div class="ind-label">BIAS 乖离率</div><div class="ind-value">${ind.bias != null ? ind.bias : '—'}</div><div class="ind-sub">${ind.bias_sub || '—'}</div></div>
-          <div class="ind-card"><div class="ind-label">VR 量比率</div><div class="ind-value">${ind.vr != null ? ind.vr : '—'}</div><div class="ind-sub">${ind.vr_sub || '—'}</div></div>
-          <div class="ind-card"><div class="ind-label">DMA 均线差</div><div class="ind-value">${ind.dma != null ? ind.dma : '—'}</div><div class="ind-sub">${ind.dma_sub || '—'}</div></div>
-          <div class="ind-card"><div class="ind-label">TRIX 三重平滑</div><div class="ind-value">${ind.trix != null ? ind.trix : '—'}</div><div class="ind-sub">${ind.trix_sub || '—'}</div></div>
-          <div class="ind-card"><div class="ind-label">MTM 动量</div><div class="ind-value">${ind.mtm != null ? ind.mtm : '—'}</div><div class="ind-sub">${ind.mtm_sub || '—'}</div></div>
-          <div class="ind-card"><div class="ind-label">MFI 资金流</div><div class="ind-value">${ind.mfi != null ? ind.mfi : '—'}</div><div class="ind-sub">${ind.mfi_sub || '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">MACD (DIFF)</div><div class="ind-value"${dc('macd')}>${ind.macd_diff}</div><div class="ind-sub">${ind.macd_sub}</div></div>
+          <div class="ind-card"><div class="ind-label">KDJ (K值)</div><div class="ind-value"${dc('kdj')}>${ind.kdj_k}</div><div class="ind-sub">${ind.kdj_sub}</div></div>
+          <div class="ind-card"><div class="ind-label">RSI (6日)</div><div class="ind-value"${dc('rsi')}>${ind.rsi_6}</div><div class="ind-sub">${ind.rsi_sub}</div></div>
+          <div class="ind-card"><div class="ind-label">BOLL 中轨</div><div class="ind-value"${dc('boll')}>${ind.boll_mid}</div><div class="ind-sub">${ind.boll_sub}</div></div>
+          <div class="ind-card"><div class="ind-label">ATR (14日)</div><div class="ind-value"${dc('atr')}>${ind.atr_14}</div><div class="ind-sub">${ind.atr_sub}</div></div>
+          <div class="ind-card"><div class="ind-label">OBV 能量潮</div><div class="ind-value"${dc('obv')}>${ind.obv}</div><div class="ind-sub">${ind.obv_sub}，20日${obvT.label}</div></div>
+          <div class="ind-card"><div class="ind-label">波动率</div><div class="ind-value"${dc('vol')}>${ind.volatility != null ? ind.volatility : '—'}%</div><div class="ind-sub">${ind.vol_sub || '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">CCI 顺势</div><div class="ind-value"${dc('cci')}>${ind.cci != null ? ind.cci : '—'}</div><div class="ind-sub">${ind.cci_sub || '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">PSY 心理线</div><div class="ind-value"${dc('psy')}>${ind.psy != null ? ind.psy : '—'}</div><div class="ind-sub">${ind.psy_sub || '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">BIAS 乖离率</div><div class="ind-value"${dc('bias')}>${ind.bias != null ? ind.bias : '—'}</div><div class="ind-sub">${ind.bias_sub || '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">VR 量比率</div><div class="ind-value"${dc('vr')}>${ind.vr != null ? ind.vr : '—'}</div><div class="ind-sub">${ind.vr_sub || '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">DMA 均线差</div><div class="ind-value"${dc('dma')}>${ind.dma != null ? ind.dma : '—'}</div><div class="ind-sub">${ind.dma_sub || '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">TRIX 三重平滑</div><div class="ind-value"${dc('trix')}>${ind.trix != null ? ind.trix : '—'}</div><div class="ind-sub">${ind.trix_sub || '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">MTM 动量</div><div class="ind-value"${dc('mtm')}>${ind.mtm != null ? ind.mtm : '—'}</div><div class="ind-sub">${ind.mtm_sub || '—'}</div></div>
+          <div class="ind-card"><div class="ind-label">MFI 资金流</div><div class="ind-value"${dc('mfi')}>${ind.mfi != null ? ind.mfi : '—'}</div><div class="ind-sub">${ind.mfi_sub || '—'}</div></div>
         </div>
         <div class="ind-group-label">结构信号（浙商 8 维）</div>
         <div class="ind-row-5 struct-row">
