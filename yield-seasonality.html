@@ -205,9 +205,9 @@ body .evStatsT{width:100%;min-width:760px;border-collapse:collapse;font-size:var
 </head>
 <body data-site="inner" data-page="yield-seasonality">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 09:55</span></div></div>
-<nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html" class="active" aria-current="page">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></div></nav>
-<script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-10-29 14:39</span><span class="site-stamp site-stamp-data">数据截至 2026-10-28</span></span></div></div>
+<nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html" class="active" aria-current="page">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html" class="active" aria-current="page">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
+<script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
 <div class="wrap">
   <header class="page-head">
@@ -605,11 +605,12 @@ function reviewPanelHTML(){
     <span class="fld" style="margin-left:8px">事件复盘</span><span class="catBox"></span>
     <span class="catTools"><button class="miniBtn allCats">全选</button><button class="miniBtn noCats">清空</button></span>
     <label class="chip" title="叠加实施日（默认只显示公告/会议日）"><input type="checkbox" class="showImpl">显示实施日</label>
+    <label class="chip" title="在图上标注事件文字；默认只显示圆点，悬停查看"><input type="checkbox" class="showLabels">事件文字</label>
   </div>
   <div class="revSplit">
     <div class="card revMain">
       <div class="cardhead"><h2>债市复盘：真实时间序列</h2><span class="revCount"></span></div>
-      <div class="note">横轴 = 真实日期；可多选国债/国开收益率曲线（1Y~30Y）。事件点标在已选曲线上（点越大 = 同日事件越多），文字贴在事件点旁（拥挤时省略，悬停看全部），勾选「显示实施日」后叠加实施日。悬停显示当日数值与事件，点右侧清单或图中事件文字可定位。</div>
+      <div class="note">横轴 = 真实日期；可多选国债/国开收益率曲线（1Y~30Y）。事件默认只显示圆点（点越大 = 同日事件越多），悬停查看当日数值与全部事件；勾选「事件文字」后在图上标注。勾选「显示实施日」后叠加实施日。点右侧清单可定位事件。</div>
       <div class="evLegend"><span><i class="evDotSm"></i>公告/会议（点越大 = 同日事件越多）</span><span><i class="evDotSm hollow"></i>实施日（由上方开关控制）</span></div>
       <div class="revBox">
         <div class="chart revChart"></div>
@@ -643,7 +644,8 @@ function makeReviewPanel(RV){
   const $ = s => host.querySelector(s);
   const R = { curveBox:$('.curveBox'), catBox:$('.catBox'), startEl:$('.startDate'),
               endEl:$('.endDate'), chartEl:$('.revChart'), evList:$('.evList'), evWrap:$('.evWrap'),
-              impl:$('.showImpl'), rng:$('.rngBox'), revCount:$('.revCount'), evCnt:$('.evCnt') };
+              impl:$('.showImpl'), labels:$('.showLabels'), rng:$('.rngBox'),
+              revCount:$('.revCount'), evCnt:$('.evCnt') };
   const chart = echarts.init(R.chartEl);
   const STAT = RV.evStats || null;
   let statMode = 'ann';
@@ -663,7 +665,7 @@ function makeReviewPanel(RV){
 
   const st = { curves:new Set(['国债10Y','国开10Y']),
                cats:new Set(defaultCat ? [defaultCat] : []),
-               start:firstD, end:lastD, showImpl:false,
+               start:firstD, end:lastD, showImpl:false, showLabels:false,
                zoom:{start:0,end:100}, focus:null };
 
   // 9 个当前类别全部固定色；未来新增类别按名称哈希取色（顺序变化不漂移）
@@ -721,6 +723,7 @@ function makeReviewPanel(RV){
   function layoutEventLabels(groups){
     const wrap = R.evWrap;
     wrap.innerHTML = '';
+    if (!st.showLabels) return;          // 默认只显示圆点，标签改为按需开启
     const cs = chart.getModel().getComponent('grid', 0);
     if (!cs) return;
     const rect = cs.coordinateSystem.getRect();       // 绘图区像素 {x,y,width,height}
@@ -1131,6 +1134,7 @@ function makeReviewPanel(RV){
     st.cats = new Set(); buildChips(); render(false);
   });
   R.impl.addEventListener('change', () => { st.showImpl = R.impl.checked; render(false); });
+  R.labels.addEventListener('change', () => { st.showLabels = R.labels.checked; layoutEventLabels(lastGroups); });
   host.querySelector('.evStatsSeg').addEventListener('click', ev => {
     const b = ev.target.closest('button[data-t]'); if (!b) return;
     statMode = b.dataset.t;
@@ -1215,7 +1219,7 @@ window.addEventListener('resize', () => {
 });
 </script>
 <!--FOOTER_START-->
-<footer class="site-footer"><div class="site-wrap"><span>数据来源 中国货币网 / 同花顺 iFinD / 中债登</span><span>每日 09:00 自动更新</span></div></footer>
+<footer class="site-footer"><div class="site-wrap"><span>数据来源 中国货币网 / 同花顺 iFinD / 中债登</span><span class="site-footer-actions"><span>每日 09:00 自动更新</span><button class="glossary-open" type="button">术语与口径</button></span></div></footer>
 <!--FOOTER_END-->
 </body>
 </html>
