@@ -29,6 +29,15 @@
   --chart-air:var(--air);
   --chart-grid:#E7EEF3;
 
+  /* 方向语义（2026-10-28 定）：只分利好/利空，一律红绿，不再用紫蓝。
+     利好=红：收益率下行、利差压缩、看多、价格上行、净买入为正；
+     利空=绿：收益率上行、利差走扩、看空、价格下行。
+     文字用深一档保证对比度 ≥4.5:1，图表标记用金融标准红绿。 */
+  --sig-bull:#B8352C;
+  --sig-bear:#1E6B43;
+  --sig-bull-mark:#C23531;
+  --sig-bear-mark:#2E8B57;
+
   --serif:"Noto Serif SC Web","Noto Serif SC","Source Han Serif SC","Songti SC",serif;
   --sans:"Noto Sans SC Web","Noto Sans SC","Source Han Sans SC","Microsoft YaHei UI","Microsoft YaHei",sans-serif;
 
@@ -194,9 +203,15 @@ body[data-site="inner"] h1{
 .stat-card.hit{border-top:0;box-shadow:inset 0 2px 0 var(--violet)}
 .stat-card.hit:first-child{box-shadow:inset 0 2px 0 var(--violet)}
 
-/* 涨跌两色：紫色只做强调，绿色不做小字 */
-.pos,.up{color:var(--violet)}
-.neg,.down{color:var(--ink-2)}
+/* 方向两色：pos/up=红（利好、上行），neg/down=绿（利空、下行）。 */
+.pos,.up{color:var(--sig-bull)}
+.neg,.down{color:var(--sig-bear)}
+/* 季节性复盘的概率卡：类名指收益率方向，下行=利好红、上行=利空绿，与通用规则相反 */
+body[data-page="bond-seasonality"] .stat-card .value.down{color:var(--sig-bull)}
+body[data-page="bond-seasonality"] .stat-card .value.up{color:var(--sig-bear)}
+/* 句中的方向词（压缩/走扩、下行/上行）用同义类，避免和正负号类混用 */
+.t-bull{color:var(--sig-bull)}
+.t-bear{color:var(--sig-bear)}
 .muted,.dim{color:var(--muted)}
 
 /* 表格：宋体表头，数字等宽，0.5px 行线 */
@@ -323,16 +338,16 @@ body[data-page="signal-eval"] #usage{font-size:12px;color:var(--muted);line-heig
 #report .kpi span{font-family:var(--serif);font-size:12px;color:var(--muted)}
 #report .kpi b{font-family:var(--sans);font-size:var(--t-figure);font-weight:600;
   color:var(--ink);font-variant-numeric:tabular-nums;margin-top:2px}
-#report .kpi b.pos{color:#C23531}
-#report .kpi b.neg{color:#2E8B57}
+#report .kpi b.pos{color:var(--sig-bull)}
+#report .kpi b.neg{color:var(--sig-bear)}
 #report table{font-size:12px;border-collapse:collapse}
 #report th{background:none;border:0;border-bottom:var(--hair) solid var(--rule-strong);
   font-family:var(--serif);font-weight:500;color:var(--muted);
   padding:5px 7px;text-align:right}
 #report td{border:0;border-bottom:var(--hair) solid var(--rule);
   padding:4px 7px;font-variant-numeric:tabular-nums}
-#report td.pos{color:#C23531;background:none;font-weight:600}
-#report td.neg{color:#2E8B57;background:none;font-weight:600}
+#report td.pos{color:var(--sig-bull);background:none;font-weight:600}
+#report td.neg{color:var(--sig-bear);background:none;font-weight:600}
 #report .l3sub td,#report .l4sub td{background:var(--paper-3);font-family:var(--serif);
   font-weight:500;color:var(--ink-2)}
 #report .tip{color:var(--air)}
@@ -343,16 +358,21 @@ body[data-page="signal-eval"] #usage{font-size:12px;color:var(--muted);line-heig
 body[data-page="bond-alert"] .stat-card.bull,
 body[data-page="bond-alert"] .stat-card.bear,
 body[data-page="bond-alert"] .stat-card.neu{border-left-color:var(--rule)}
-body[data-page="bond-alert"] .stat-card .value.bull{color:#C23531}
-body[data-page="bond-alert"] .stat-card .value.bear{color:#2E8B57}
+body[data-page="bond-alert"] .stat-card .value.bull{color:var(--sig-bull)}
+body[data-page="bond-alert"] .stat-card .value.bear{color:var(--sig-bear)}
 body[data-page="bond-alert"] .stat-card .value.neu{color:var(--ink-2)}
 
+/* 信号徽标：方向用实心红绿，中性保持细线，扫表时一眼分出多空 */
 body[data-page="bond-alert"] .badge{
   background:none;border:var(--hair) solid var(--rule);border-radius:0;
   padding:1px 7px;font-size:11px;font-weight:500;letter-spacing:.02em;
 }
-body[data-page="bond-alert"] .badge.bull{background:none;border-color:#C23531;color:#C23531}
-body[data-page="bond-alert"] .badge.bear{background:none;border-color:#2E8B57;color:#2E8B57}
+body[data-page="bond-alert"] .badge.bull{
+  background:var(--sig-bull);border-color:var(--sig-bull);color:#fff;
+}
+body[data-page="bond-alert"] .badge.bear{
+  background:var(--sig-bear);border-color:var(--sig-bear);color:#fff;
+}
 body[data-page="bond-alert"] .badge.neu{background:none;border-color:var(--rule);color:var(--muted)}
 
 body[data-page="bond-alert"] .seg{
@@ -364,8 +384,8 @@ body[data-page="bond-alert"] .seg.active{
   background:var(--violet);border-color:var(--violet);color:#fff;
 }
 
-body[data-page="bond-alert"] .tbl .pos{color:#C23531}
-body[data-page="bond-alert"] .tbl .neg{color:#2E8B57}
+body[data-page="bond-alert"] .tbl .pos{color:var(--sig-bull)}
+body[data-page="bond-alert"] .tbl .neg{color:var(--sig-bear)}
 body[data-page="bond-alert"] .tbl .dim{color:var(--faint)}
 body[data-page="bond-alert"] .tbl .win{color:var(--ink);font-weight:600}
 body[data-page="bond-alert"] .tbl tbody tr:hover td{background:var(--paper-3)}
