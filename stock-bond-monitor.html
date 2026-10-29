@@ -35,7 +35,8 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
 .v-state{font-size:var(--t-figure);font-weight:600;line-height:1.3}
 .v-delta{font-size:var(--t-figure);font-weight:600;line-height:1.3;
   font-variant-numeric:tabular-nums;color:var(--ink-2)}
-.v-delta.emph{color:var(--violet)}
+.v-delta.emph{color:var(--sig-bull)}
+.container.mode-widen .v-delta.emph{color:var(--sig-bear)}
 .v-sub{font-size:var(--t-small);color:var(--muted);line-height:1.5;margin-top:4px}
 .v-primary .v-sub{color:rgba(255,255,255,.74)}
 .unit{font-size:var(--t-small);font-weight:400;color:var(--muted);margin-left:2px}
@@ -147,10 +148,10 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
   font-variant-numeric:tabular-nums;margin-top:2px}
 .track-grid .v .u{font-size:var(--t-small);color:var(--muted);font-weight:400;margin-left:2px}
 
-/* 涨跌强调：压缩页负值为信号，走扩页正值为信号；其余降为墨色 */
+/* 涨跌强调：压缩红、走扩绿（利差压缩=利好=红）；当前模式对应的信号侧着色 */
 .container .pos,.container .neg{color:var(--ink-2)}
-.container.mode-compress .neg{color:var(--violet)}
-.container.mode-widen .pos{color:var(--violet)}
+.container.mode-compress .neg{color:var(--sig-bull)}
+.container.mode-widen .pos{color:var(--sig-bear)}
 
 .note{font-size:var(--t-small);color:var(--muted);line-height:1.75;margin-top:10px}
 .empty{padding:24px 0;color:var(--muted);font-size:var(--t-small)}
@@ -199,7 +200,7 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
 </head>
 <body data-site="inner" data-page="stock-bond-monitor">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-28 21:48</span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 09:41</span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性全景复盘</a><a href="treasury-futures.html">国债期货日报</a><a href="stock-bond-monitor.html" class="active" aria-current="page">股债联动</a><a href="yield-seasonality.html">收益率与期限利差季节图</a><a href="bond-flow-lead.html">净买入领先分析</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">债市信号评价</a><a href="bond-alert.html">债市预警</a></div></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
 <!--NAV_END-->
@@ -499,6 +500,8 @@ function render(){
   }
   if (meta.roll_day) stateSub += '；最新交易日为换月日';
   $('v-state').textContent = stateTxt;
+  /* 进行中的事件方向是核心信号：压缩红、走扩绿；已结束/未触发保持墨色 */
+  $('v-state').className = 'v-state' + ((last && last.active) ? (isWiden ? ' t-bear' : ' t-bull') : '');
   $('v-state-sub').textContent = stateSub;
 
   var sr20 = num(cur.sr20);
