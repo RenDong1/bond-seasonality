@@ -125,7 +125,7 @@ select:focus{outline:none;border-color:var(--violet)}
 </head>
 <body data-site="inner" data-page="bond-seasonality">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 09:55</span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 10:13</span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html" class="active" aria-current="page">季节性全景复盘</a><a href="treasury-futures.html">国债期货日报</a><a href="stock-bond-monitor.html">股债联动</a><a href="yield-seasonality.html">收益率与期限利差季节图</a><a href="bond-flow-lead.html">净买入领先分析</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">债市信号评价</a><a href="bond-alert.html">债市预警</a></div></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
 <!--NAV_END-->
@@ -423,52 +423,97 @@ function showDetail(series,mdKey){
             barMaxWidth:26,
             label:{show:true,fontSize:10,color:'#66665B',formatter:function(p){return sgn(p.value,1);}}}],
         grid:{left:55,right:15,top:35,bottom:25}
-    });
+    },true);   // notMerge：弹层复用时清掉上一次的系列，避免不同曲线的年份残留
     var base=series.replace('_chg10','');
     var yd=DATA.yields_by_year[base]||DATA.spreads_by_year[base];
     if(yd){
-        var tMonth=parseInt(mdKey.split('-')[0]);
+        /* 以所选日为基准：各年取离该日最近的交易日为 0 点，画前后各 20 个交易日的累计变化（bp）。
+           收益率序列单位为 %（×100 转 bp），利差序列本身就是 bp。 */
+        var isYld=!!DATA.yields_by_year[base];
+        var scale=isYld?100:1;
+        var tp=mdKey.split('-'), tM=parseInt(tp[0]), tD=parseInt(tp[1]);
         var allYrs=Object.keys(yd).sort();
-        var y0=parseInt(allYrs[0]),y1=parseInt(allYrs[allYrs.length-1]);
+        var y0=parseInt(allYrs[0]), y1=parseInt(allYrs[allYrs.length-1]);
         var violetAt=function(t){t=Math.max(0,Math.min(1,t));
             var a=[201,193,206],b=[74,62,82];
             return 'rgb('+Math.round(a[0]+(b[0]-a[0])*t)+','+Math.round(a[1]+(b[1]-a[1])*t)+','+Math.round(a[2]+(b[2]-a[2])*t)+')';};
-        var allDatesSet=new Set();
-        var yrPtsMap={};
+        // 拼成跨年全序列，便于 1 月/12 月的窗口越过年初年末
+        var full=[];
         allYrs.forEach(function(yr){
-            var pts=yd[yr].filter(function(p){
-                var m=parseInt(p[0].split('-')[0]);
-                return m===tMonth;
+            yd[yr].forEach(function(p){
+                var md=p[0].split('-');
+                full.push({d:yr+'-'+p[0],y:parseInt(yr),
+                    t:Date.UTC(parseInt(yr),parseInt(md[0])-1,parseInt(md[1])),v:p[1]});
             });
-            yrPtsMap[yr]={};
-            pts.forEach(function(p){allDatesSet.add(p[0]);yrPtsMap[yr][p[0]]=p[1];});
         });
-        var unifiedDates=Array.from(allDatesSet).sort();
+        var X=[];
+        for(var o=-20;o<=20;o++)X.push(String(o));
         var curYear=String(new Date().getFullYear());
-        var tSeries=[];
-        var legendYrs=[]; // 仅本月实际有数据的年份才进入图例，避免空年份(如2018-07)残留
-        allYrs.forEach(function(yr,i){
-            // 该年在本月实际拥有数据的最后一个日期索引：线只画到这里，不向未来延伸
-            var lastIdx=-1;
-            for(var k=0;k<unifiedDates.length;k++){if(yrPtsMap[yr][unifiedDates[k]]!==undefined){lastIdx=k;}}
-            if(lastIdx<0)return;
-            var vals2=unifiedDates.map(function(d,k){
-                if(k>lastIdx)return null; // 超出该年已有数据范围，不渲染（防止错位/延伸到未来）
-                return yrPtsMap[yr][d]!==undefined?yrPtsMap[yr][d]:null;
-            });
-            legendYrs.push(yr);
-            tSeries.push({name:yr,type:'line',data:vals2,connectNulls:true,
-                lineStyle:{width:yr===curYear?2.5:1},itemStyle:{color:yr===curYear?'#42423A':violetAt((parseInt(yr)-y0)/Math.max(1,y1-y0))},
-                symbol:'none',emphasis:{lineStyle:{width:2.5}}});
+        var tSeries=[],legendYrs=[],datesByYear={};
+        allYrs.forEach(function(yr){
+            var yi=parseInt(yr);
+            var start=-1,end=-1;
+            for(var i=0;i<full.length;i++){if(full[i].y===yi){if(start<0)start=i;end=i;}}
+            if(start<0)return;
+            // 当年内离目标月日最近的交易日；等距时取较早的（与原统计的 ffill 口径一致）
+            var target=Date.UTC(yi,tM-1,tD);
+            var bi=start,best=Math.abs(full[start].t-target);
+            for(i=start+1;i<=end;i++){
+                var dist=Math.abs(full[i].t-target);
+                if(dist<best){best=dist;bi=i;}
+            }
+            // 该年数据离目标日太远（如数据从这个月才开始、或当年数据尚未到该月）则不画，
+            // 否则会把年中/年末的缺口误当成基准日
+            if(best>10*86400000)return;
+            var vals=new Array(X.length).fill(null),drows={},has=false;
+            for(var k=Math.max(0,bi-20);k<=Math.min(full.length-1,bi+20);k++){
+                var off=k-bi;
+                vals[off+20]=Math.round((full[k].v-full[bi].v)*scale*100)/100;
+                drows[off+20]=full[k].d;
+                has=true;
+            }
+            if(!has)return;
+            legendYrs.push(yr);datesByYear[yr]=drows;
+            tSeries.push({name:yr,type:'line',data:vals,connectNulls:false,
+                lineStyle:{width:yr===curYear?2.5:1},
+                itemStyle:{color:yr===curYear?'#42423A':violetAt((yi-y0)/Math.max(1,y1-y0))},
+                symbol:'none',emphasis:{lineStyle:{width:2.5},focus:'series'}});
         });
+        if(tSeries.length){
+            tSeries[0].markLine={silent:true,symbol:'none',label:{show:false},
+                lineStyle:{color:'#B9C5CF',width:0.5,type:'dashed'},
+                data:[{yAxis:0},{xAxis:'0'}]};
+        }
         var c2=echarts.init(document.getElementById('modal-trend'));
         c2.setOption({
-            title:{text:formatName(base)+' 各年 '+tMonth+' 月走势叠加',textStyle:{fontSize:13,fontWeight:600,color:'#42423A'}},
-            tooltip:{trigger:'axis'},legend:{data:legendYrs,type:'scroll',orient:'vertical',right:6,top:30,itemWidth:14,itemHeight:8,itemGap:7,textStyle:{fontSize:10}},
-            xAxis:{type:'category',data:unifiedDates},
-            yAxis:{type:'value',name:series.includes('chg10')?'%':'bp'},
-            series:tSeries,grid:{left:55,right:78,top:35,bottom:25}
-        });
+            title:{text:formatName(base)+' 前后 20 个交易日变化（基准：'+mdLabel(mdKey)+'）',textStyle:{fontSize:13,fontWeight:600,color:'#42423A'}},
+            tooltip:{trigger:'axis',axisPointer:{type:'line'},confine:true,
+                formatter:function(ps){
+                    if(!ps||!ps.length)return '';
+                    var idx=ps[0].dataIndex,cells=[];
+                    ps.forEach(function(p){
+                        if(p.value==null)return;
+                        var dt=(datesByYear[p.seriesName]||{})[idx]||'';
+                        var v=p.value;
+                        var col=v>0?'#1E6B43':v<0?'#B8352C':'#66665B';
+                        cells.push(dt+' <b style="color:'+col+'">'+(v>0?'+':'')+v.toFixed(2)+'bp</b>');
+                    });
+                    // 双列表格：20 年也压在 10 行内，且不受 tooltip 默认 nowrap 影响
+                    var html='<table style="font-size:11px;line-height:1.65;border-collapse:collapse">';
+                    for(var i=0;i<cells.length;i+=2){
+                        html+='<tr><td style="padding-right:16px;white-space:nowrap">'+cells[i]+'</td><td style="white-space:nowrap">'+(cells[i+1]||'')+'</td></tr>';
+                    }
+                    return html+'</table>';
+                }},
+            legend:{data:legendYrs.slice().reverse(),type:'scroll',orient:'vertical',right:4,top:28,
+                pageButtonPosition:'start',itemWidth:14,itemHeight:8,itemGap:6,textStyle:{fontSize:10}},
+            xAxis:{type:'category',data:X,boundaryGap:false,
+                // 函数间隔：固定每 5 个标签显示一次（-20、-15…基准…+20），避免轴自适应挑出 -9/+2 这类怪标签
+                axisLabel:{interval:function(i){return i%5===0;},fontSize:11,
+                    formatter:function(v){var n=parseInt(v);return n===0?'基准':(n>0?'+'+n:String(n));}}},
+            yAxis:{type:'value',name:'bp',scale:true},
+            series:tSeries,grid:{left:55,right:90,top:35,bottom:28}
+        },true);   // notMerge：换曲线/换年份集合时不合并旧系列
     }
 }
 
