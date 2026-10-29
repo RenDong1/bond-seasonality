@@ -168,6 +168,9 @@ body .evStatsT{width:100%;min-width:760px;border-collapse:collapse;font-size:var
   vertical-align:1px;background:var(--asparagus);}
 .evStatsT .sv{font-variant-numeric:tabular-nums;}
 .evStatsT .sr{color:var(--muted);font-size:11px;}
+.evStatsT .d-down{color:var(--sig-bull);font-weight:600;}
+.evStatsT .d-up{color:var(--sig-bear);font-weight:600;}
+.evStatsT .d-na{color:var(--muted);}
 .evStatsEmpty,.evStatsFoot{font-size:12px;color:var(--muted);line-height:1.7;}
 .evStatsFoot{margin-top:8px;}
 
@@ -202,7 +205,7 @@ body .evStatsT{width:100%;min-width:760px;border-collapse:collapse;font-size:var
 </head>
 <body data-site="inner" data-page="yield-seasonality">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-28 21:49</span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 09:41</span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性全景复盘</a><a href="treasury-futures.html">国债期货日报</a><a href="stock-bond-monitor.html">股债联动</a><a href="yield-seasonality.html" class="active" aria-current="page">收益率与期限利差季节图</a><a href="bond-flow-lead.html">净买入领先分析</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">债市信号评价</a><a href="bond-alert.html">债市预警</a></div></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
 <!--NAV_END-->
@@ -275,7 +278,7 @@ function panelHTML(brand){
         <div class="chips legrow">
           <label class="chip" title="显示/隐藏历史各年份线"><span class="sw" style="background:#8D7C97"></span><input type="checkbox" class="ckHist" checked> 历史线</label>
           <label class="chip" title="显示/隐藏多年同日均值"><span class="sw dash" style="color:#749AB2"></span><input type="checkbox" class="ckMean" checked> 均值线</label>
-          <span class="chip" style="cursor:default" title="当年（芦笋绿粗线）"><span class="sw" style="background:#769365"></span>当年</span>
+          <span class="chip" style="cursor:default" title="当年（深墨粗线）"><span class="sw" style="background:#42423A"></span>当年</span>
         </div>
         <div class="chart chartEl" style="flex:1 1 auto;min-height:0;"></div>
       </div>
@@ -443,9 +446,9 @@ function makePanel(brand, P){
         symbol:'circle', symbolSize:7,
         label:{show:true, color:'#42423A', fontWeight:600, fontSize:13, position:'top', distance:6, formatter:String(curY)}};
       const i = series.length; st.curSerI = i; st.yearSer[String(curY)] = i;
-      st.orig[i] = {opacity:1, width:2.6, color:'#769365'};
+      st.orig[i] = {opacity:1, width:2.6, color:'#42423A'};
       series.push({name:String(curY), type:'line', data:c, showSymbol:false,
-        lineStyle:{width:2.6, color:'#769365'}, itemStyle:{color:'#769365'}, z:4});
+        lineStyle:{width:2.6, color:'#42423A'}, itemStyle:{color:'#42423A'}, z:4});
     }
     series.push({name:'_q', type:'line', data:[], silent:true, tooltip:{show:false}, z:0,   // 季度参考竖虚线
       markLine:{silent:true, symbol:'none', label:{show:false},
@@ -940,7 +943,8 @@ function makeReviewPanel(RV){
       const row = data[cat], dir = STAT.dir[cat] || 0;
       h += '<tr' + (row.n < 10 ? ' class="dim" title="N<10，仅参考"' : '') + '>' +
            '<td class="l"><span class="evSDot" style="background:' + catColor(cat) + '"></span>' + cat + '</td>' +
-           '<td>' + row.n + '</td><td>' + (dir < 0 ? '↓' : dir > 0 ? '↑' : '不定') + '</td>';
+           '<td>' + row.n + '</td><td class="' + (dir < 0 ? 'd-down' : dir > 0 ? 'd-up' : 'd-na') + '">' +
+           (dir < 0 ? '↓' : dir > 0 ? '↑' : '不定') + '</td>';
       row.cells.forEach(c => {
         if (!c){ h += '<td>—</td>'; return; }
         const rate = dir ? pct(c.hit) + '%' : '上' + pct(c.up) + '%';
