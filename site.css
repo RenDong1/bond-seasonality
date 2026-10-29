@@ -214,6 +214,9 @@ body[data-page="bond-seasonality"] .stat-card .value.up{color:var(--sig-bear)}
 /* 句中的方向词（压缩/走扩、下行/上行）用同义类，避免和正负号类混用 */
 .t-bull{color:var(--sig-bull)}
 .t-bear{color:var(--sig-bear)}
+/* 信号多空（2026-10-29 用户定）：多红、空绿；中性不上色。信号评价页 KPI/表格共用 */
+.sig-long{color:var(--sig-bull)}
+.sig-short{color:var(--sig-bear)}
 .muted,.dim{color:var(--muted)}
 
 /* 表格：宋体表头，数字等宽，0.5px 行线 */
@@ -342,6 +345,8 @@ body[data-page="signal-eval"] #usage{font-size:12px;color:var(--muted);line-heig
   color:var(--ink);font-variant-numeric:tabular-nums;margin-top:2px}
 #report .kpi b.pos{color:var(--sig-bull)}
 #report .kpi b.neg{color:var(--sig-bear)}
+#report .kpi b.sig-long{color:var(--sig-bull)}
+#report .kpi b.sig-short{color:var(--sig-bear)}
 #report table{font-size:12px;border-collapse:collapse}
 #report th{background:none;border:0;border-bottom:var(--hair) solid var(--rule-strong);
   font-family:var(--serif);font-weight:500;color:var(--muted);
