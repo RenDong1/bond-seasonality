@@ -67,9 +67,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 </head>
 <body data-site="inner" data-page="bond-alert">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-stamp">数据截至 2026-10-29 09:55</span></div></div>
-<nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html" class="active" aria-current="page">预警指标</a></div></div></nav>
-<script>(function(){var a=document.querySelector(".site-links a.active");if(!a)return;var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);})();</script>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-10-29 14:39</span><span class="site-stamp site-stamp-data">数据截至 2026-10-27</span></span></div></div>
+<nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html" class="active" aria-current="page">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html" class="active" aria-current="page">预警指标</a></div></nav>
+<script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
 <div class="header">
 <h1>债市预警</h1>
@@ -100,7 +100,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 <div id="over-yield" style="width:100%;height:300px"></div>
 <h3 class="sub">历史统计：<span id="over-stat-name"></span></h3>
 <div class="tbl-wrap"><table class="tbl" id="over-stat"></table></div>
-<p class="note">区间内 = 信号触发期间收益率变化；后 N 日 = 信号结束后 N 个交易日的收益率变化。有利均值：看多为收益率下行幅度，看空为上行幅度，正值代表方向正确。盈亏比 = 盈利样本合计 / 亏损样本合计。</p>
+<p class="note">区间内 = 信号触发期间收益率变化；后 N 日 = 信号结束后 N 个交易日的收益率变化。区间内方向正确率天然偏低——信号往往在反向波动中被触发，且区间长度不一，判断信号有效性应以后 5–40 日为主。有利均值：看多为收益率下行幅度，看空为上行幅度，正值代表方向正确。盈亏比 = 盈利样本合计 / 亏损样本合计。</p>
 </div>
 
 <div class="panel">
@@ -195,7 +195,7 @@ function renderSummary(){
     <div class="delta">较前一交易日 <span class="${cls(-dY)}">${dY===null?'—':(dY>0?'+':'')+fmt(dY,2)+' bp'}</span>，数据截至 ${O.dates[oi]}</div>
   </div>
   <div class="stat-card">
-    <div class="label">数据更新</div>
+    <div class="label">页面更新</div>
     <div class="value" style="font-size:20px;line-height:1.3">${DATA.generated.split(' ')[0]}</div>
     <div class="delta">超涨超跌：${O.dates[0]} ~ ${O.dates[oi]}<br>利率拐点：${T.dates[0]} ~ ${T.dates[ti]}</div>
   </div>`;
@@ -395,7 +395,7 @@ window.addEventListener('resize', resizeAll);
 window.addEventListener('load', () => [0, 300, 1200].forEach(t => setTimeout(resizeAll, t)));
 </script>
 <!--FOOTER_START-->
-<footer class="site-footer"><div class="site-wrap"><span>数据来源 中国货币网 / 同花顺 iFinD / 中债登</span><span>每日 09:00 自动更新</span></div></footer>
+<footer class="site-footer"><div class="site-wrap"><span>数据来源 中国货币网 / 同花顺 iFinD / 中债登</span><span class="site-footer-actions"><span>每日 09:00 自动更新</span><button class="glossary-open" type="button">术语与口径</button></span></div></footer>
 <!--FOOTER_END-->
 </body>
 </html>
