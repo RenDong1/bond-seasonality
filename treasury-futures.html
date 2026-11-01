@@ -213,7 +213,7 @@
 <body data-site="inner" data-page="treasury-futures">
 
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-01 20:44</span><span class="site-stamp site-stamp-data">数据截至 2026-10-30</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-01 22:33</span><span class="site-stamp site-stamp-data">数据截至 2026-10-30</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -21695,7 +21695,7 @@ function assessRisk(tSig, tlSig, tData, tlData) {
   if (tOi[tOi.length-1] < tOi[tOi.length-3])
     risks.push({ cls:'warn', label:'T 持仓下降', value:'OI ↓', sub:'持仓趋势性下降，多头信心不足' });
   if (tlOi[tlOi.length-1] < tlOi[tlOi.length-5])
-    risks.push({ cls:'danger', label:'TL 持仓骤降', value:'OI ↓ '+(tlOi[tlOi.length-1]-tlOi[tlOi.length-5]).toLocaleString(), sub:'三十年期持仓从高峰显著回落，部分多头离场' });
+    risks.push({ cls:'danger', label:'TL 持仓骤降', value:'OI ↓ '+(tlOi[tlOi.length-1]-tlOi[tlOi.length-5]).toLocaleString(), sub:'三十年期持仓从高峰显著回落，有多头减仓迹象' });
 
   // ─── 8. T-TL信号分化 ───
   if (tSig.signal.includes('long') && tlSig.signal.includes('short'))
@@ -22057,7 +22057,7 @@ function generateAnalysis(data, name) {
     else parts.push('RSI(6)=' + rsi.toFixed(0) + ' 处中性区间');
   }
   if (oiDelta != null && oiDelta >= OI_SURGE_THRESHOLD) parts.push('当日大幅增仓' + fmtWan(oiDelta) + '，多头资金主动进场');
-  else if (oiDelta != null && oiDelta <= -OI_SURGE_THRESHOLD) parts.push('当日大幅减仓' + fmtWan(oiDelta) + '，注意多头离场');
+  else if (oiDelta != null && oiDelta <= -OI_SURGE_THRESHOLD) parts.push('当日大幅减仓' + fmtWan(oiDelta) + '，警惕多头减仓');
   else if (oiDelta != null) parts.push('持仓' + (oiDelta >= 0 ? '小幅增加' : '小幅减少') + fmtWan(Math.abs(oiDelta)));
   parts.push('当日收盘' + (chg >= 0 ? '上涨' : '下跌') + Math.abs(chg).toFixed(3) + '%');
 
@@ -22171,8 +22171,8 @@ function renderAll() {
     return `<div class="signal-card ${zsSig.signalClass}">
       <div class="signal-header">
         <div class="signal-main"><div class="contract-name">${name}</div>
-          <div class="signal-info">全指标共振 <strong>${bullN}</strong> 多 / <strong>${bearN}</strong> 空，有效信号 <strong>${total}</strong> 个</div></div>
-        <div class="signal-side"><span class="signal-badge ${zsSig.signalClass}"><span class="dot"></span>${zsSig.signalLabel}</span>
+          <div class="signal-info">结构信号 <strong>${zsSig.bullCount}</strong> 多 / <strong>${zsSig.bearCount}</strong> 空｜全指标 <strong>${bullN}</strong> 多 / <strong>${bearN}</strong> 空，有效 <strong>${total}</strong> 个</div></div>
+        <div class="signal-side"><span class="signal-badge ${zsSig.signalClass}"><span class="dot"></span>结构综合：${zsSig.signalLabel}</span>
           <div class="signal-code">${code}</div></div></div>
       <div class="ohlc-grid">
         <div class="ohlc-item"><span class="k">开盘价</span><span class="v">${last.o||'—'}</span></div>
