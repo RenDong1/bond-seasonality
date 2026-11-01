@@ -210,14 +210,14 @@ body .evStatsT{width:100%;min-width:760px;border-collapse:collapse;font-size:var
 </head>
 <body data-site="inner" data-page="yield-seasonality">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-01 22:33</span><span class="site-stamp site-stamp-data">数据截至 2026-10-30</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-01 23:04</span><span class="site-stamp site-stamp-data">数据截至 2026-10-30</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html" class="active" aria-current="page">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html" class="active" aria-current="page">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
 <div class="wrap">
   <header class="page-head">
     <h1>收益率与期限利差季节图</h1>
-    <div class="sub">本地双档日度数据包，国债与国开收益率 1Y 至 30Y，2007 年起。横轴为年内第 1 至 365 天，每年一条轨迹。自上而下依次为国债、国开、国开与国债利差（国开收益率减国债收益率，单位 bp），三块控件各自独立。浅线为历史各年，年代越近颜色越深；气蓝虚线为多年同日均值，芦笋绿粗线为当年。末尾为真实日期序列与事件复盘标注。</div>
+    <div class="sub">本地日度数据包：国债、国开两条收益率曲线，1Y 至 30Y 共 8 个期限，2007 年起。横轴为年内第 1 至 365 天，每年一条轨迹。自上而下依次为国债、国开、国开与国债利差（国开收益率减国债收益率，单位 bp），三块控件各自独立。浅线为历史各年，年代越近颜色越深；气蓝虚线为多年同日均值，芦笋绿粗线为当年。末尾为真实日期序列与事件复盘标注。</div>
   </header>
   <div id="panels"></div>
   <div class="footer" id="foot"></div>
