@@ -15,35 +15,16 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
 .issue-date .d{font-size:var(--t-figure);font-weight:600;line-height:1.25;color:var(--date);font-variant-numeric:tabular-nums}
 .issue-date .wd{font-size:var(--t-small);color:var(--muted);line-height:1.4}
 
-/* 进行中 */
-.tag{display:inline-block;background:var(--columbia);color:var(--ink);
-  font-family:var(--serif);font-weight:500;font-size:var(--t-small);line-height:1.3;
-  padding:2px 7px 3px}
-.lead{max-width:var(--site-max);margin:0 auto;padding:12px var(--site-gutter);
-  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:24px;
-  border-bottom:var(--hair) solid var(--rule)}
-.lead-main{display:flex;align-items:center;gap:12px;min-width:0}
-.lead .tag{flex:none;position:relative;top:2px}
-.lead a{font-size:var(--t-figure);font-weight:600;line-height:1.35;text-decoration:none;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
-.lead a:hover{color:var(--violet);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
-.lead-figs{display:flex;gap:36px;flex:none}
-.lead-fig{text-align:right}
-.lead-fig .k{display:block;font-family:var(--serif);font-weight:500;font-size:var(--t-small);color:var(--muted);line-height:1.4}
-.lead-fig .v{display:inline-block;margin-top:2px;font-size:var(--t-figure);font-weight:600;line-height:1.3;font-variant-numeric:tabular-nums}
-.lead-fig .v.t-bull{color:var(--sig-bull)}
-.lead-fig .v.t-bear{color:var(--sig-bear)}
-.lead-fig .blk{display:inline-block;background:var(--violet);color:#fff;padding:1px 7px 2px}
-
 /* 今日读数 */
 .kpi-strip{max-width:var(--site-max);margin:0 auto;padding:0 var(--site-gutter);
   border-bottom:var(--hair) solid var(--rule)}
-.kpi-inner{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));column-gap:0}
-.kpi{display:flex;flex-direction:column;gap:1px;min-width:0;
-  padding:11px 22px;border-left:var(--hair) solid var(--rule);
+.kpi-inner{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));column-gap:0}
+.kpi{display:flex;flex-direction:column;gap:1px;min-width:0;grid-column:span 1;
+  padding:11px 13px;border-left:var(--hair) solid var(--rule);
   text-decoration:none;color:inherit}
 .kpi:first-child{border-left:0;padding-left:0}
 .kpi:last-child{padding-right:0}
+.kpi.kpi-signals{grid-column:span 2}
 .kpi-k{font-family:var(--serif);font-size:var(--t-small);font-weight:500;color:var(--muted);line-height:1.4}
 .kpi-v{font-size:var(--t-figure);font-weight:600;line-height:1.3;font-variant-numeric:tabular-nums;white-space:nowrap}
 .kpi-v .unit{font-size:var(--t-small);font-weight:400;color:var(--muted);margin-left:0}
@@ -55,33 +36,40 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
 .kpi-s .t-bull,.kpi-s .sig-long{color:var(--sig-bull)}
 .kpi-s .t-bear,.kpi-s .sig-short{color:var(--sig-bear)}
 .kpi:hover .kpi-k{color:var(--ink)}
-.kpi-sig-grid{display:grid;grid-template-columns:1fr 1fr;column-gap:12px;margin:1px 0}
-.kpi-sig{display:flex;align-items:baseline;justify-content:flex-start;gap:5px;min-width:0;
+.kpi-sig-grid{display:grid;grid-template-columns:1fr 1fr;column-gap:10px;margin:1px 0}
+.kpi-sig{display:flex;align-items:baseline;justify-content:flex-start;gap:4px;min-width:0;
   font-family:var(--serif);font-size:var(--t-small);line-height:1.5;color:var(--ink-2)}
 .kpi-sig-k{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kpi-sig-dir{flex:none;font-weight:600}
 .kpi-sig-dir.sig-long{color:var(--sig-bull)}
 .kpi-sig-dir.sig-short{color:var(--sig-bear)}
 
-/* 栏目 */
+/* 栏目：三组并排，各组浅色底纹 */
 .front{max-width:var(--site-max);margin:0 auto;padding:0 var(--site-gutter)}
-.ledger{padding-top:22px}
+.ledger{padding-top:18px}
 .ledger-head{border-bottom:var(--hair) solid var(--rule-strong);padding-bottom:6px}
 .ledger-head h2{font-family:var(--serif);font-size:var(--t-small);font-weight:500;letter-spacing:.12em;color:var(--muted)}
-.ledger-group{margin-top:14px}
-.ledger-group-head{display:flex;align-items:center;gap:10px;padding-bottom:5px;
-  border-bottom:var(--hair) solid var(--rule-strong)}
-.ledger-group-head span{font-family:var(--serif);font-size:var(--t-small);font-weight:500;
-  letter-spacing:.08em;color:var(--ink-2);white-space:nowrap}
-.ledger-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:32px}
+.ledger-groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch;
+  margin-top:14px}
+.ledger-group{padding:12px 18px 4px;border-top:3px solid var(--rule-strong);background:var(--paper-3)}
+.ledger-group:nth-child(1){background:#EAF2F8;border-top-color:var(--air)}
+.ledger-group:nth-child(2){background:#EDF4E8;border-top-color:var(--asparagus)}
+.ledger-group:nth-child(3){background:#F2ECF5;border-top-color:var(--violet)}
+.ledger-group-head{display:flex;align-items:center;gap:10px;padding-bottom:6px;
+  border-bottom:var(--hair) solid rgba(66,66,58,.16)}
+.ledger-group-head span{font-family:var(--serif);font-size:var(--t-small);font-weight:600;
+  letter-spacing:.1em;color:var(--ink-2);white-space:nowrap}
+.ledger-grid{display:block}
 .entry{display:grid;grid-template-columns:24px minmax(0,1fr);gap:0 6px;align-items:baseline;
-  padding:13px 0 14px;border-bottom:var(--hair) solid var(--rule);text-decoration:none;color:inherit;min-width:0}
+  padding:12px 0 13px;border-bottom:var(--hair) solid rgba(66,66,58,.14);
+  text-decoration:none;color:inherit;min-width:0}
+.entry:last-child{border-bottom:0;padding-bottom:10px}
 .entry .no{font-size:var(--t-small);color:var(--faint);font-variant-numeric:tabular-nums;line-height:1.6}
 .entry h3{font-family:var(--serif);font-size:var(--t-body);font-weight:500;line-height:1.45;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.entry .st{display:block;margin-top:1px;font-family:var(--serif);font-size:var(--t-small);font-weight:500;
-  line-height:1.5;color:var(--muted);font-variant-numeric:tabular-nums;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entry .st{display:block;margin-top:2px;font-family:var(--serif);font-size:var(--t-small);font-weight:500;
+  line-height:1.55;color:var(--ink-2);font-variant-numeric:tabular-nums;
+  white-space:normal;overflow:visible;text-overflow:clip}
 .entry .st-date{display:inline-block;margin-right:6px;color:var(--faint);font-variant-numeric:tabular-nums}
 .entry .st .sig-long,.entry .st .t-bull{color:var(--sig-bull)}
 .entry .st .sig-short,.entry .st .t-bear{color:var(--sig-bear)}
@@ -94,35 +82,41 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
 .site-footer .site-wrap{max-width:var(--site-max);margin:0 auto;padding:0 var(--site-gutter);
   display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
+@media(max-width:1360px){
+  .kpi-inner{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .kpi{padding:10px 16px}
+  .kpi:nth-child(5n+1){border-left:0;padding-left:0}
+  .kpi:nth-child(n+6){border-top:var(--hair) solid var(--rule)}
+  .kpi.kpi-signals{grid-column:span 2}
+}
 @media(max-width:1120px){
   .kpi-inner{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .kpi:nth-child(n){border-left:var(--hair) solid var(--rule);padding-left:16px;border-top:0}
   .kpi:nth-child(3n+1){border-left:0;padding-left:0}
-  .kpi{padding:10px 18px}
-  .ledger-grid{grid-template-columns:1fr 1fr}
+  .kpi:nth-child(n+4){border-top:var(--hair) solid var(--rule)}
+  .kpi.kpi-signals{grid-column:span 1;padding-left:16px}
+  .ledger-groups{grid-template-columns:1fr;gap:14px}
 }
 @media(max-width:860px){
   .masthead{padding:32px 0 20px}
   .masthead .wrap{flex-wrap:wrap;gap:16px}
-  .lead{grid-template-columns:1fr;gap:10px}
-  .lead-figs{gap:28px}
-  .lead-fig{text-align:left}
   .kpi-inner{grid-template-columns:1fr 1fr}
-  .kpi:nth-child(n){border-left:var(--hair) solid var(--rule);padding-left:18px}
+  .kpi:nth-child(n){border-left:var(--hair) solid var(--rule);padding-left:16px;border-top:0}
   .kpi:nth-child(odd){border-left:0;padding-left:0}
+  .kpi:nth-child(n+3){border-top:var(--hair) solid var(--rule)}
+  .kpi.kpi-signals{grid-column:span 2}
 }
 @media(max-width:560px){
   .kpi-strip{padding:0 var(--site-gutter)}
-  .kpi{padding:9px 14px}
-  .kpi:nth-child(n){padding-left:14px}
+  .kpi{padding:9px 12px}
+  .kpi:nth-child(n){padding-left:12px}
   .kpi:nth-child(odd){padding-left:0}
-  .kpi.kpi-signals{grid-column:1/-1;border-left:0;border-top:var(--hair) solid var(--rule);
-    padding:9px 0 10px}
   .kpi-v{font-size:18px}
   .kpi-s{white-space:normal;overflow:visible;text-overflow:clip}
-  .ledger-grid{grid-template-columns:1fr;column-gap:0}
+  .kpi.kpi-signals{padding-right:0}
+  .ledger-group{padding:11px 14px 3px}
   .masthead .wrap{align-items:center}
   .issue-date{flex-direction:row;align-items:baseline;gap:8px}
-  .lead-figs{flex-wrap:wrap;gap:10px 28px}
 }
 </style>
 <!--THEME_START-->
@@ -154,15 +148,17 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
   </div>
 </header>
 
-<div class="lead wrap"><div class="lead-main"><span class="tag">进行中</span><a href="stock-bond-monitor.html">30Y–10Y 利差<span class="t-bull">压缩</span>，第 12 日</a></div><div class="lead-figs"><div class="lead-fig"><span class="k">当前利差</span><span class="v"><span class="blk">43.26<small class="unit">bp</small></span></span></div><div class="lead-fig"><span class="k">20 日变动</span><span class="v t-bull">-14.30<small class="unit">bp</small></span></div></div></div>
-
 <section class="kpi-strip" aria-label="今日读数">
   <div class="kpi-inner">
-<a class="kpi" href="yield-seasonality.html"><span class="kpi-k">10Y 国债</span><span class="kpi-v t-bull">1.623<small class="unit">%</small></span><span class="kpi-s"><span class="kpi-d">10-30</span><span class="t-bull">-1.1bp</span></span></a>
-<a class="kpi" href="stock-bond-monitor.html"><span class="kpi-k">30Y–10Y 利差</span><span class="kpi-v">42.34<small class="unit">bp</small></span><span class="kpi-s"><span class="kpi-d">10-29</span><span class="t-bull">20日 -13.9bp</span></span></a>
+<a class="kpi" href="yield-seasonality.html"><span class="kpi-k">10Y 国债</span><span class="kpi-v t-bear">1.650<small class="unit">%</small></span><span class="kpi-s"><span class="kpi-d">10-30</span><span class="t-bear">+2.7bp</span></span></a>
+<a class="kpi" href="stock-bond-monitor.html"><span class="kpi-k">30Y–10Y 利差</span><span class="kpi-v">43.26<small class="unit">bp</small></span><span class="kpi-s"><span class="kpi-d">10-30</span><span class="t-bull">20日 -14.3bp</span></span></a>
+<a class="kpi" href="yield-seasonality.html"><span class="kpi-k">10Y 国开–国债</span><span class="kpi-v">4.31<small class="unit">bp</small></span><span class="kpi-s"><span class="kpi-d">10-30</span><span class="t-bear">+0.53bp</span></span></a>
+<a class="kpi" href="yield-seasonality.html"><span class="kpi-k">10Y–5Y 利差</span><span class="kpi-v">29.68<small class="unit">bp</small></span><span class="kpi-s"><span class="kpi-d">10-30</span><span class="t-bear">+0.3bp</span></span></a>
 <a class="kpi" href="bond-flow-lead.html"><span class="kpi-k">DR001</span><span class="kpi-v t-bear">1.289<small class="unit">%</small></span><span class="kpi-s"><span class="kpi-d">10-30</span><span class="t-bear">+1.1bp</span></span></a>
-<a class="kpi" href="treasury-futures.html"><span class="kpi-k">国债期货 T</span><span class="kpi-v t-bear">109.840</span><span class="kpi-s"><span class="kpi-d">10-30</span><span class="t-bear">-0.25%</span>｜TL 117.420</span></a>
-<a class="kpi kpi-signals" href="signal-eval.html"><span class="kpi-k">量化信号</span><span class="kpi-sig-grid"><span class="kpi-sig"><span class="kpi-sig-k">华泰利率动量</span><span class="kpi-sig-dir sig-long">多</span></span><span class="kpi-sig"><span class="kpi-sig-k">量价指标</span><span class="kpi-sig-dir sig-long">多</span></span><span class="kpi-sig"><span class="kpi-sig-k">盈亏指标</span><span class="kpi-sig-dir ">中性</span></span><span class="kpi-sig"><span class="kpi-sig-k">资金价格异动</span><span class="kpi-sig-dir sig-long">多</span></span></span><span class="kpi-s"><span class="kpi-d">10-30</span>4 个信号</span></a>
+<a class="kpi" href="bond-flow-lead.html"><span class="kpi-k">DR007</span><span class="kpi-v t-bear">1.390<small class="unit">%</small></span><span class="kpi-s"><span class="kpi-d">10-30</span><span class="t-bear">+4.8bp</span></span></a>
+<a class="kpi" href="treasury-futures.html"><span class="kpi-k">国债期货 T</span><span class="kpi-v t-bear">109.840</span><span class="kpi-s"><span class="kpi-d">10-30</span><span class="t-bear">-0.25%</span></span></a>
+<a class="kpi" href="treasury-futures.html"><span class="kpi-k">国债期货 TL</span><span class="kpi-v t-bear">117.420</span><span class="kpi-s"><span class="kpi-d">10-30</span><span class="t-bear">-1.03%</span></span></a>
+<a class="kpi kpi-signals" href="signal-eval.html"><span class="kpi-k">量化信号</span><span class="kpi-sig-grid"><span class="kpi-sig"><span class="kpi-sig-k">利率动量</span><span class="kpi-sig-dir sig-long">看多</span></span><span class="kpi-sig"><span class="kpi-sig-k">量价指标</span><span class="kpi-sig-dir sig-long">看多</span></span><span class="kpi-sig"><span class="kpi-sig-k">盈亏指标</span><span class="kpi-sig-dir ">中性</span></span><span class="kpi-sig"><span class="kpi-sig-k">资金价格异动</span><span class="kpi-sig-dir sig-long">看多</span></span></span><span class="kpi-s"><span class="kpi-d">10-30</span>4 个信号</span></a>
   </div>
 </section>
 
@@ -171,6 +167,7 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
     <div class="ledger-head">
       <h2 id="ledger-title">栏目</h2>
     </div>
+    <div class="ledger-groups">
       <div class="ledger-group">
         <div class="ledger-group-head"><span>利率与期限</span></div>
         <div class="ledger-grid">
@@ -178,21 +175,21 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
           <span class="no">01</span>
           <div>
             <h3>季节性规律</h3>
-            <span class="st"><span class="st-date">10-30</span>10Y 未来10日 <span class="t-bear">上行 53%</span>（n=19）</span>
+            <span class="st"><span class="st-date">10-30</span>未来10日 >65%｜期限：1Y AA中票 <span class="t-bear">上行 68%</span>｜利差：10Y–2Y 国开 <span class="t-bull">收窄 79%</span>、10Y–3Y 中票AAA <span class="t-bull">收窄 73%</span>、5Y–3Y 中票AAA <span class="t-bull">收窄 72%</span>、10Y–5Y 国开 <span class="t-bull">收窄 68%</span>、AAA中票–国开 10Y <span class="t-bull">收窄 67%</span>、AA–AAA中票 3Y <span class="t-bull">收窄 67%</span></span>
           </div>
         </a>
         <a class="entry" href="yield-seasonality.html">
           <span class="no">02</span>
           <div>
             <h3>利率和利差</h3>
-            <span class="st"><span class="st-date">10-30</span>10Y 1.650%｜国开 1.693%</span>
+            <span class="st"><span class="st-date">10-30</span>10Y国债 1.650%｜10Y国开 1.693%｜国开-国债 4.3bp｜10Y-5Y 29.7bp｜30Y-10Y 43.3bp</span>
           </div>
         </a>
         <a class="entry" href="treasury-futures.html">
           <span class="no">03</span>
           <div>
             <h3>国债期货</h3>
-            <span class="st"><span class="st-date">10-30</span>T 109.840｜TL 117.420</span>
+            <span class="st"><span class="st-date">10-30</span>综合<span class="t-bear">谨慎偏空</span>（多1/空4）｜空头：单均线、阶矩、VPIN｜T 109.840 <span class="t-bear">-0.25%</span>｜TL 117.420 <span class="t-bear">-1.03%</span></span>
           </div>
         </a>
         </div>
@@ -204,21 +201,21 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
           <span class="no">04</span>
           <div>
             <h3>股债联动</h3>
-            <span class="st"><span class="st-date">10-30</span><span class="t-bull">压缩</span>，第 12 日</span>
+            <span class="st"><span class="st-date">10-30</span>股市 4/4 弱势｜TL-T 相对仓位 -7.67pp（减仓）｜<span class="t-bull">压缩</span>信号第 12 日</span>
           </div>
         </a>
         <a class="entry" href="bond-flow-lead.html">
           <span class="no">05</span>
           <div>
             <h3>现券成交</h3>
-            <span class="st"><span class="st-date">10-23</span>近5日 大行 7-10Y 净买入 <span class="t-bull">+37.8亿</span></span>
+            <span class="st"><span class="st-date">10-23</span>近5日（亿） 大行7-10Y政金 <span class="t-bull">+37.8</span>｜基金7-10Y政金 <span class="t-bull">+317.1</span>｜保险10Y+地方 <span class="t-bull">+311.2</span>｜中小行1Y存单 <span class="t-bull">+370.6</span>｜货基1Y存单 <span class="t-bear">-476.7</span></span>
           </div>
         </a>
         <a class="entry" href="duration-tracking.html">
           <span class="no">06</span>
           <div>
             <h3>久期跟踪</h3>
-            <span class="st"><span class="st-date">10-30</span>长债 8.30 年｜信用 3.62 年</span>
+            <span class="st"><span class="st-date">10-30</span>利率 8.30 年｜金融 4.20 年｜信用 3.62 年</span>
           </div>
         </a>
         </div>
@@ -230,18 +227,19 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
           <span class="no">07</span>
           <div>
             <h3>信号评价</h3>
-            <span class="st"><span class="st-date">10-30</span>华泰 <span class="sig-long">多</span>｜量价 <span class="sig-long">多</span>｜盈亏 中性｜资金 <span class="sig-long">多</span></span>
+            <span class="st"><span class="st-date">10-30</span>利率动量 <span class="sig-long">看多</span>｜量价 <span class="sig-long">看多</span>｜盈亏 中性｜资金 <span class="sig-long">看多</span></span>
           </div>
         </a>
         <a class="entry" href="bond-alert.html">
           <span class="no">08</span>
           <div>
             <h3>预警指标</h3>
-            <span class="st"><span class="st-date">10-30</span>超涨超跌 中性｜拐点 <span class="t-bear">看空</span></span>
+            <span class="st"><span class="st-date">10-30</span>超涨超跌 中性｜拐点 <span class="t-bear">看空</span>（10债-股息率、风险偏好）</span>
           </div>
         </a>
         </div>
       </div>
+    </div>
   </section>
 </div>
 
