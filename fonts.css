@@ -633,7 +633,7 @@
   font-weight: 300 700;
   font-display: swap;
   src: url(fonts/noto-sans-sc/078.woff2) format('woff2');
-  unicode-range: U+20-22, U+5E27, U+655B, U+6E32, U+70C1, U+8D4E;
+  unicode-range: U+20-22, U+5C49, U+5E27, U+655B, U+6E32, U+70C1, U+8D4E;
 }
 @font-face {
   font-family: 'Noto Sans SC Web';
@@ -1441,7 +1441,7 @@
   font-weight: 300 700;
   font-display: swap;
   src: url(fonts/noto-serif-sc/078.woff2) format('woff2');
-  unicode-range: U+20-22, U+5E27, U+655B, U+6E32, U+70C1, U+8D4E;
+  unicode-range: U+20-22, U+5C49, U+5E27, U+655B, U+6E32, U+70C1, U+8D4E;
 }
 @font-face {
   font-family: 'Noto Serif SC Web';
