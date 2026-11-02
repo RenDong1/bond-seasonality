@@ -107,16 +107,29 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
   .kpi.kpi-signals{grid-column:span 2}
 }
 @media(max-width:560px){
+  /* 移动端密度（2026-11-02）：标题、读数、栏目统一收紧 */
+  body{line-height:1.5}
+  .masthead{padding:16px 0 10px}
+  .masthead h1{font-size:24px;line-height:1.2}
+  .issue-date .d{font-size:18px}
+  .issue-date .wd{font-size:11px}
   .kpi-strip{padding:0 var(--site-gutter)}
-  .kpi{padding:9px 12px}
+  .kpi{padding:7px 12px}
   .kpi:nth-child(n){padding-left:12px}
   .kpi:nth-child(odd){padding-left:0}
-  .kpi-v{font-size:18px}
-  .kpi-s{white-space:normal;overflow:visible;text-overflow:clip}
+  .kpi-k,.kpi-s{font-size:11px}
+  .kpi-v{font-size:17px}
+  .kpi-s{line-height:1.35;white-space:normal;overflow:visible;text-overflow:clip}
+  .kpi-sig{font-size:11px;line-height:1.4}
   .kpi.kpi-signals{padding-right:0}
-  .ledger-group{padding:11px 14px 3px}
+  .ledger{padding-top:12px}
+  .ledger-group{padding:9px 12px 2px}
+  .entry{padding:9px 0 10px}
+  .entry h3{font-size:14px;line-height:1.4}
+  .entry .st{font-size:11px;line-height:1.5;margin-top:1px}
   .masthead .wrap{align-items:center}
   .issue-date{flex-direction:row;align-items:baseline;gap:8px}
+  .site-footer{margin-top:24px;padding:10px 0 22px}
 }
 </style>
 <!--THEME_START-->
