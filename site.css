@@ -484,15 +484,48 @@ body[data-page="bond-alert"] .two-col h3{
   #report th,#report td{padding:4px 5px}
 }
 @media(max-width:560px){
-  .site-nav .site-wrap{flex-wrap:nowrap;gap:14px}
-  .site-seal .seal-mark{width:26px;height:26px}
-  body[data-site="inner"] .site-utility .site-name{font-size:12px}
-  .site-utility .site-meta{gap:10px;font-size:12px}
+  /* 移动端密度（2026-11-02）：字号、行距、留白整体收紧一档。
+     16px 正文在 390px 屏上偏大，改 14px；版心留白 20→14。 */
+  :root{
+    --site-gutter:14px;
+    --site-topbar:24px;
+    --site-nav-h:44px;
+    --t-display:22px;
+    --t-figure:18px;
+    --t-body:14px;
+    --t-small:12px;
+  }
+  /* 首页信息条在窄屏只剩一个空条，直接收起 */
+  body:not([data-site]) .site-utility{display:none}
+  .site-utility .site-wrap{gap:10px;height:var(--site-topbar)}
+  .site-nav .site-wrap{flex-wrap:nowrap;gap:10px}
+  .site-seal{gap:8px}
+  .site-seal .seal-mark{width:24px;height:24px;font-size:13px}
+  body[data-site="inner"] .site-utility .site-name{font-size:11px}
+  .site-utility .site-meta{gap:10px;font-size:11px}
   .site-utility .site-stamp:not(.site-stamp-data){display:none}
-  .site-menu{grid-template-columns:1fr;padding-bottom:10px}
+  .site-menu-btn{padding:3px 10px;font-size:12px}
+  .site-menu{grid-template-columns:1fr;padding:4px var(--site-gutter) 9px}
+  .site-menu a{padding:7px 0;font-size:13px}
+
+  /* 内页正文：行距 1.6→1.5，页头去掉大段空白 */
+  body[data-site="inner"]{line-height:1.5}
+  body[data-site="inner"] .header{padding:12px var(--site-gutter) 10px}
   /* 全站内页标题统一窄屏字号（各页旧规则字号不一） */
   body[data-site="inner"] h1,
-  body[data-site="inner"] .header h1{font-size:26px;line-height:1.3}
-  .site-footer .site-wrap{gap:10px}
-  .site-footer-actions{gap:14px}
+  body[data-site="inner"] .header h1{font-size:22px;line-height:1.25}
+  .header p,.header .sub{font-size:12px;line-height:1.5;margin-top:3px}
+  body[data-site="inner"] .panel{padding:9px 12px;margin-bottom:8px}
+  .panel h2{margin-bottom:6px}
+  .panel h2,.panel h2 .sub{font-size:13px}
+  .stat-card{padding:8px 12px 7px}
+  .stat-card .value{font-size:18px}
+  .stat-card .label,.stat-card .unit,.stat-card .delta{font-size:11px}
+  .note,.sub{font-size:11.5px;line-height:1.5}
+  .tbl,.kpi-table{font-size:11.5px}
+  .tbl th,.kpi-table th{padding:5px 6px}
+  .tbl td,.kpi-table td{padding:4px 6px}
+  .site-footer{margin-top:18px;padding:8px 0 16px;font-size:11px}
+  .site-footer .site-wrap{gap:6px}
+  .site-footer-actions{gap:12px}
 }
