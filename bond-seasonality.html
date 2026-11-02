@@ -60,9 +60,9 @@ select:focus{outline:none;border-color:var(--violet)}
 .strength{font-family:var(--serif);font-weight:600;color:var(--violet)}
 
 /* 方向：红=下行（利率下行、利好），绿=上行 */
-.dir{font-weight:600}
-.dir.down,.is-bull{color:var(--sig-bull)}
-.dir.up,.is-bear{color:var(--sig-bear)}
+.dir{font-weight:600;color:var(--ink)}
+.is-bull{color:var(--sig-bull)}
+.is-bear{color:var(--sig-bear)}
 
 /* 事件表 */
 .summary-box{padding:9px 0 7px;background:none;border:0;border-top:var(--hair) solid var(--rule);margin:0;font-family:var(--serif);font-weight:500;font-size:var(--t-small);color:var(--muted);line-height:1.7}
@@ -135,7 +135,7 @@ select:focus{outline:none;border-color:var(--violet)}
 </head>
 <body data-site="inner" data-page="bond-seasonality">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-02 14:15</span><span class="site-stamp site-stamp-data">数据截至 2026-10-30</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-02 14:47</span><span class="site-stamp site-stamp-data">数据截至 2026-10-30</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html" class="active" aria-current="page">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html" class="active" aria-current="page">季节性规律</a><a href="yield-seasonality.html">利率和利差</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -392,11 +392,23 @@ function mdLabel(key){
     if(parts.length===2) return parseInt(parts[0])+'月'+parseInt(parts[1])+'日';
     return key;
 }
+// 利差序列：元数据里有名单就直接用，否则按「含连字符」判断（收益率曲线名均不含连字符）
+function isSpreadSeries(s){
+    s=s.replace(/_chg10/g,'');
+    var names=(DATA.metadata&&DATA.metadata.spread_names)||[];
+    if(names.length)return names.indexOf(s)>=0;
+    return s.indexOf('-')>=0;
+}
 function classifyEvent(s){
-    if(s.includes('5-2')||s.includes('10-5')||s.includes('10-2')||s.includes('30-10'))return 'term';
-    if(s.includes('国开-国债')||s.includes('中票-国开')||s.includes('中票-二债')||s.includes('二债-国开')||false)return 'variety';
-    if(s.includes('AA-AAA'))return 'credit';
-    return 'yield';
+    if(!isSpreadSeries(s))return 'yield';
+    if(s.indexOf('AA-AAA')===0)return 'credit';
+    if(/^\d+-\d+/.test(s))return 'term';
+    return 'variety';
+}
+// 方向列文案：利率讲上下行，利差讲走扩/收窄
+function dirLabel(s,direction){
+    if(isSpreadSeries(s))return direction==='上行'?'走扩':'收窄';
+    return direction;
 }
 
 let curCat='all',curMonth=0,curProb=0.7,curDir='all',curSeriesFilter='all';
@@ -436,7 +448,11 @@ function judgeBullBear(series,direction){
     var s=series.replace(/_chg10/g,'');
     var up=(direction==='上行');
     var legA='',legB='';
-    var mTerm=s.match(/^(\d+)-(\d+)(国债|国开)$/);
+    // 期限利差：10-3二债 / 30-10国债 / 5-3中票AAA
+    var mTerm=s.match(/^(\d+)-(\d+)(.+)$/);
+    // 期限写在两端的品种利差：3中票AAA-1存单
+    var mLead=s.match(/^(\d+)(.+?)-(\d+)(.+)$/);
+    // 期限写在末尾的品种/评级利差：AAA中票-国开5Y / AA-AAA中票10Y
     var mVar=s.match(/^(.+?)-(.+?)(\d+Y)$/);
     // 只有 → 后面的「看多/看空」按多空上色：看多红、看空绿；
     // 前面的利率/利差变化（走扩、收窄、收益率上下行）保持正文色。
@@ -446,6 +462,12 @@ function judgeBullBear(series,direction){
         if(up)return{prefix:'走扩(陡峭化)→',legs:[{txt:'看空'+legA,dir:'bear'},{txt:'看多'+legB,dir:'bull'}]};
         return{prefix:'收窄(平坦化)→',legs:[{txt:'看多'+legA,dir:'bull'},{txt:'看空'+legB,dir:'bear'}]};
     }
+    if(mLead){
+        legA=mLead[1]+'Y'+mLead[2];
+        legB=mLead[3]+'Y'+mLead[4];
+        if(up)return{prefix:'走扩→',legs:[{txt:'看空'+legA,dir:'bear'},{txt:'看多'+legB,dir:'bull'}]};
+        return{prefix:'收窄→',legs:[{txt:'看多'+legA,dir:'bull'},{txt:'看空'+legB,dir:'bear'}]};
+    }
     if(mVar){
         var term=mVar[3];
         legA=term+' '+mVar[1];
@@ -453,13 +475,20 @@ function judgeBullBear(series,direction){
         if(up)return{prefix:'走扩→',legs:[{txt:'看空'+legA,dir:'bear'},{txt:'看多'+legB,dir:'bull'}]};
         return{prefix:'收窄→',legs:[{txt:'看多'+legA,dir:'bull'},{txt:'看空'+legB,dir:'bear'}]};
     }
+    if(isSpreadSeries(series)){
+        if(up)return{prefix:'走扩→',legs:[{txt:'看空'+nm,dir:'bear'}]};
+        return{prefix:'收窄→',legs:[{txt:'看多'+nm,dir:'bull'}]};
+    }
     if(up)return{prefix:'收益率上行→',legs:[{txt:'看空'+nm,dir:'bear'}]};
     return{prefix:'收益率下行→',legs:[{txt:'看多'+nm,dir:'bull'}]};
 }
-function judgeHtml(j){
-    return j.prefix+j.legs.map(function(l){
+function judgeLegsHtml(j){
+    return j.legs.map(function(l){
         return '<span class="'+(l.dir==='bull'?'is-bull':'is-bear')+'">'+l.txt+'</span>';
     }).join('/');
+}
+function judgeHtml(j){
+    return j.prefix+judgeLegsHtml(j);
 }
 function renderUpcoming(){
     var m=parseInt(document.getElementById('cur-month').value);
@@ -494,13 +523,12 @@ function renderUpcoming(){
     var html='<div class="judge-line"><b>本周研判</b>'+top+'</div>';
     html+='<table class="up-tbl"><thead><tr><th>品种</th><th>方向</th><th>多空研判</th><th>触发</th><th>概率</th><th>累计</th></tr></thead><tbody>';
     results.forEach(function(a){
-        var dc=a.direction==='下行'?'down':'up';
         var avgP=(a.totalProb/a.days*100).toFixed(0);
         var strength=a.days>=4?'强':a.days>=3?'中':'';
         var j=judgeBullBear(a.series,a.direction);
         html+='<tr><td class="name">'+formatName(a.series)+'</td>';
-        html+='<td><span class="dir '+dc+'">'+a.direction+'</span></td>';
-        html+='<td>'+judgeHtml(j)+'</td>';
+        html+='<td><span class="dir">'+dirLabel(a.series,a.direction)+'</span></td>';
+        html+='<td>'+judgeLegsHtml(j)+'</td>';
         html+='<td class="num">'+a.days+'/5'+(strength?' <span class="strength">'+strength+'</span>':'')+'</td>';
         html+='<td class="num">'+avgP+'%</td>';
         html+='<td class="num">'+sgn(a.totalChg,1)+'<span class="unit">bp</span></td></tr>';
@@ -530,9 +558,11 @@ function renderEvents(){
         return 0;
     });
     var summary=document.getElementById('events-summary');
-    var downCount=evts.filter(e=>e.direction==='下行').length;
-    var upCount=evts.filter(e=>e.direction==='上行').length;
-    summary.innerHTML='筛选结果 <strong>'+evts.length+'</strong> 个高概率事件，下行 '+downCount+' 个，上行 '+upCount+' 个；点击任意行查看各年走势';
+    var yDown=evts.filter(e=>!isSpreadSeries(e.series)&&e.direction==='下行').length;
+    var yUp=evts.filter(e=>!isSpreadSeries(e.series)&&e.direction==='上行').length;
+    var sNarrow=evts.filter(e=>isSpreadSeries(e.series)&&e.direction==='下行').length;
+    var sWiden=evts.filter(e=>isSpreadSeries(e.series)&&e.direction==='上行').length;
+    summary.innerHTML='筛选结果 <strong>'+evts.length+'</strong> 个高概率事件，利率下行 '+yDown+' 个、上行 '+yUp+' 个，利差收窄 '+sNarrow+' 个、走扩 '+sWiden+' 个；点击任意行查看各年走势';
     var tbody=document.getElementById('events-body');
     tbody.innerHTML=evts.slice(0,300).map(function(e){
         var dc=e.direction==='下行'?'down':'up';
@@ -540,7 +570,7 @@ function renderEvents(){
         return '<tr onclick="showDetail(\''+e.series+'\',\''+e.date+'\')">'+
             '<td class="date">'+mdLabel(e.date)+'</td>'+
             '<td>'+formatName(e.series)+'</td>'+
-            '<td><span class="dir '+dc+'">'+e.direction+'</span></td>'+
+            '<td><span class="dir">'+dirLabel(e.series,e.direction)+'</span></td>'+
             '<td class="prob"><span class="pv">'+pct+'%</span><span class="pbar"><i class="'+dc+'" style="width:'+pct+'%"></i></span></td>'+
             '<td class="num'+(e.avg_change<0?' down':e.avg_change>0?' up':'')+'">'+sgn(e.avg_change,1)+'<span class="unit">bp</span></td>'+
             '<td class="num'+(e.median_change<0?' down':e.median_change>0?' up':'')+'">'+sgn(e.median_change,1)+'<span class="unit">bp</span></td>'+
