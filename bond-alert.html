@@ -74,7 +74,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 </head>
 <body data-site="inner" data-page="bond-alert">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-03 09:11</span><span class="site-stamp site-stamp-data">数据截至 2026-11-02</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-03 14:20</span><span class="site-stamp site-stamp-data">数据截至 2026-11-02</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html" class="active" aria-current="page">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html" class="active" aria-current="page">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -89,7 +89,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 <h2>今日信号</h2>
 <div class="two-col">
 <div>
-<h3>超涨超跌模型（滚动分位）</h3>
+<h3>超涨超跌模型（滚动分位 + 期货背离）</h3>
 <div class="tbl-wrap"><table class="tbl" id="tbl-over"></table></div>
 </div>
 <div>
@@ -122,10 +122,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',s
 
 <div class="panel method">
 <h2>模型与数据说明</h2>
-<p><b>超涨超跌</b>：利率债-信用债指数（20日）= 利率债全价(7-10年) 20日涨幅 − 信用债总全价 20日涨幅；中长债-短债指数（20日）= 长期债券全价 20日涨幅 − 中短期债券全价 20日涨幅；债券综合指数（20日）= 债券综合全价 20日涨幅；债券综合指数（40日）= 债券综合全价 40 日涨幅（仅展示，不参与综合）。每个指标取最近 <code>1197</code> 个观测的 98% / 3% 分位作为阈值，突破上阈记为看空（超涨回调），跌破下阈记为看多（超跌反弹）；综合信号分“任一指标触发”与“≥2 个指标同向触发”两档。</p>
+<p><b>超涨超跌</b>：利率债-信用债指数（20日）= 利率债全价(7-10年) 20日涨幅 − 信用债总全价 20日涨幅；中长债-短债指数（20日）= 长期债券全价 20日涨幅 − 中短期债券全价 20日涨幅；债券综合指数（20日）= 债券综合全价 20日涨幅；债券综合指数（40日）= 债券综合全价 40 日涨幅（仅展示，不参与综合）。每个指标取最近 <code>1197</code> 个观测的 98% / 3% 分位作为阈值，突破上阈记为看空（超涨回调），跌破下阈记为看多（超跌反弹）。另加入 <b>T/TL 国债期货背离</b>：两个合约合并为一个指标，任一合约顶背离视为超涨看空、底背离视为超跌看多，确认后 15 个交易日有效；顶背离若 DIF 升破参考高点 DIF 则提前失效；两合约方向冲突时当日不计；信号均映射到 10Y 国债上统计。综合信号由指标 1/2/3 + T/TL 合并背离共 4 个指标合成，分“任一指标触发”与“≥2 个指标同向触发”两档。</p>
 <p><b>利率拐点</b>：六个指标分别为降息预期（FR007 IRS 1Y 20日均值 − FR007 20日均值）、10债-OMO 利差、隔夜杠杆（R001 成交量占比 20日均值，阈值反向）、10债-股息率分位差 10日均值、10债-大宗分位差 10日均值、风险偏好（创业板20日涨幅 − 红利20日涨幅 10日均值）。阈值冻结为 2016–2023 年 5% / 95% 分位；六个指标中≥2 个同向触发才给出综合信号。</p>
-<p><b>数据源</b>：中债登全价指数；本地收益率库（国债/国开/存单/资金利率）；中国货币网（FR007、回购成交、IRS）；天软 cjpy（创业板、红利指数）；中证指数（商品 CFCI、沪深300 股息率）。运行时 <b>零 Wind / 零 iFinD 额度</b>，每日 09:00 自动增量更新并重建本页。</p>
-<p><b>与 Excel 对账</b>：超涨超跌模型的指标值、分位、98%/3% 阈值与桌面 Excel 种子逐日完全一致（0 差异）；利率拐点模型的最新值、阈值、信号与 Excel 一致，历史少数日期的 Excel 缓存标记存在已知的公式拖拽错位，本页按实时重算结果展示。</p>
+<p><b>数据源</b>：中债登全价指数；本地收益率库（国债/国开/存单/资金利率）；中国货币网（FR007、回购成交、IRS）；天软 cjpy（创业板、红利指数、T/TL 国债期货）；中证指数（商品 CFCI、沪深300 股息率）。运行时 <b>零 Wind / 零 iFinD 额度</b>，每日 09:00 自动增量更新并重建本页。</p>
+<p><b>与 Excel 对账</b>：超涨超跌原 4 个指标的指标值、分位、98%/3% 阈值与桌面 Excel 种子逐日完全一致（0 差异）；加入 T/TL 背离后，综合信号已不再与 Excel 逐日一致（Excel 无该指标）。利率拐点模型的最新值、阈值、信号与 Excel 一致，历史少数日期的 Excel 缓存标记存在已知的公式拖拽错位，本页按实时重算结果展示。</p>
 <p id="gen-info"></p>
 </div>
 </div>
@@ -196,7 +196,7 @@ function renderSummary(){
   const a1 = sig(ge1), a2 = sig(tc);
   $('summary').innerHTML = `
   <div class="stat-card ${a1[1]}">
-    <div class="label">超涨超跌，任一触发</div>
+    <div class="label">超涨超跌（含背离），任一触发</div>
     <div class="value ${a1[1]}">${a1[0]}</div>
     <div class="delta">今日触发：${triggerNames(O.inds, oi)}<br>≥2 确认：${sig(ge2)[0]}；历史累计看多 ${os.ge1.bull.count} / 看空 ${os.ge1.bear.count}</div>
   </div>
@@ -215,19 +215,28 @@ function renderSummary(){
     <div class="value" style="font-size:20px;line-height:1.3">${DATA.generated.split(' ')[0]}</div>
     <div class="delta">超涨超跌：${O.dates[0]} ~ ${O.dates[oi]}<br>利率拐点：${T.dates[0]} ~ ${T.dates[ti]}</div>
   </div>`;
-  $('data-info').textContent = `数据截至 ${O.dates[oi]} ｜ 超涨超跌：滚动 1197 日 98%/3% 分位 ｜ 利率拐点：2016–2023 冻结 5%/95% 阈值 ｜ 每日 09:00 自动更新`;
+  $('data-info').textContent = `数据截至 ${O.dates[oi]} ｜ 超涨超跌：滚动 1197 日 98%/3% 分位 + T/TL 期货背离 ｜ 利率拐点：2016–2023 冻结 5%/95% 阈值 ｜ 每日 09:00 自动更新`;
   $('gen-info').textContent = `本页生成于 ${DATA.generated}；数据源：中债登 / 本地收益率库 / 中国货币网 / 天软 / 中证指数。`;
 }
 
 // ---------------- 今日信号表 ----------------
 function renderToday(){
   const oi = O.dates.length - 1, ti = T.dates.length - 1;
-  let h = '<thead><tr><th>指标</th><th class="num">最新值</th><th class="num">分位</th><th class="num">98%阈值</th><th class="num">3%阈值</th><th>信号</th></tr></thead><tbody>';
+  let h = '<thead><tr><th>指标</th><th class="num">最新值 / 最近信号</th><th class="num">分位</th><th class="num">98%阈值</th><th class="num">3%阈值</th><th>信号</th></tr></thead><tbody>';
   for (const x of O.inds){
-    h += `<tr title="${x.desc||''}"><td>${x.name}</td>
-      <td class="num">${fmt(x.values[oi],3)}</td><td class="num">${pct(x.rank[oi])}</td>
-      <td class="num">${fmt(x.hi[oi],3)}</td><td class="num">${fmt(x.lo[oi],3)}</td>
-      <td>${badge(x.flags[oi])}</td></tr>`;
+    if (x.kind === 'divergence'){
+      const ev = x.latest;
+      const txt = ev ? `${ev.contract} ${ev.kind} ${ev.date.slice(5)} ${ev.active ? '<span class="tag">窗口内</span>' : '<span class="tag">已过窗</span>'}` : '—';
+      h += `<tr title="${x.desc||''}"><td>${x.name}</td>
+        <td class="num">${txt}</td><td class="num dim">—</td>
+        <td class="num dim">—</td><td class="num dim">—</td>
+        <td>${badge(x.flags[oi])}</td></tr>`;
+    } else {
+      h += `<tr title="${x.desc||''}"><td>${x.name}</td>
+        <td class="num">${fmt(x.values[oi],3)}</td><td class="num">${pct(x.rank[oi])}</td>
+        <td class="num">${fmt(x.hi[oi],3)}</td><td class="num">${fmt(x.lo[oi],3)}</td>
+        <td>${badge(x.flags[oi])}</td></tr>`;
+    }
   }
   h += `<tr><td><b>综合，任一触发</b></td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td>${badge(O.comp.ge1.flags[oi])}</td></tr>`;
   h += `<tr><td><b>综合，≥2 同向</b></td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td class="num dim">—</td><td>${badge(O.comp.ge2.flags[oi])}</td></tr></tbody>`;
@@ -261,6 +270,30 @@ function overChart(ind){
   const c = initChart('over-chart');
   if (c.getDom().clientWidth > 0) c.resize();
   trackZoom('over-chart', 'over');
+  if (ind.kind === 'divergence'){
+    c.setOption({
+      animation:false,
+      tooltip:{trigger:'axis', confine:true, formatter: ps => {
+        const i = ps[0].dataIndex;
+        const ev = ind.latest;
+        return `<b>${dates[i]}</b><br>T/TL 合并信号：${sig(ind.flags[i])[0]}<br>最近背离：${ev ? ev.contract + ' ' + ev.kind + ' ' + ev.date : '—'}`;
+      }},
+      legend:{top:0, itemWidth:14, itemHeight:8, textStyle:{fontSize:11,color:'#607d8b'}},
+      grid:baseGrid(58), xAxis:xAxis(dates),
+      yAxis:{type:'value', min:-1.3, max:1.3, name:'信号',
+        nameTextStyle:{fontSize:10,color:'#90a4ae'},
+        axisLabel:{fontSize:10, color:'#78909c', formatter:v => v===1?'看多':(v===-1?'看空':v)},
+        splitLine:{lineStyle:{color:'#f0f2f5'}}},
+      dataZoom:zoom('over'),
+      series:[
+        {name:'T/TL 合并背离信号', type:'line', step:'end', data:ind.flags, showSymbol:false,
+         lineStyle:{width:1.2,color:'#1a237e'}, itemStyle:{color:'#1a237e'},
+         markLine:{silent:true, symbol:'none', lineStyle:{color:'#cfd8dc', type:'dashed'},
+           data:[{yAxis:1},{yAxis:-1}]}}
+      ]
+    }, true);
+    return;
+  }
   c.setOption({
     animation:false,
     tooltip:{trigger:'axis', confine:true, formatter: ps => {
