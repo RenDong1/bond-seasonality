@@ -179,9 +179,6 @@
   .div-strip.on .div-badge{color:var(--sig-bear);border-color:var(--sig-bear)}
   .div-main{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
   .div-sub{color:var(--muted);font-variant-numeric:tabular-nums}
-  .div-link{margin-left:auto;color:var(--violet);cursor:pointer;white-space:nowrap;
-    border-bottom:var(--hair) solid var(--violet);line-height:1.4}
-  .div-link:hover{opacity:.7}
 
   @media(max-width:900px){
     .main-grid{grid-template-columns:1fr}
@@ -211,7 +208,6 @@
     .quick-stats .stat-card{border-left:0;padding-left:0}
     .div-strip{gap:2px 8px}
     .div-main{white-space:normal}
-    .div-link{margin-left:0}
   }
 </style>
 <!--THEME_START-->
@@ -230,7 +226,7 @@
 <body data-site="inner" data-page="treasury-futures">
 
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-03 12:21</span><span class="site-stamp site-stamp-data">数据截至 2026-11-02</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-03 13:39</span><span class="site-stamp site-stamp-data">数据截至 2026-11-02</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -21414,6 +21410,298 @@ const FUTURES_DATA = {
       "mdd_median": -0.89,
       "trough_med": 10.0
     }
+  },
+  "bottom_t": {
+    "rule": {
+      "index": "RSI14",
+      "price": "low",
+      "k": 3,
+      "ref": "recent",
+      "gap": 5
+    },
+    "signals": [
+      {
+        "date": "2022-03-04",
+        "ref_date": "2022-02-22",
+        "ref_low": 99.76,
+        "ref_rsi": 32.3,
+        "trigger_low": 99.58,
+        "trigger_close": 99.795,
+        "trigger_rsi": 38.2
+      },
+      {
+        "date": "2022-03-11",
+        "ref_date": "2022-03-03",
+        "ref_low": 99.56,
+        "ref_rsi": 32.2,
+        "trigger_low": 99.53,
+        "trigger_close": 100.22,
+        "trigger_rsi": 50.9
+      },
+      {
+        "date": "2022-06-30",
+        "ref_date": "2022-06-15",
+        "ref_low": 100.155,
+        "ref_rsi": 42.0,
+        "trigger_low": 99.74,
+        "trigger_close": 99.995,
+        "trigger_rsi": 43.3
+      },
+      {
+        "date": "2022-10-12",
+        "ref_date": "2022-09-16",
+        "ref_low": 101.085,
+        "ref_rsi": 45.7,
+        "trigger_low": 100.795,
+        "trigger_close": 101.055,
+        "trigger_rsi": 47.4
+      },
+      {
+        "date": "2022-11-30",
+        "ref_date": "2022-11-17",
+        "ref_low": 99.235,
+        "ref_rsi": 23.4,
+        "trigger_low": 99.125,
+        "trigger_close": 99.295,
+        "trigger_rsi": 28.7
+      },
+      {
+        "date": "2023-01-30",
+        "ref_date": "2022-12-27",
+        "ref_low": 99.915,
+        "ref_rsi": 47.9,
+        "trigger_low": 99.63,
+        "trigger_close": 100.03,
+        "trigger_rsi": 49.3
+      },
+      {
+        "date": "2023-09-26",
+        "ref_date": "2023-09-18",
+        "ref_low": 101.585,
+        "ref_rsi": 38.4,
+        "trigger_low": 101.44,
+        "trigger_close": 101.6,
+        "trigger_rsi": 38.5
+      },
+      {
+        "date": "2023-10-12",
+        "ref_date": "2023-09-26",
+        "ref_low": 101.44,
+        "ref_rsi": 38.5,
+        "trigger_low": 101.36,
+        "trigger_close": 101.565,
+        "trigger_rsi": 40.5
+      },
+      {
+        "date": "2023-10-20",
+        "ref_date": "2023-10-12",
+        "ref_low": 101.36,
+        "ref_rsi": 40.5,
+        "trigger_low": 101.185,
+        "trigger_close": 101.47,
+        "trigger_rsi": 42.3
+      },
+      {
+        "date": "2024-03-13",
+        "ref_date": "2024-03-01",
+        "ref_low": 103.565,
+        "ref_rsi": 54.9,
+        "trigger_low": 103.535,
+        "trigger_close": 103.885,
+        "trigger_rsi": 55.6
+      },
+      {
+        "date": "2025-03-10",
+        "ref_date": "2025-02-25",
+        "ref_low": 107.54,
+        "ref_rsi": 33.6,
+        "trigger_low": 107.52,
+        "trigger_close": 107.69,
+        "trigger_rsi": 33.9
+      },
+      {
+        "date": "2025-03-18",
+        "ref_date": "2025-02-25",
+        "ref_low": 107.54,
+        "ref_rsi": 33.6,
+        "trigger_low": 107.07,
+        "trigger_close": 107.24,
+        "trigger_rsi": 35.0
+      },
+      {
+        "date": "2025-07-31",
+        "ref_date": "2025-07-14",
+        "ref_low": 108.655,
+        "ref_rsi": 38.3,
+        "trigger_low": 108.375,
+        "trigger_close": 108.485,
+        "trigger_rsi": 44.4
+      },
+      {
+        "date": "2025-08-25",
+        "ref_date": "2025-07-30",
+        "ref_low": 108.095,
+        "ref_rsi": 37.6,
+        "trigger_low": 107.555,
+        "trigger_close": 107.95,
+        "trigger_rsi": 39.6
+      },
+      {
+        "date": "2025-09-15",
+        "ref_date": "2025-09-01",
+        "ref_low": 107.7,
+        "ref_rsi": 44.2,
+        "trigger_low": 107.67,
+        "trigger_close": 107.805,
+        "trigger_rsi": 44.5
+      }
+    ],
+    "last": {
+      "date": "2025-09-15",
+      "ref_date": "2025-09-01",
+      "ref_low": 107.7,
+      "ref_rsi": 44.2,
+      "trigger_low": 107.67,
+      "trigger_close": 107.805,
+      "trigger_rsi": 44.5
+    }
+  },
+  "bottom_tl": {
+    "rule": {
+      "index": "RSI14",
+      "price": "low",
+      "k": 3,
+      "ref": "recent",
+      "gap": 5
+    },
+    "signals": [
+      {
+        "date": "2023-09-28",
+        "ref_date": "2023-09-18",
+        "ref_low": 98.66,
+        "ref_rsi": 39.5,
+        "trigger_low": 98.38,
+        "trigger_close": 98.82,
+        "trigger_rsi": 43.9
+      },
+      {
+        "date": "2023-10-20",
+        "ref_date": "2023-10-12",
+        "ref_low": 98.21,
+        "ref_rsi": 40.6,
+        "trigger_low": 97.88,
+        "trigger_close": 98.43,
+        "trigger_rsi": 42.9
+      },
+      {
+        "date": "2023-10-30",
+        "ref_date": "2023-10-12",
+        "ref_low": 98.21,
+        "ref_rsi": 40.6,
+        "trigger_low": 98.14,
+        "trigger_close": 98.22,
+        "trigger_rsi": 41.6
+      },
+      {
+        "date": "2024-05-20",
+        "ref_date": "2024-05-10",
+        "ref_low": 105.51,
+        "ref_rsi": 44.5,
+        "trigger_low": 105.5,
+        "trigger_close": 105.74,
+        "trigger_rsi": 45.8
+      },
+      {
+        "date": "2025-03-20",
+        "ref_date": "2025-02-25",
+        "ref_low": 116.09,
+        "ref_rsi": 36.5,
+        "trigger_low": 114.69,
+        "trigger_close": 115.32,
+        "trigger_rsi": 40.0
+      },
+      {
+        "date": "2025-08-04",
+        "ref_date": "2025-07-14",
+        "ref_low": 120.06,
+        "ref_rsi": 44.9,
+        "trigger_low": 119.12,
+        "trigger_close": 119.19,
+        "trigger_rsi": 45.7
+      },
+      {
+        "date": "2025-08-25",
+        "ref_date": "2025-07-30",
+        "ref_low": 117.64,
+        "ref_rsi": 36.7,
+        "trigger_low": 115.6,
+        "trigger_close": 116.8,
+        "trigger_rsi": 40.4
+      },
+      {
+        "date": "2025-09-25",
+        "ref_date": "2025-09-11",
+        "ref_low": 114.35,
+        "ref_rsi": 31.3,
+        "trigger_low": 113.35,
+        "trigger_close": 114.11,
+        "trigger_rsi": 33.4
+      },
+      {
+        "date": "2025-10-13",
+        "ref_date": "2025-09-11",
+        "ref_low": 114.35,
+        "ref_rsi": 31.3,
+        "trigger_low": 114.25,
+        "trigger_close": 114.44,
+        "trigger_rsi": 42.5
+      },
+      {
+        "date": "2025-12-17",
+        "ref_date": "2025-12-08",
+        "ref_low": 111.69,
+        "ref_rsi": 21.9,
+        "trigger_low": 111.54,
+        "trigger_close": 112.14,
+        "trigger_rsi": 35.4
+      },
+      {
+        "date": "2026-01-08",
+        "ref_date": "2025-12-16",
+        "ref_low": 111.28,
+        "ref_rsi": 25.6,
+        "trigger_low": 110.4,
+        "trigger_close": 111.0,
+        "trigger_rsi": 36.9
+      },
+      {
+        "date": "2026-03-23",
+        "ref_date": "2026-03-16",
+        "ref_low": 110.36,
+        "ref_rsi": 31.3,
+        "trigger_low": 110.31,
+        "trigger_close": 110.71,
+        "trigger_rsi": 35.7
+      },
+      {
+        "date": "2026-05-12",
+        "ref_date": "2026-04-27",
+        "ref_low": 112.71,
+        "ref_rsi": 52.7,
+        "trigger_low": 112.62,
+        "trigger_close": 112.93,
+        "trigger_rsi": 53.3
+      }
+    ],
+    "last": {
+      "date": "2026-05-12",
+      "ref_date": "2026-04-27",
+      "ref_low": 112.71,
+      "ref_rsi": 52.7,
+      "trigger_low": 112.62,
+      "trigger_close": 112.93,
+      "trigger_rsi": 53.3
+    }
   }
 };
 
@@ -22110,6 +22398,8 @@ const tData = FUTURES_DATA.data_t;
 const tlData = FUTURES_DATA.data_tl;
 const tDiv = FUTURES_DATA.divergence_t || null;
 const tlDiv = FUTURES_DATA.divergence_tl || null;
+const tBottom = FUTURES_DATA.bottom_t || null;
+const tlBottom = FUTURES_DATA.bottom_tl || null;
 const tSignal = determineSignals(tData);
 const tlSignal = determineSignals(tlData);
 const risks = assessRisk(tSignal, tlSignal, tData, tlData);
@@ -22293,8 +22583,6 @@ function buildContractChart(prefix, name) {
 
   let fibLines = [];
   let fibOn = false;
-  let macdChip = null;
-  let macdItem = null;
   let divRefLine = null;
   let lastData = null;
   let oiRows = [];                 // 增仓副图当前数据（悬停读数用）
@@ -22308,7 +22596,7 @@ function buildContractChart(prefix, name) {
     });
   }
 
-  // —— 顶背离标记：主图 ▼（历史灰、当前绿），副图标参考 DIF / 触发点，并连参考高点 ——
+  // —— 背离标记：主图 ▼ 顶背离（绿）、▲ 底背离（红）；副图标参考 DIF / 触发点，并连参考高点 ——
   function drawDivergence(data) {
     const div = prefix === 'kT' ? tDiv : tlDiv;
     if (divRefLine) { macdDiff.removePriceLine(divRefLine); divRefLine = null; }
@@ -22321,12 +22609,24 @@ function buildContractChart(prefix, name) {
     const a = div && div.active ? div.active : null;
     const curDate = a && a.state === 'active' ? a.date : null;
     const sigs = ((div && div.signals) || []).filter(s => s.date >= first && s.date <= lastD);
+    const bdiv = prefix === 'kT' ? tBottom : tlBottom;
+    const bsigs = ((bdiv && bdiv.signals) || []).filter(s => s.date >= first && s.date <= lastD);
+    const lastB = bsigs.length ? bsigs[bsigs.length - 1].date : null;
 
-    candle.setMarkers(sigs.map(s => ({
-      time: toBD(s.date), position: 'aboveBar',
-      color: s.date === curDate ? KDOWN : '#A6ABA3',
-      shape: 'arrowDown', text: s.date === curDate ? '顶背离' : ''
-    })));
+    // 主图箭头：向下（顶背离）一律绿色，向上（底背离）一律红色；最新信号带文字。
+    const marks = [];
+    sigs.forEach(s => marks.push({
+      date: s.date,
+      m: { time: toBD(s.date), position: 'aboveBar', color: KDOWN, shape: 'arrowDown',
+           text: s.date === curDate ? '顶背离' : '' }
+    }));
+    bsigs.forEach(s => marks.push({
+      date: s.date,
+      m: { time: toBD(s.date), position: 'belowBar', color: KUP, shape: 'arrowUp',
+           text: s.date === lastB ? '底背离' : '' }
+    }));
+    marks.sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
+    candle.setMarkers(marks.map(x => x.m));
 
     if (a && a.ref_dif != null) {
       divRefLine = macdDiff.createPriceLine({
@@ -22365,62 +22665,12 @@ function buildContractChart(prefix, name) {
     }
   }
 
-  // 状态条「查看 DIF」：展开 MACD 副图，并把视图拉到参考高点前后
-  function openMacd() {
-    if (!macdChip || !macdItem || !lastData || !lastData.length) return;
-    const div = prefix === 'kT' ? tDiv : tlDiv;
-    const scrollToChart = () => {
-      const wrap = document.getElementById(prefix + '-main');
-      if (wrap) wrap.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    };
-    const desiredFrom = div && div.last ? subtractDays(div.last.ref_date, 30) : null;
-    const applyRange = () => {
-      if (!div || !div.last) return;
-      const end = addDays(div.last.date, 30);
-      const lastDate = lastData[lastData.length - 1].date;
-      const toDate = end < lastDate ? end : lastDate;
-      try {
-        cMain.timeScale().setVisibleRange({ from: toBD(desiredFrom), to: toBD(toDate) });
-      } catch (e) { /* 数据不足时保持当前视图 */ }
-    };
-    // 副图刚由隐藏切到显示时，setVisibleRange 可能被静默忽略；重排过程中副图还会
-    // 抛出一帧旧范围，把主图同步回去。这里在 1.5 秒内反复重设，并让 syncFrom 暂时
-    // 忽略副图发起的同步，直到范围稳定 300ms 或超时。
-    const deadline = performance.now() + 1500;
-    zoomGuard = deadline;
-    let okSince = null;
-    const applyUntilSettled = () => {
-      applyRange();
-      const vr = cMain.timeScale().getVisibleRange && cMain.timeScale().getVisibleRange();
-      const start = vr && vr.from && vr.from.year
-        ? vr.from.year + '-' + String(vr.from.month).padStart(2, '0') + '-' + String(vr.from.day).padStart(2, '0')
-        : null;
-      const ok = !start || !desiredFrom || start >= subtractDays(desiredFrom, 15);
-      const now = performance.now();
-      okSince = ok ? (okSince == null ? now : okSince) : null;
-      const stable = okSince != null && now - okSince > 300;
-      if (!stable && now < deadline) {
-        requestAnimationFrame(applyUntilSettled);
-      } else {
-        scrollToChart();
-      }
-    };
-    if (macdChip.classList.contains('off')) {
-      macdChip.classList.remove('off');
-      setPanel(macdItem, true, false);
-      requestAnimationFrame(applyUntilSettled);
-    } else {
-      applyUntilSettled();
-    }
-  }
-
   legendEl.innerHTML = '';
   legendItems.forEach(it => {
     const chip = document.createElement('span');
     chip.className = 'lg-chip off';   // 默认未选中
     chip.textContent = it.label;
     chip.style.borderColor = it.color;
-    if (it.panel === prefix + '-macd') { macdChip = chip; macdItem = it; }
     chip.addEventListener('click', () => {
       const show = !chip.classList.toggle('off');
       if (it.series) {
@@ -22489,13 +22739,11 @@ function buildContractChart(prefix, name) {
   //    拖拽超出数据时整体收回，四图都不显示空白。syncing 标志阻断 setVisibleLogicalRange
   //    同步触发的 change 回调，避免 A→B、B→A 循环。 ——
   let syncing = false;
-  let zoomGuard = 0;      // 「查看 DIF」程序化缩放的保护窗口，期内忽略副图发起的同步
   let dataLen = 0;
   const allPanels = [cMain, cMacd, cRsi, cOi];
 
   function syncFrom(source) {
     if (syncing) return;
-    if (source !== cMain && performance.now() < zoomGuard) return;
     const lr = source.timeScale().getVisibleLogicalRange();
     if (!lr) return;                 // 0 宽隐藏态无可见范围
     const span = lr.to - lr.from;
@@ -22522,7 +22770,7 @@ function buildContractChart(prefix, name) {
 
   allPanels.forEach(ch => ch.timeScale().subscribeVisibleLogicalRangeChange(() => syncFrom(ch)));
 
-  return { render, openMacd };
+  return { render };
 }
 
 // ====== 盘面分析文本（基于本地自算指标自动生成） ======
@@ -22652,7 +22900,7 @@ function setupRangeSelector() {
 // ====== 顶背离状态条 ======
 function fmtPct(v) { return (v >= 0 ? '+' : '') + v.toFixed(2) + '%'; }
 
-function renderDivStrip(elId, div, chartKey) {
+function renderDivStrip(elId, div) {
   const el = document.getElementById(elId);
   if (!el) return;
   if (!div || !div.last) {
@@ -22704,13 +22952,7 @@ function renderDivStrip(elId, div, chartKey) {
   el.className = cls;
   el.innerHTML = '<span class="div-badge">' + badge + '</span>'
     + '<span class="div-main">' + main + '</span>'
-    + '<span class="div-sub">' + parts.join(' ｜ ') + '</span>'
-    + '<span class="div-link">查看 DIF</span>';
-  const link = el.querySelector('.div-link');
-  if (link) link.addEventListener('click', () => {
-    const api = klineCharts[chartKey];
-    if (api && api.openMacd) api.openMacd();
-  });
+    + '<span class="div-sub">' + parts.join(' ｜ ') + '</span>';
 }
 
 // ====== RENDER FUNCTIONS ======
@@ -22765,8 +23007,8 @@ function renderAll() {
     sigCard('十年期国债期货', 'TZL.CFE', tData, tSignal, tBull, tBear) +
     sigCard('三十年期国债期货', 'TLZL2.CFE', tlData, tlSignal, tlBull, tlBear);
 
-  renderDivStrip('divT', tDiv, 'T');
-  renderDivStrip('divTL', tlDiv, 'TL');
+  renderDivStrip('divT', tDiv);
+  renderDivStrip('divTL', tlDiv);
 
   // Contract panels
   function contractPanel(name, code, data, ind, zsSig) {
