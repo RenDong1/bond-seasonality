@@ -169,6 +169,20 @@
     font-size:var(--t-small);color:var(--ink-2);line-height:1.8}
   .kline-analysis strong{color:var(--ink)}
 
+  /* 顶背离状态条 */
+  .div-strip{display:flex;align-items:center;gap:3px 10px;flex-wrap:wrap;margin:0 0 8px;
+    padding:6px 10px;border:var(--hair) solid var(--rule);border-left:2px solid var(--faint);
+    background:var(--paper-2);font-size:var(--t-small);color:var(--ink-2);line-height:1.55}
+  .div-strip.on{border-left-color:var(--sig-bear)}
+  .div-badge{font-family:var(--serif);font-weight:600;letter-spacing:.04em;color:var(--muted);
+    border:var(--hair) solid var(--rule);padding:0 6px 1px;white-space:nowrap}
+  .div-strip.on .div-badge{color:var(--sig-bear);border-color:var(--sig-bear)}
+  .div-main{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .div-sub{color:var(--muted);font-variant-numeric:tabular-nums}
+  .div-link{margin-left:auto;color:var(--violet);cursor:pointer;white-space:nowrap;
+    border-bottom:var(--hair) solid var(--violet);line-height:1.4}
+  .div-link:hover{opacity:.7}
+
   @media(max-width:900px){
     .main-grid{grid-template-columns:1fr}
     .signal-bar{grid-template-columns:1fr}
@@ -195,6 +209,9 @@
     .signal-info{grid-column:1/-1;grid-row:2;margin-top:2px}
     .quick-stats{grid-template-columns:1fr}
     .quick-stats .stat-card{border-left:0;padding-left:0}
+    .div-strip{gap:2px 8px}
+    .div-main{white-space:normal}
+    .div-link{margin-left:0}
   }
 </style>
 <!--THEME_START-->
@@ -213,7 +230,7 @@
 <body data-site="inner" data-page="treasury-futures">
 
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-03 09:04</span><span class="site-stamp site-stamp-data">数据截至 2026-11-02</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-03 12:21</span><span class="site-stamp site-stamp-data">数据截至 2026-11-02</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -243,6 +260,7 @@
   </div>
   <div class="kline-item">
     <div class="kline-title">十年期国债期货<span class="code">TZL.CFE</span></div>
+    <div class="div-strip" id="divT"></div>
     <div class="kline-chart-wrap">
       <div class="kline-legend" id="legendT"></div>
       <div id="kT-main" style="width:100%;height:300px"></div>
@@ -254,6 +272,7 @@
   </div>
   <div class="kline-item">
     <div class="kline-title">三十年期国债期货<span class="code">TLZL2.CFE</span></div>
+    <div class="div-strip" id="divTL"></div>
     <div class="kline-chart-wrap">
       <div class="kline-legend" id="legendTL"></div>
       <div id="kTL-main" style="width:100%;height:300px"></div>
@@ -21022,6 +21041,379 @@ const FUTURES_DATA = {
     "t_fund_change": -3.3,
     "tl_fund": 202.7,
     "tl_fund_change": 5.2
+  },
+  "divergence_t": {
+    "rule": {
+      "index": "DIF",
+      "price": "high",
+      "k": 3,
+      "ref": "highest120",
+      "gap": 20,
+      "window": 15
+    },
+    "signals": [
+      {
+        "date": "2021-11-26",
+        "ref_date": "2021-11-10",
+        "ref_high": 100.28,
+        "ref_dif": 0.077,
+        "trigger_high": 100.415,
+        "trigger_close": 100.355,
+        "trigger_dif": 0.075
+      },
+      {
+        "date": "2022-01-17",
+        "ref_date": "2021-12-30",
+        "ref_high": 100.88,
+        "ref_dif": 0.181,
+        "trigger_high": 101.02,
+        "trigger_close": 100.73,
+        "trigger_dif": 0.145
+      },
+      {
+        "date": "2023-06-12",
+        "ref_date": "2023-05-11",
+        "ref_high": 101.955,
+        "ref_dif": 0.325,
+        "trigger_high": 101.98,
+        "trigger_close": 101.88,
+        "trigger_dif": 0.145
+      },
+      {
+        "date": "2023-07-21",
+        "ref_date": "2023-06-14",
+        "ref_high": 102.335,
+        "ref_dif": 0.2,
+        "trigger_high": 102.415,
+        "trigger_close": 102.355,
+        "trigger_dif": 0.157
+      },
+      {
+        "date": "2024-01-09",
+        "ref_date": "2023-12-28",
+        "ref_high": 103.075,
+        "ref_dif": 0.229,
+        "trigger_high": 103.115,
+        "trigger_close": 103.105,
+        "trigger_dif": 0.22
+      },
+      {
+        "date": "2024-02-06",
+        "ref_date": "2024-01-09",
+        "ref_high": 103.115,
+        "ref_dif": 0.22,
+        "trigger_high": 103.585,
+        "trigger_close": 103.28,
+        "trigger_dif": 0.213
+      },
+      {
+        "date": "2024-04-12",
+        "ref_date": "2024-03-07",
+        "ref_high": 104.44,
+        "ref_dif": 0.252,
+        "trigger_high": 104.53,
+        "trigger_close": 104.395,
+        "trigger_dif": 0.128
+      },
+      {
+        "date": "2024-06-19",
+        "ref_date": "2024-04-23",
+        "ref_high": 104.9,
+        "ref_dif": 0.226,
+        "trigger_high": 104.975,
+        "trigger_close": 104.975,
+        "trigger_dif": 0.143
+      },
+      {
+        "date": "2024-07-22",
+        "ref_date": "2024-07-01",
+        "ref_high": 105.495,
+        "ref_dif": 0.194,
+        "trigger_high": 105.775,
+        "trigger_close": 105.715,
+        "trigger_dif": 0.179
+      },
+      {
+        "date": "2024-09-10",
+        "ref_date": "2024-08-05",
+        "ref_high": 106.55,
+        "ref_dif": 0.341,
+        "trigger_high": 106.61,
+        "trigger_close": 106.6,
+        "trigger_dif": 0.167
+      },
+      {
+        "date": "2024-11-25",
+        "ref_date": "2024-09-24",
+        "ref_high": 107.135,
+        "ref_dif": 0.276,
+        "trigger_high": 107.15,
+        "trigger_close": 107.095,
+        "trigger_dif": 0.216
+      },
+      {
+        "date": "2024-12-27",
+        "ref_date": "2024-12-16",
+        "ref_high": 108.85,
+        "ref_dif": 0.498,
+        "trigger_high": 108.88,
+        "trigger_close": 108.86,
+        "trigger_dif": 0.463
+      },
+      {
+        "date": "2025-02-06",
+        "ref_date": "2025-01-03",
+        "ref_high": 109.495,
+        "ref_dif": 0.478,
+        "trigger_high": 109.565,
+        "trigger_close": 109.535,
+        "trigger_dif": 0.237
+      },
+      {
+        "date": "2026-04-20",
+        "ref_date": "2025-11-05",
+        "ref_high": 108.75,
+        "ref_dif": 0.181,
+        "trigger_high": 108.795,
+        "trigger_close": 108.715,
+        "trigger_dif": 0.09
+      },
+      {
+        "date": "2026-05-26",
+        "ref_date": "2026-04-22",
+        "ref_high": 108.885,
+        "ref_dif": 0.122,
+        "trigger_high": 108.91,
+        "trigger_close": 108.855,
+        "trigger_dif": 0.114
+      },
+      {
+        "date": "2026-06-29",
+        "ref_date": "2026-06-04",
+        "ref_high": 109.3,
+        "ref_dif": 0.164,
+        "trigger_high": 109.36,
+        "trigger_close": 109.335,
+        "trigger_dif": 0.068
+      },
+      {
+        "date": "2026-09-29",
+        "ref_date": "2026-08-18",
+        "ref_high": 109.65,
+        "ref_dif": 0.1,
+        "trigger_high": 109.66,
+        "trigger_close": 109.655,
+        "trigger_dif": 0.053
+      }
+    ],
+    "last": {
+      "date": "2026-09-29",
+      "ref_date": "2026-08-18",
+      "ref_high": 109.65,
+      "ref_dif": 0.1,
+      "trigger_high": 109.66,
+      "trigger_close": 109.655,
+      "trigger_dif": 0.053
+    },
+    "active": {
+      "state": "invalid",
+      "date": "2026-09-29",
+      "ref_date": "2026-08-18",
+      "ref_high": 109.65,
+      "ref_dif": 0.1,
+      "trigger_high": 109.66,
+      "trigger_close": 109.655,
+      "trigger_dif": 0.053,
+      "current_dif": 0.124,
+      "day": 19,
+      "window": 15,
+      "entry": 109.62,
+      "current": 109.935,
+      "ret": 0.29,
+      "max_dd": -0.24,
+      "invalid_date": "2026-10-20",
+      "last_date": "2026-11-02"
+    },
+    "stats": {
+      "n": 17,
+      "win01": 94.1,
+      "win05": 47.1,
+      "mdd_median": -0.46,
+      "trough_med": 12.0
+    }
+  },
+  "divergence_tl": {
+    "rule": {
+      "index": "DIF",
+      "price": "high",
+      "k": 3,
+      "ref": "highest120",
+      "gap": 20,
+      "window": 15
+    },
+    "signals": [
+      {
+        "date": "2023-06-12",
+        "ref_date": "2023-05-11",
+        "ref_high": 97.69,
+        "ref_dif": 0.29,
+        "trigger_high": 97.74,
+        "trigger_close": 97.62,
+        "trigger_dif": 0.157
+      },
+      {
+        "date": "2023-08-11",
+        "ref_date": "2023-07-24",
+        "ref_high": 99.59,
+        "ref_dif": 0.442,
+        "trigger_high": 99.62,
+        "trigger_close": 99.55,
+        "trigger_dif": 0.355
+      },
+      {
+        "date": "2023-12-22",
+        "ref_date": "2023-08-25",
+        "ref_high": 101.47,
+        "ref_dif": 0.658,
+        "trigger_high": 101.64,
+        "trigger_close": 101.47,
+        "trigger_dif": 0.529
+      },
+      {
+        "date": "2024-01-22",
+        "ref_date": "2024-01-09",
+        "ref_high": 102.82,
+        "ref_dif": 0.673,
+        "trigger_high": 103.81,
+        "trigger_close": 103.68,
+        "trigger_dif": 0.649
+      },
+      {
+        "date": "2024-02-27",
+        "ref_date": "2024-02-05",
+        "ref_high": 105.9,
+        "ref_dif": 1.004,
+        "trigger_high": 106.94,
+        "trigger_close": 106.57,
+        "trigger_dif": 0.922
+      },
+      {
+        "date": "2024-04-23",
+        "ref_date": "2024-03-07",
+        "ref_high": 108.09,
+        "ref_dif": 0.961,
+        "trigger_high": 108.48,
+        "trigger_close": 108.35,
+        "trigger_dif": 0.475
+      },
+      {
+        "date": "2024-06-18",
+        "ref_date": "2024-04-23",
+        "ref_high": 108.48,
+        "ref_dif": 0.475,
+        "trigger_high": 108.52,
+        "trigger_close": 108.32,
+        "trigger_dif": 0.441
+      },
+      {
+        "date": "2024-07-25",
+        "ref_date": "2024-07-01",
+        "ref_high": 110.1,
+        "ref_dif": 0.644,
+        "trigger_high": 110.18,
+        "trigger_close": 110.12,
+        "trigger_dif": 0.447
+      },
+      {
+        "date": "2024-09-10",
+        "ref_date": "2024-08-05",
+        "ref_high": 113.0,
+        "ref_dif": 0.975,
+        "trigger_high": 113.31,
+        "trigger_close": 113.28,
+        "trigger_dif": 0.565
+      },
+      {
+        "date": "2024-12-10",
+        "ref_date": "2024-09-24",
+        "ref_high": 116.0,
+        "ref_dif": 1.063,
+        "trigger_high": 117.28,
+        "trigger_close": 116.95,
+        "trigger_dif": 0.915
+      },
+      {
+        "date": "2025-01-27",
+        "ref_date": "2025-01-03",
+        "ref_high": 120.99,
+        "ref_dif": 1.207,
+        "trigger_high": 121.28,
+        "trigger_close": 121.24,
+        "trigger_dif": 0.866
+      },
+      {
+        "date": "2026-06-29",
+        "ref_date": "2026-04-22",
+        "ref_high": 114.37,
+        "ref_dif": 0.546,
+        "trigger_high": 114.53,
+        "trigger_close": 114.25,
+        "trigger_dif": 0.192
+      },
+      {
+        "date": "2026-09-22",
+        "ref_date": "2026-08-25",
+        "ref_high": 116.84,
+        "ref_dif": 0.511,
+        "trigger_high": 117.15,
+        "trigger_close": 117.03,
+        "trigger_dif": 0.237
+      },
+      {
+        "date": "2026-10-28",
+        "ref_date": "2026-10-20",
+        "ref_high": 118.51,
+        "ref_dif": 0.505,
+        "trigger_high": 118.66,
+        "trigger_close": 118.56,
+        "trigger_dif": 0.467
+      }
+    ],
+    "last": {
+      "date": "2026-10-28",
+      "ref_date": "2026-10-20",
+      "ref_high": 118.51,
+      "ref_dif": 0.505,
+      "trigger_high": 118.66,
+      "trigger_close": 118.56,
+      "trigger_dif": 0.467
+    },
+    "active": {
+      "state": "active",
+      "date": "2026-10-28",
+      "ref_date": "2026-10-20",
+      "ref_high": 118.51,
+      "ref_dif": 0.505,
+      "trigger_high": 118.66,
+      "trigger_close": 118.56,
+      "trigger_dif": 0.467,
+      "current_dif": 0.351,
+      "day": 3,
+      "window": 15,
+      "entry": 118.45,
+      "current": 117.8,
+      "ret": -0.55,
+      "max_dd": -0.87,
+      "invalid_date": null,
+      "last_date": "2026-11-02"
+    },
+    "stats": {
+      "n": 14,
+      "win01": 92.9,
+      "win05": 64.3,
+      "mdd_median": -0.89,
+      "trough_med": 10.0
+    }
   }
 };
 
@@ -21716,6 +22108,8 @@ function assessRisk(tSig, tlSig, tData, tlData) {
 // ====== COMPUTE ALL ======
 const tData = FUTURES_DATA.data_t;
 const tlData = FUTURES_DATA.data_tl;
+const tDiv = FUTURES_DATA.divergence_t || null;
+const tlDiv = FUTURES_DATA.divergence_tl || null;
 const tSignal = determineSignals(tData);
 const tlSignal = determineSignals(tlData);
 const risks = assessRisk(tSignal, tlSignal, tData, tlData);
@@ -21793,6 +22187,8 @@ function buildContractChart(prefix, name) {
   const bollU = cMain.addLineSeries({ color: '#C6D6E5', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false, lastValueVisible: false, visible: false });
   const bollM = cMain.addLineSeries({ color: '#5B5B51', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, visible: false });
   const bollL = cMain.addLineSeries({ color: '#C6D6E5', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false, lastValueVisible: false, visible: false });
+  // 顶背离连线：参考高点 -> 触发日，只画当前有效信号（不进图例）
+  const divConnector = cMain.addLineSeries({ color: '#8A8F86', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false, visible: false });
 
   // —— MACD 副图（默认隐藏） ——
   const macdBar  = cMacd.addHistogramSeries({ priceLineVisible: false, lastValueVisible: false });
@@ -21889,7 +22285,7 @@ function buildContractChart(prefix, name) {
     { label: 'MA20', color: '#5A7448', series: ma20 },
     { label: 'BOLL', color: '#C6D6E5', series: [bollU, bollM, bollL] },
     { label: 'VOL', color: '#75756A', vol: true },
-    { label: 'MACD', color: '#5D4C68', panel: prefix + '-macd', chart: cMacd },
+    { label: 'MACD/DIF', color: '#5D4C68', panel: prefix + '-macd', chart: cMacd },
     { label: 'RSI', color: '#3E6B8C', panel: prefix + '-rsi', chart: cRsi },
     { label: '增仓', color: '#5A7448', panel: prefix + '-oi', chart: cOi },
     { label: '斐波那契', color: '#75756A', fib: true }
@@ -21897,6 +22293,9 @@ function buildContractChart(prefix, name) {
 
   let fibLines = [];
   let fibOn = false;
+  let macdChip = null;
+  let macdItem = null;
+  let divRefLine = null;
   let lastData = null;
   let oiRows = [];                 // 增仓副图当前数据（悬停读数用）
   let oiDateIdx = new Map();       // date -> i
@@ -21909,12 +22308,119 @@ function buildContractChart(prefix, name) {
     });
   }
 
+  // —— 顶背离标记：主图 ▼（历史灰、当前绿），副图标参考 DIF / 触发点，并连参考高点 ——
+  function drawDivergence(data) {
+    const div = prefix === 'kT' ? tDiv : tlDiv;
+    if (divRefLine) { macdDiff.removePriceLine(divRefLine); divRefLine = null; }
+    if (!data || !data.length) {
+      candle.setMarkers([]); macdDiff.setMarkers([]); divConnector.setData([]);
+      divConnector.applyOptions({ visible: false });
+      return;
+    }
+    const first = data[0].date, lastD = data[data.length - 1].date;
+    const a = div && div.active ? div.active : null;
+    const curDate = a && a.state === 'active' ? a.date : null;
+    const sigs = ((div && div.signals) || []).filter(s => s.date >= first && s.date <= lastD);
+
+    candle.setMarkers(sigs.map(s => ({
+      time: toBD(s.date), position: 'aboveBar',
+      color: s.date === curDate ? KDOWN : '#A6ABA3',
+      shape: 'arrowDown', text: s.date === curDate ? '顶背离' : ''
+    })));
+
+    if (a && a.ref_dif != null) {
+      divRefLine = macdDiff.createPriceLine({
+        price: a.ref_dif, color: '#A6ABA3', lineWidth: 1,
+        lineStyle: LightweightCharts.LineStyle.Dashed,
+        axisLabelVisible: true, title: '参考DIF'
+      });
+    }
+    if (a && a.ref_date >= first && a.ref_date <= lastD && a.date >= first && a.date <= lastD) {
+      macdDiff.setMarkers([
+        { time: toBD(a.ref_date), position: 'inBar', color: '#75756A', shape: 'circle', text: '' },
+        { time: toBD(a.date), position: 'aboveBar', color: KDOWN, shape: 'arrowDown', text: 'DIF背离' }
+      ]);
+    } else {
+      macdDiff.setMarkers([]);
+    }
+
+    if (a && a.state === 'active' && a.ref_date >= first && a.date <= lastD) {
+      divConnector.setData([
+        { time: toBD(a.ref_date), value: a.ref_high },
+        { time: toBD(a.date), value: a.trigger_high }
+      ]);
+      divConnector.applyOptions({ visible: true });
+    } else {
+      divConnector.setData([]);
+      divConnector.applyOptions({ visible: false });
+    }
+  }
+
+  // 副图显隐；deferSync 用于容器刚从 display:none 恢复的场景：
+  // 需等两帧让 autoSize 的 ResizeObserver 完成重测，再按主图范围对齐。
+  function setPanel(item, show, deferSync) {
+    document.getElementById(item.panel).style.display = show ? '' : 'none';
+    if (show && deferSync) {
+      requestAnimationFrame(() => requestAnimationFrame(() => syncFrom(cMain)));
+    }
+  }
+
+  // 状态条「查看 DIF」：展开 MACD 副图，并把视图拉到参考高点前后
+  function openMacd() {
+    if (!macdChip || !macdItem || !lastData || !lastData.length) return;
+    const div = prefix === 'kT' ? tDiv : tlDiv;
+    const scrollToChart = () => {
+      const wrap = document.getElementById(prefix + '-main');
+      if (wrap) wrap.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    };
+    const desiredFrom = div && div.last ? subtractDays(div.last.ref_date, 30) : null;
+    const applyRange = () => {
+      if (!div || !div.last) return;
+      const end = addDays(div.last.date, 30);
+      const lastDate = lastData[lastData.length - 1].date;
+      const toDate = end < lastDate ? end : lastDate;
+      try {
+        cMain.timeScale().setVisibleRange({ from: toBD(desiredFrom), to: toBD(toDate) });
+      } catch (e) { /* 数据不足时保持当前视图 */ }
+    };
+    // 副图刚由隐藏切到显示时，setVisibleRange 可能被静默忽略；重排过程中副图还会
+    // 抛出一帧旧范围，把主图同步回去。这里在 1.5 秒内反复重设，并让 syncFrom 暂时
+    // 忽略副图发起的同步，直到范围稳定 300ms 或超时。
+    const deadline = performance.now() + 1500;
+    zoomGuard = deadline;
+    let okSince = null;
+    const applyUntilSettled = () => {
+      applyRange();
+      const vr = cMain.timeScale().getVisibleRange && cMain.timeScale().getVisibleRange();
+      const start = vr && vr.from && vr.from.year
+        ? vr.from.year + '-' + String(vr.from.month).padStart(2, '0') + '-' + String(vr.from.day).padStart(2, '0')
+        : null;
+      const ok = !start || !desiredFrom || start >= subtractDays(desiredFrom, 15);
+      const now = performance.now();
+      okSince = ok ? (okSince == null ? now : okSince) : null;
+      const stable = okSince != null && now - okSince > 300;
+      if (!stable && now < deadline) {
+        requestAnimationFrame(applyUntilSettled);
+      } else {
+        scrollToChart();
+      }
+    };
+    if (macdChip.classList.contains('off')) {
+      macdChip.classList.remove('off');
+      setPanel(macdItem, true, false);
+      requestAnimationFrame(applyUntilSettled);
+    } else {
+      applyUntilSettled();
+    }
+  }
+
   legendEl.innerHTML = '';
   legendItems.forEach(it => {
     const chip = document.createElement('span');
     chip.className = 'lg-chip off';   // 默认未选中
     chip.textContent = it.label;
     chip.style.borderColor = it.color;
+    if (it.panel === prefix + '-macd') { macdChip = chip; macdItem = it; }
     chip.addEventListener('click', () => {
       const show = !chip.classList.toggle('off');
       if (it.series) {
@@ -21925,13 +22431,7 @@ function buildContractChart(prefix, name) {
         // 关掉成交量时，把主图价格轴底部余量收回，让蜡烛占满整图
         cMain.priceScale('right').applyOptions({ scaleMargins: show ? { top: 0.08, bottom: 0.22 } : { top: 0.08, bottom: 0.08 } });
       } else if (it.panel) {
-        document.getElementById(it.panel).style.display = show ? '' : 'none';
-        if (show) {
-          // 容器从 display:none 恢复后，autoSize 的 ResizeObserver 需下一帧才完成重测；
-          // 立即 fitContent 会基于 0 宽算错可见范围。这里延迟两帧后按主图当前可见时间
-          // 范围强制对齐（syncFrom 会同步其余三图，含刚显示的这张）。
-          requestAnimationFrame(() => requestAnimationFrame(() => syncFrom(cMain)));
-        }
+        setPanel(it, show, true);
       } else if (it.fib) {
         fibOn = show;
         if (lastData) drawFib(computeFib(lastData));
@@ -21968,6 +22468,7 @@ function buildContractChart(prefix, name) {
     macdBar.setData(macdBarData);
     macdDiff.setData(lineData(times, macd.diff));
     macdDea.setData(lineData(times, macd.dea));
+    drawDivergence(data);
 
     rsi6.setData(lineData(times, rsi6v));
     rsi12.setData(lineData(times, rsi12v));
@@ -21988,11 +22489,13 @@ function buildContractChart(prefix, name) {
   //    拖拽超出数据时整体收回，四图都不显示空白。syncing 标志阻断 setVisibleLogicalRange
   //    同步触发的 change 回调，避免 A→B、B→A 循环。 ——
   let syncing = false;
+  let zoomGuard = 0;      // 「查看 DIF」程序化缩放的保护窗口，期内忽略副图发起的同步
   let dataLen = 0;
   const allPanels = [cMain, cMacd, cRsi, cOi];
 
   function syncFrom(source) {
     if (syncing) return;
+    if (source !== cMain && performance.now() < zoomGuard) return;
     const lr = source.timeScale().getVisibleLogicalRange();
     if (!lr) return;                 // 0 宽隐藏态无可见范围
     const span = lr.to - lr.from;
@@ -22019,7 +22522,7 @@ function buildContractChart(prefix, name) {
 
   allPanels.forEach(ch => ch.timeScale().subscribeVisibleLogicalRangeChange(() => syncFrom(ch)));
 
-  return { render };
+  return { render, openMacd };
 }
 
 // ====== 盘面分析文本（基于本地自算指标自动生成） ======
@@ -22082,14 +22585,22 @@ const OI_SURGE_THRESHOLD = 15000; // 持仓变动信号: 单日增仓≥1.5万�
 let chartRange = '1y';
 let customStart = null, customEnd = null;
 
-function subtractDays(dateStr, days) {
+function shiftDays(dateStr, days) {
   const parts = dateStr.split('-').map(Number);
   const dt = new Date(parts[0], parts[1] - 1, parts[2]);
-  dt.setDate(dt.getDate() - days);
+  dt.setDate(dt.getDate() + days);
   const yy = dt.getFullYear();
   const mm = String(dt.getMonth() + 1).padStart(2, '0');
   const dd = String(dt.getDate()).padStart(2, '0');
   return yy + '-' + mm + '-' + dd;
+}
+
+function subtractDays(dateStr, days) {
+  return shiftDays(dateStr, -days);
+}
+
+function addDays(dateStr, days) {
+  return shiftDays(dateStr, days);
 }
 
 function filterByRange(data) {
@@ -22135,6 +22646,70 @@ function setupRangeSelector() {
   document.getElementById('customEnd').addEventListener('change', () => {
     customEnd = document.getElementById('customEnd').value || null;
     renderKlines();
+  });
+}
+
+// ====== 顶背离状态条 ======
+function fmtPct(v) { return (v >= 0 ? '+' : '') + v.toFixed(2) + '%'; }
+
+function renderDivStrip(elId, div, chartKey) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (!div || !div.last) {
+    el.className = 'div-strip';
+    el.innerHTML = '<span class="div-badge">顶背离</span><span class="div-sub">暂无信号</span>';
+    return;
+  }
+  const a = div.active;
+  const st = div.stats || {};
+  const parts = [];
+  let cls = 'div-strip';
+  let badge = '顶背离';
+  let main = '';
+
+  if (a && a.state === 'active') {
+    cls += ' on';
+    badge = '顶背离预警';
+    main = a.date.slice(5) + ' 触发 ｜ ' + (a.day === 0 ? '今日收盘确认' : '第 ' + a.day + '/' + a.window + ' 日');
+    parts.push('参考 ' + a.ref_date.slice(5) + ' 高点 ' + a.ref_high.toFixed(3)
+      + '（DIF ' + a.ref_dif.toFixed(3) + '） → 触发 ' + a.trigger_high.toFixed(3)
+      + '（DIF ' + a.trigger_dif.toFixed(3) + '）');
+    parts.push('当前 DIF ' + a.current_dif.toFixed(3));
+    if (a.entry != null) {
+      parts.push('入场 ' + a.entry.toFixed(3) + ' 最新 ' + a.current.toFixed(3) + ' ' + fmtPct(a.ret)
+        + (a.max_dd != null ? ' 最大回撤 ' + a.max_dd.toFixed(2) + '%' : ''));
+    } else {
+      parts.push('次日开盘入场');
+    }
+  } else if (a && a.state === 'invalid') {
+    badge = '顶背离已失效';
+    main = '最近 ' + a.date.slice(5) + ' 触发，'
+      + (a.invalid_date ? a.invalid_date.slice(5) : '') + ' DIF 升破参考值';
+    parts.push('参考 ' + a.ref_date.slice(5) + ' 高点 ' + a.ref_high.toFixed(3)
+      + '（DIF ' + a.ref_dif.toFixed(3) + '）');
+    parts.push('当前 DIF ' + a.current_dif.toFixed(3));
+  } else {
+    main = '当前无信号 ｜ 最近 ' + a.date.slice(5) + ' 触发，'
+      + a.window + ' 日窗口已结束';
+    parts.push('参考 ' + a.ref_date.slice(5) + ' 高点 ' + a.ref_high.toFixed(3)
+      + '（DIF ' + a.ref_dif.toFixed(3) + '）');
+  }
+
+  if (st.n) {
+    parts.push('历史 ' + st.n + ' 次'
+      + (st.win01 != null ? ' ｜ ' + st.win01.toFixed(0) + '% 出现≥0.1%回撤' : '')
+      + (st.trough_med != null ? ' ｜ 低点中位 ' + st.trough_med + ' 日' : ''));
+  }
+
+  el.className = cls;
+  el.innerHTML = '<span class="div-badge">' + badge + '</span>'
+    + '<span class="div-main">' + main + '</span>'
+    + '<span class="div-sub">' + parts.join(' ｜ ') + '</span>'
+    + '<span class="div-link">查看 DIF</span>';
+  const link = el.querySelector('.div-link');
+  if (link) link.addEventListener('click', () => {
+    const api = klineCharts[chartKey];
+    if (api && api.openMacd) api.openMacd();
   });
 }
 
@@ -22189,6 +22764,9 @@ function renderAll() {
   document.getElementById('signalBar').innerHTML =
     sigCard('十年期国债期货', 'TZL.CFE', tData, tSignal, tBull, tBear) +
     sigCard('三十年期国债期货', 'TLZL2.CFE', tlData, tlSignal, tlBull, tlBear);
+
+  renderDivStrip('divT', tDiv, 'T');
+  renderDivStrip('divTL', tlDiv, 'TL');
 
   // Contract panels
   function contractPanel(name, code, data, ind, zsSig) {
