@@ -226,7 +226,7 @@
 <body data-site="inner" data-page="treasury-futures">
 
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-04 09:04</span><span class="site-stamp site-stamp-data">数据截至 2026-11-03</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-04 09:31</span><span class="site-stamp site-stamp-data">数据截至 2026-11-03</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -260,7 +260,7 @@
     <div class="kline-chart-wrap">
       <div class="kline-legend" id="legendT"></div>
       <div id="kT-main" style="width:100%;height:300px"></div>
-      <div id="kT-macd" style="width:100%;height:80px;display:none"></div>
+      <div id="kT-macd" style="width:100%;height:120px;display:none"></div>
       <div id="kT-rsi" style="width:100%;height:80px;display:none"></div>
       <div id="kT-oi" style="width:100%;height:80px;display:none"></div>
     </div>
@@ -272,7 +272,7 @@
     <div class="kline-chart-wrap">
       <div class="kline-legend" id="legendTL"></div>
       <div id="kTL-main" style="width:100%;height:300px"></div>
-      <div id="kTL-macd" style="width:100%;height:80px;display:none"></div>
+      <div id="kTL-macd" style="width:100%;height:120px;display:none"></div>
       <div id="kTL-rsi" style="width:100%;height:80px;display:none"></div>
       <div id="kTL-oi" style="width:100%;height:80px;display:none"></div>
     </div>
@@ -22474,6 +22474,9 @@ function buildContractChart(prefix, name) {
   const cMacd = mkChart(document.getElementById(prefix + '-macd'), p => p.toFixed(3));
   const cRsi  = mkChart(document.getElementById(prefix + '-rsi'),  p => p.toFixed(1));
   const cOi   = mkChart(document.getElementById(prefix + '-oi'),   p => (Math.abs(p) >= 10000 ? (p / 10000).toFixed(1) + '万' : p.toFixed(0)));
+  // MACD 副图上下留白略大：参考 DIF 价格线会把刻度顶到面板边缘，顶部刻度文字会被裁掉一半；
+  // entireTextOnly 让被面板切掉一半的刻度（如 TL 的 1.000）不画出来。
+  cMacd.priceScale('right').applyOptions({ scaleMargins: { top: 0.16, bottom: 0.12 }, entireTextOnly: true });
 
   // —— 主图：蜡烛（始终显示）+ VOL / MA / BOLL（默认隐藏，图例点选后显示） ——
   const candle = cMain.addCandlestickSeries({ upColor: KUP, downColor: KDOWN, borderUpColor: KUP, borderDownColor: KDOWN, wickUpColor: KUP, wickDownColor: KDOWN, priceFormat: { type: 'price', precision: 3, minMove: 0.001 } });
@@ -22606,7 +22609,9 @@ function buildContractChart(prefix, name) {
     });
   }
 
-  // —— 背离标记：主图 ▼ 顶背离（绿）、▲ 底背离（红）；副图标参考 DIF / 触发点，并连参考高点 ——
+  // —— 背离标记：主图 ▼ 顶背离（绿）、▲ 底背离（红）；副图用参考 DIF 虚线，并连参考高点。
+  //    注意：不要在 macdDiff 上 setMarkers —— 本版 lightweight-charts 的标记会把所在系列的
+  //    价格轴撑成数据范围的数倍，MACD 被压成一条直线（参考 DIF 数值见页首状态条）。 ——
   function drawDivergence(data) {
     const div = prefix === 'kT' ? tDiv : tlDiv;
     if (divRefLine) { macdDiff.removePriceLine(divRefLine); divRefLine = null; }
@@ -22639,19 +22644,12 @@ function buildContractChart(prefix, name) {
     candle.setMarkers(marks.map(x => x.m));
 
     if (a && a.ref_dif != null) {
+      // 参考 DIF 只画虚线，不在右侧坐标轴上出数值标签（数值见页首状态条）
       divRefLine = macdDiff.createPriceLine({
         price: a.ref_dif, color: '#A6ABA3', lineWidth: 1,
         lineStyle: LightweightCharts.LineStyle.Dashed,
-        axisLabelVisible: true, title: '参考DIF'
+        axisLabelVisible: false, title: ''
       });
-    }
-    if (a && a.ref_date >= first && a.ref_date <= lastD && a.date >= first && a.date <= lastD) {
-      macdDiff.setMarkers([
-        { time: toBD(a.ref_date), position: 'inBar', color: '#75756A', shape: 'circle', text: '' },
-        { time: toBD(a.date), position: 'aboveBar', color: KDOWN, shape: 'arrowDown', text: 'DIF背离' }
-      ]);
-    } else {
-      macdDiff.setMarkers([]);
     }
 
     if (a && a.state === 'active' && a.ref_date >= first && a.date <= lastD) {
