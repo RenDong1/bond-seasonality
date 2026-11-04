@@ -271,6 +271,15 @@ body[data-page="bond-seasonality"] .stat-card .value.up{color:var(--sig-bear)}
 .tbl tr.current td{background:#F1F4F6}
 .kpi-table tr.key td{background:#F1F4F6}
 .tbl-wrap{border-radius:0}
+/* 数字列：右对齐 + 等宽数字（2026-11-03 排印收口） */
+.tbl th.num,.tbl td.num,.kpi-table th.num,.kpi-table td.num{
+  text-align:right;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;
+}
+.tbl td,.kpi-table td{font-variant-numeric:tabular-nums}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl td.num .unit,.kpi-table td.num .unit{
+  font-size:11px;font-weight:400;color:var(--muted);margin-left:2px;
+}
 
 /* 按钮 / 分段 / 选择器：直角细线，选中的用紫底 */
 .seg,.mode-btn,.btn{
@@ -290,6 +299,7 @@ body[data-page="bond-seasonality"] .stat-card .value.up{color:var(--sig-bear)}
 .pill.cur{border-color:var(--violet);color:var(--violet)}
 .pill.on{background:var(--paper-3);border-color:var(--violet);color:var(--violet)}
 .pill:not(.cur):hover{border-color:var(--violet);color:var(--violet)}
+:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
 
 /* 进度条：紫/哥蓝 */
 .progress{background:var(--paper-3);border-radius:0}
@@ -326,6 +336,7 @@ body[data-page="signal-eval"] .chip{
   display:block;background:none;border:0;border-radius:0;padding:0;
   margin:6px 0 2px;font-size:var(--t-small);color:var(--muted);
 }
+body[data-page="signal-eval"] .chip[hidden]{display:none}
 body[data-page="signal-eval"] .chip.ok{color:var(--asparagus)}
 body[data-page="signal-eval"] .chip.bad{color:#B23A32}
 body[data-page="signal-eval"] .meta{font-size:12px;color:var(--muted);line-height:1.8;margin:0 0 12px}
@@ -362,8 +373,9 @@ body[data-page="signal-eval"] #usage{font-size:12px;color:var(--muted);line-heig
 
 /* 报告区：章节、要点、指标、表格 */
 #report{margin-top:4px}
-#report h1{font-family:var(--serif);font-size:var(--t-figure);font-weight:600;
-  line-height:1.4;margin:16px 0 8px;color:var(--ink)}
+#report h1,
+#report > h2.report-title{font-family:var(--serif);font-size:var(--t-figure);font-weight:600;
+  border:0;padding:0;line-height:1.4;margin:16px 0 8px;color:var(--ink)}
 #report section{background:var(--paper-2);border:var(--hair) solid var(--rule);
   border-radius:0;padding:16px 18px;margin:14px 0;overflow-x:auto}
 #report h2{font-family:var(--serif);font-size:var(--t-body);font-weight:600;
@@ -485,9 +497,9 @@ body[data-page="bond-alert"] .two-col h3{
 }
 @media(max-width:560px){
   /* 移动端密度（2026-11-02）：字号、行距、留白整体收紧一档。
-     16px 正文在 390px 屏上偏大，改 14px；版心留白 20→14。 */
+     16px 正文在 390px 屏上偏大，改 14px；版心留白 20→18。 */
   :root{
-    --site-gutter:14px;
+    --site-gutter:18px;
     --site-topbar:24px;
     --site-nav-h:44px;
     --t-display:22px;
