@@ -15,7 +15,7 @@
   .header .date{font-family:var(--sans);font-size:var(--t-small);color:var(--muted);margin-top:6px;line-height:1.7}
   .header .status{display:inline-block;background:var(--columbia);color:var(--ink);
     padding:2px 9px 3px;border-radius:0;font-family:var(--serif);font-size:var(--t-small);
-    font-weight:500;margin-left:12px;vertical-align:3px;letter-spacing:.04em}
+    font-weight:500;margin-left:12px;vertical-align:3px;letter-spacing:.02em}
 
   /* 综合信号 */
   .signal-bar{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0 14px}
@@ -78,7 +78,7 @@
     background:var(--paper-2);border-radius:0;border:var(--hair) solid var(--rule)}
   .mini-chart-wrap canvas{width:100%;height:100%}
   .section-title{font-family:var(--serif);font-size:var(--t-small);font-weight:500;color:var(--muted);
-    letter-spacing:.04em;margin:16px 0 8px;padding-bottom:5px;border-bottom:var(--hair) solid var(--rule)}
+    letter-spacing:.02em;margin:16px 0 8px;padding-bottom:5px;border-bottom:var(--hair) solid var(--rule)}
   .ind-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
   .ind-row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
   .ind-row-5{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
@@ -86,9 +86,9 @@
   .ind-card .ind-label{font-size:var(--t-small);color:var(--muted);line-height:1.4}
   .ind-card .ind-value{font-size:var(--t-body);font-weight:600;color:var(--ink);
     margin:2px 0;font-variant-numeric:tabular-nums;line-height:1.4}
-  .ind-card .ind-sub{font-size:var(--t-small);color:var(--faint);line-height:1.4}
-  .ind-group-label{font-family:var(--serif);font-size:var(--t-small);color:var(--faint);
-    letter-spacing:.04em;margin:14px 0 6px}
+  .ind-card .ind-sub{font-size:var(--t-small);color:var(--muted);line-height:1.4}
+  .ind-group-label{font-family:var(--serif);font-size:var(--t-small);color:var(--muted);
+    letter-spacing:.02em;margin:14px 0 6px}
   .struct-row .ind-value{font-size:var(--t-small)}
   .ctd-box{background:var(--paper-3);border:var(--hair) solid var(--rule);
     border-left:2px solid var(--violet);border-radius:0;padding:10px 14px;margin-bottom:8px}
@@ -111,7 +111,7 @@
   .risk-card .risk-value{font-size:var(--t-figure);font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
   .risk-card .risk-sub{font-size:var(--t-small);color:var(--muted);margin-top:3px;line-height:1.55}
   .risk-card.warn .risk-value{color:var(--violet)}
-  .risk-card.danger .risk-value{color:var(--violet);font-weight:700}
+  .risk-card.danger .risk-value{color:var(--violet);font-weight:600}
   .risk-card.safe .risk-value{color:var(--ink)}
 
   /* 行情明细表 */
@@ -124,7 +124,7 @@
   .trend-table tr:hover td{background:var(--paper-3)}
   .trend-table .up{color:var(--sig-bull)}
   .trend-table .down{color:var(--sig-bear)}
-  .trend-table .cur{font-weight:700;color:var(--ink)}
+  .trend-table .cur{font-weight:600;color:var(--ink)}
 
   /* K 线区块 */
   .kline-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;
@@ -174,7 +174,7 @@
     padding:6px 10px;border:var(--hair) solid var(--rule);border-left:2px solid var(--faint);
     background:var(--paper-2);font-size:var(--t-small);color:var(--ink-2);line-height:1.55}
   .div-strip.on{border-left-color:var(--sig-bear)}
-  .div-badge{font-family:var(--serif);font-weight:600;letter-spacing:.04em;color:var(--muted);
+  .div-badge{font-family:var(--serif);font-weight:600;letter-spacing:.02em;color:var(--muted);
     border:var(--hair) solid var(--rule);padding:0 6px 1px;white-space:nowrap}
   .div-strip.on .div-badge{color:var(--sig-bear);border-color:var(--sig-bear)}
   .div-main{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -226,7 +226,7 @@
 <body data-site="inner" data-page="treasury-futures">
 
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-03 13:46</span><span class="site-stamp site-stamp-data">数据截至 2026-11-02</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-03 21:41</span><span class="site-stamp site-stamp-data">数据截至 2026-11-02</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
