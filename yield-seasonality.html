@@ -14,12 +14,12 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.6;}
-.wrap{max-width:var(--site-max);margin:0 auto;padding:30px 0 48px;}
-.page-head{border-bottom:var(--hair) solid var(--rule-strong);padding:0 0 16px;margin-bottom:26px;}
+.wrap{max-width:var(--site-max);margin:0 auto;padding:22px 0 48px;}
+.page-head{border-bottom:var(--hair) solid var(--rule-strong);padding:0 0 14px;margin-bottom:18px;}
 .sub{color:var(--muted);font-size:var(--t-small);margin:8px 0 0;line-height:1.8;max-width:none;}
 
 /* 三块面板之间只用留白分隔，不再是一张张白卡 */
-body .panel{background:none;border:0;border-radius:0;box-shadow:none;padding:0;margin:0 0 34px;}
+body .panel{background:none;border:0;border-radius:0;box-shadow:none;padding:0;margin:0 0 26px;}
 body .panel:last-child{margin-bottom:0;}
 
 /* 控件行：去掉卡片外壳，贴近纸面 */
@@ -84,7 +84,7 @@ body .pill{font-size:var(--t-small);line-height:1.5;padding:1px 8px 2px;
   color:var(--muted);cursor:pointer;user-select:none;}
 body .pill.on{border-color:var(--violet);color:var(--ink);background:var(--paper-2);}
 body .pill.off{text-decoration:line-through;opacity:.4;}
-body .pill.cur{border-color:var(--violet);color:var(--violet);font-weight:700;cursor:default;}
+body .pill.cur{border-color:var(--violet);color:var(--violet);font-weight:600;cursor:default;}
 body .pill:not(.cur):hover{border-color:var(--violet);color:var(--violet);}
 
 /* 当前位置读数 */
@@ -113,6 +113,10 @@ body .controls input[type=date]{padding:3px 8px;border:var(--hair) solid var(--r
 .revHead h2{font-family:var(--serif);font-size:var(--t-figure);font-weight:600;color:var(--ink);}
 .revControls{margin-bottom:8px;}
 .revSplit{display:flex;gap:18px;align-items:stretch;flex-wrap:nowrap;height:580px;margin-bottom:18px;}
+/* 未选事件类别时清单为空：隐藏清单卡，主图独占整行，避免空白栏与错底 */
+.revSplit.is-empty{height:auto;align-items:stretch;}
+.revSplit.is-empty .evCard{display:none;}
+.revSplit.is-empty .revMain{flex:1 1 100%;max-width:none;}
 .revSplit .revMain{flex:3 1 720px;min-width:0;margin-bottom:0;overflow:hidden;}
 .revSplit .evCard{flex:1 1 280px;min-width:260px;max-width:360px;margin-bottom:0;overflow:hidden;}
 .revSplit .cardhead{display:flex;align-items:baseline;gap:8px;flex-shrink:0;}
@@ -191,7 +195,7 @@ body .evStatsT{width:100%;min-width:760px;border-collapse:collapse;font-size:var
   .chart{height:320px;}
   .tblwrap{min-height:0;max-height:none;}
   .tbl th,.tbl td{padding:6px 4px;}
-  .tbl td .d{display:block;margin-left:0;font-size:10px;line-height:1.2;}
+  .tbl td .d{display:block;margin-left:0;font-size:11px;line-height:1.3;}
   body .controls{gap:6px 12px;}
 }
 </style>
@@ -210,7 +214,7 @@ body .evStatsT{width:100%;min-width:760px;border-collapse:collapse;font-size:var
 </head>
 <body data-site="inner" data-page="yield-seasonality">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-03 09:04</span><span class="site-stamp site-stamp-data">数据截至 2026-11-02</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-03 21:41</span><span class="site-stamp site-stamp-data">数据截至 2026-11-02</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html" class="active" aria-current="page">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html" class="active" aria-current="page">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -622,7 +626,7 @@ function reviewPanelHTML(){
         <div class="chart revChart"></div>
         <div class="evWrap"></div>
       </div>
-      <div class="note revNote">横轴 = 真实日期；可多选国债/国开收益率曲线（1Y~30Y）。事件默认只显示圆点（点越大 = 同日事件越多），悬停查看当日数值与全部事件；勾选「事件文字」后在图上标注。勾选「显示实施日」后叠加实施日。点右侧清单可定位事件。</div>
+      <div class="note revNote">横轴 = 真实日期；可多选国债/国开收益率曲线（1Y~30Y）。事件默认只显示圆点（点越大 = 同日事件越多），悬停查看当日数值与全部事件；勾选「事件文字」后在图上标注。勾选「显示实施日」后叠加实施日。勾选上方事件类别后，右侧出现清单，点击可定位事件。</div>
     </div>
     <div class="card evCard">
       <div class="cardhead"><h2>事件清单</h2><span class="evCnt"></span></div>
@@ -1102,6 +1106,7 @@ function makeReviewPanel(RV){
         `<span class="evD">${r.d}</span><span class="evT">${r.title}${r.kind==='实施'?'（实施）':''}</span></div>`;
     });
     R.evList.innerHTML = listHtml || '<div class="evNote">未选择事件类别，或所选时间段内无事件。</div>';
+    R.evList.closest('.revSplit').classList.toggle('is-empty', !listHtml);
     R.evCnt.textContent = rows.length ? rows.length + ' 条' : '';
     R.revCount.textContent = groups.length ? `所选区间 ${groups.length} 个事件日 / ${rows.length} 条` : '';
 
@@ -1216,9 +1221,9 @@ panelApi.push(makeReviewPanel(REVIEW));
 const foot = document.getElementById('foot');
 foot.textContent = PANELS
   .map(p => `${p.brand}数据最新 ${p.latest}，数据包更新 ${p.src_mtime}`)
-  .join('　｜　') + '　｜　债市复盘事件 ' + REVIEW.events.length + ' 条（同日同类去重 ' +
+  .join(' ｜ ') + ' ｜ 债市复盘事件 ' + REVIEW.events.length + ' 条（同日同类去重 ' +
   (REVIEW.evStats ? REVIEW.evStats.nUnique : REVIEW.events.length) + '），数据最新 ' + REVIEW.latest
-  + '　生成于 treasury-seasonality skill';
+  + ' 生成于 treasury-seasonality skill';
 
 window.addEventListener('resize', () => {
   panelApi.forEach(pl => { pl.syncCardH(); pl.resize(); });
