@@ -22,17 +22,17 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink)}
 
 body .panel h2{display:flex;align-items:baseline;gap:8px}
 
-.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl{width:100%;border-collapse:collapse;font-size:var(--t-small)}
 body .tbl th{position:sticky;top:0;z-index:1;padding:8px 10px;text-align:left;
   background:var(--paper-2);border-bottom:var(--hair) solid var(--rule-strong)}
 .tbl td{padding:7px 10px;border-bottom:var(--hair) solid var(--rule);font-variant-numeric:tabular-nums}
 .tbl .date{font-weight:600}
-.tbl .dt{font-size:10.5px;margin-left:5px;letter-spacing:0}
-.note{font-size:11px;color:var(--muted);line-height:1.8;margin-top:6px}
+.tbl .dt{font-size:11px;margin-left:5px;letter-spacing:0}
+.note{font-size:11.5px;color:var(--muted);line-height:1.8;margin-top:6px}
 
-.seg{display:inline-block;padding:4px 12px;margin-right:6px;cursor:pointer;font-size:12px}
+.seg{display:inline-block;padding:4px 12px;margin-right:6px;cursor:pointer;font-size:var(--t-small)}
 input[type=date]{border:var(--hair) solid var(--rule);border-radius:0;background:var(--paper-2);
-  color:var(--ink);padding:3px 6px;font-size:12px;font-family:inherit}
+  color:var(--ink);padding:3px 6px;font-size:var(--t-small);font-family:inherit}
 @media(max-width:760px){
   .page-head h1{font-size:26px}
   .stats-row{display:block}
@@ -55,7 +55,7 @@ input[type=date]{border:var(--hair) solid var(--rule);border-radius:0;background
 </head>
 <body data-site="inner" data-page="duration-tracking">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-03 09:10</span><span class="site-stamp site-stamp-data">数据截至 2026-11-02</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-03 21:41</span><span class="site-stamp site-stamp-data">数据截至 2026-11-02</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html" class="active" aria-current="page">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html" class="active" aria-current="page">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -66,7 +66,7 @@ input[type=date]{border:var(--hair) solid var(--rule);border-radius:0;background
 </header>
 <div class="stats-row" id="stats"></div>
 <div class="panel" style="padding:12px 20px;display:flex;align-items:center;flex-wrap:wrap">
-<span style="font-size:12px;color:#666;margin-right:8px">时间区间：</span>
+<span style="font-size:var(--t-small);color:var(--muted);margin-right:8px">时间区间：</span>
 <span id="range-seg">
 <span class="seg active" data-range="all">全部</span><span class="seg" data-range="1m">近1个月</span><span class="seg" data-range="3m">近3个月</span><span class="seg" data-range="6m">近半年</span><span class="seg" data-range="1y">近1年</span><span class="seg" data-range="custom">自定义</span>
 </span>
@@ -76,20 +76,20 @@ input[type=date]{border:var(--hair) solid var(--rule);border-radius:0;background
 </div>
 <div class="panel">
 <h2>三类债基估算久期中位数走势</h2>
-<div id="chart" style="width:100%;height:430px;"></div>
+<div id="chart" style="width:100%;height:380px;"></div>
 </div>
 <div class="panel">
 <h2>收益率变动可信度（三类债券当日变动分布）</h2>
 <div id="chg-seg" style="margin-bottom:12px">
 <span class="seg active" data-metric="range">极差</span><span class="seg" data-metric="var">方差</span><span class="seg" data-metric="mean">均值</span>
 </div>
-<div id="chg-chart" style="width:100%;height:360px;"></div>
+<div id="chg-chart" style="width:100%;height:320px;"></div>
 <p class="note">纵轴 = 利率债/金融债/普信债 当日收益率变动(bp)的分布统计。极差或方差越小 → 各券变动越一致 → 均值越可信、点测久期越可靠；越大 → 均值代表性越差。利率债=国债+国开，金融债=政金+商金+二永，普信债=中票+城投。</p>
 </div>
 <div class="panel">
 <h2>历史记录</h2>
 <div style="max-height:380px;overflow-y:auto;">
-<table class="tbl"><thead><tr><th>日期</th><th>长债利率</th><th>长债利率金融</th><th>长债信用</th></tr></thead><tbody id="tbl-body"></tbody></table>
+<table class="tbl"><thead><tr><th>日期</th><th class="num">长债利率</th><th class="num">长债利率金融</th><th class="num">长债信用</th></tr></thead><tbody id="tbl-body"></tbody></table>
 </div>
 <p class="note">图中实线=5日移动平均，散点=单日点测；散点中「大实心点」=高可信度日（当日对应券种收益率变动极差≤2.5bp，各券走势一致），「小淡点」=普通日；表中「●」=该类别当日高可信度（对应券种极差≤2.5bp），灰字=普通日。口径：利率债=1-10Y国债+1-10Y国开+30Y国债；金融债=政金债(国开1-10Y)+商金(1-5Y)+二永(1-5Y) 各1/3；普信债=1-5Y中票+城投。持仓来自天软基金债券配置（简化口径：利率=国债+地方债+央票，金融=金融债券含政金债，普信=其余；金融债券内政金/商金/二永按各1/3假设）。当|收益率变动|&lt;0.5bp 或结果超出分券种合理区间（利率 1.5–14 年、金融 1–12 年、信用 1–10 年）时该类别留空（点测公式除近零值会失真）。头部卡片为近 5 个交易日的中位数（有效样本数在卡内标注），不取单日读数。商业银行永续债以二级资本债同等级近似。数据源：中债登本地库 + 天软，0 额度。</p>
 </div>
@@ -135,10 +135,10 @@ function windowEndingAt(series,cat,end,n){
       var pv=medianOf(prev.vals);
       if(v!=null && pv!=null) d=v-pv;
     }
-    var dh=d==null?'':(d>0.005?'<div class="delta up">▲ +'+d.toFixed(2)+' 年（较前5日）</div>':(d<-0.005?'<div class="delta down">▼ '+d.toFixed(2)+' 年（较前5日）</div>':'<div class="delta" style="color:#999">较前5日持平</div>'));
+    var dh=d==null?'':(d>0.005?'<div class="delta up">▲ +'+d.toFixed(2)+' 年（较前5日）</div>':(d<-0.005?'<div class="delta down">▼ '+d.toFixed(2)+' 年（较前5日）</div>':'<div class="delta" style="color:var(--muted)">较前5日持平</div>'));
     return '<div class="stat-card"><div class="label"><i style="background:'+COLORS[c]+'"></i>'+c+'：近5日估算久期中位数</div>'+
            '<div class="value">'+fmt(v)+'<span class="unit"> 年</span></div>'+dh+
-           '<div class="delta" style="color:#8C8C82">样本 '+cur.vals.length+'/5，截至 '+cur.asof+'</div></div>';
+           '<div class="delta" style="color:var(--muted)">样本 '+cur.vals.length+'/5，截至 '+cur.asof+'</div></div>';
   }).join('');
 })();
 
@@ -292,8 +292,8 @@ function getFiltered(){
       var b=BOND_OF[c];
       var rel=(r.chg && r.chg[b]) && (r.chg[b].range<=REL_RANGE_BP);
       var mark=(v!=null&&rel)?'<span style="color:'+COLORS[c]+'">●</span> ':'';
-      var vstyle=(v!=null&&rel)?'font-weight:700':'color:#8C8C82';
-      return '<td>'+mark+'<span style="'+vstyle+'">'+fmt(v)+'</span><span class="dt '+cls+'">'+dtext.trim()+'</span></td>';
+      var vstyle=(v!=null&&rel)?'font-weight:600':'color:var(--muted)';
+      return '<td class="num">'+mark+'<span style="'+vstyle+'">'+fmt(v)+'</span><span class="dt '+cls+'">'+dtext.trim()+'</span></td>';
     }).join('')+'</tr>';
   }).join('');
 })();
