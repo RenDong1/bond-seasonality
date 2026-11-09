@@ -226,7 +226,7 @@
 <body data-site="inner" data-page="treasury-futures">
 
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-08 18:54</span><span class="site-stamp site-stamp-data">数据截至 2026-11-06</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-09 09:04</span><span class="site-stamp site-stamp-data">数据截至 2026-11-06</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -303,16 +303,6 @@ const FUTURES_DATA = {
   "status": "已收盘",
   "oi_source": "total",
   "data_t": [
-    {
-      "date": "2021-11-09",
-      "o": 99.99,
-      "h": 100.17,
-      "l": 99.875,
-      "c": 100.155,
-      "v": 58700.0,
-      "oi": 176507.0,
-      "oi_main": 132710.0
-    },
     {
       "date": "2021-11-10",
       "o": 100.195,
@@ -21007,7 +20997,7 @@ const FUTURES_DATA = {
     "boll_sub": "价格在中轨上方",
     "atr_14": 0.1386,
     "atr_sub": "低波环境",
-    "obv": 610.57,
+    "obv": 616.75,
     "obv_sub": "万手，年化",
     "volatility": 0.095,
     "vol_sub": "高波动",
@@ -21094,7 +21084,7 @@ const FUTURES_DATA = {
       "price": "high",
       "k": 3,
       "ref": "highest120",
-      "gap": 20,
+      "gap": 0,
       "window": 15
     },
     "signals": [
@@ -21102,10 +21092,19 @@ const FUTURES_DATA = {
         "date": "2022-01-17",
         "ref_date": "2021-12-30",
         "ref_high": 100.88,
-        "ref_dif": 0.163,
+        "ref_dif": 0.168,
         "trigger_high": 101.02,
         "trigger_close": 100.73,
-        "trigger_dif": 0.137
+        "trigger_dif": 0.14
+      },
+      {
+        "date": "2022-01-18",
+        "ref_date": "2021-12-30",
+        "ref_high": 100.88,
+        "ref_dif": 0.168,
+        "trigger_high": 101.085,
+        "trigger_close": 101.055,
+        "trigger_dif": 0.166
       },
       {
         "date": "2023-06-12",
@@ -21117,6 +21116,33 @@ const FUTURES_DATA = {
         "trigger_dif": 0.145
       },
       {
+        "date": "2023-06-13",
+        "ref_date": "2023-05-11",
+        "ref_high": 101.955,
+        "ref_dif": 0.325,
+        "trigger_high": 102.245,
+        "trigger_close": 102.145,
+        "trigger_dif": 0.175
+      },
+      {
+        "date": "2023-06-14",
+        "ref_date": "2023-05-11",
+        "ref_high": 101.955,
+        "ref_dif": 0.325,
+        "trigger_high": 102.335,
+        "trigger_close": 102.195,
+        "trigger_dif": 0.2
+      },
+      {
+        "date": "2023-06-15",
+        "ref_date": "2023-05-11",
+        "ref_high": 101.955,
+        "ref_dif": 0.325,
+        "trigger_high": 102.085,
+        "trigger_close": 101.845,
+        "trigger_dif": 0.19
+      },
+      {
         "date": "2023-07-21",
         "ref_date": "2023-06-14",
         "ref_high": 102.335,
@@ -21124,6 +21150,42 @@ const FUTURES_DATA = {
         "trigger_high": 102.415,
         "trigger_close": 102.355,
         "trigger_dif": 0.157
+      },
+      {
+        "date": "2023-07-24",
+        "ref_date": "2023-06-14",
+        "ref_high": 102.335,
+        "ref_dif": 0.2,
+        "trigger_high": 102.43,
+        "trigger_close": 102.425,
+        "trigger_dif": 0.17
+      },
+      {
+        "date": "2023-08-14",
+        "ref_date": "2023-07-24",
+        "ref_high": 102.43,
+        "ref_dif": 0.17,
+        "trigger_high": 102.565,
+        "trigger_close": 102.45,
+        "trigger_dif": 0.116
+      },
+      {
+        "date": "2023-08-15",
+        "ref_date": "2023-07-24",
+        "ref_high": 102.43,
+        "ref_dif": 0.17,
+        "trigger_high": 102.915,
+        "trigger_close": 102.705,
+        "trigger_dif": 0.142
+      },
+      {
+        "date": "2023-08-16",
+        "ref_date": "2023-07-24",
+        "ref_high": 102.43,
+        "ref_dif": 0.17,
+        "trigger_high": 102.855,
+        "trigger_close": 102.815,
+        "trigger_dif": 0.17
       },
       {
         "date": "2024-01-09",
@@ -21135,6 +21197,78 @@ const FUTURES_DATA = {
         "trigger_dif": 0.22
       },
       {
+        "date": "2024-01-22",
+        "ref_date": "2024-01-09",
+        "ref_high": 103.115,
+        "ref_dif": 0.22,
+        "trigger_high": 103.19,
+        "trigger_close": 103.125,
+        "trigger_dif": 0.149
+      },
+      {
+        "date": "2024-01-23",
+        "ref_date": "2024-01-09",
+        "ref_high": 103.115,
+        "ref_dif": 0.22,
+        "trigger_high": 103.12,
+        "trigger_close": 103.02,
+        "trigger_dif": 0.146
+      },
+      {
+        "date": "2024-01-25",
+        "ref_date": "2024-01-09",
+        "ref_high": 103.115,
+        "ref_dif": 0.22,
+        "trigger_high": 103.24,
+        "trigger_close": 103.15,
+        "trigger_dif": 0.151
+      },
+      {
+        "date": "2024-01-26",
+        "ref_date": "2024-01-09",
+        "ref_high": 103.115,
+        "ref_dif": 0.22,
+        "trigger_high": 103.185,
+        "trigger_close": 103.095,
+        "trigger_dif": 0.149
+      },
+      {
+        "date": "2024-01-29",
+        "ref_date": "2024-01-09",
+        "ref_high": 103.115,
+        "ref_dif": 0.22,
+        "trigger_high": 103.23,
+        "trigger_close": 103.21,
+        "trigger_dif": 0.155
+      },
+      {
+        "date": "2024-01-30",
+        "ref_date": "2024-01-09",
+        "ref_high": 103.115,
+        "ref_dif": 0.22,
+        "trigger_high": 103.505,
+        "trigger_close": 103.45,
+        "trigger_dif": 0.177
+      },
+      {
+        "date": "2024-01-31",
+        "ref_date": "2024-01-09",
+        "ref_high": 103.115,
+        "ref_dif": 0.22,
+        "trigger_high": 103.66,
+        "trigger_close": 103.57,
+        "trigger_dif": 0.201
+      },
+      {
+        "date": "2024-02-01",
+        "ref_date": "2024-01-09",
+        "ref_high": 103.115,
+        "ref_dif": 0.22,
+        "trigger_high": 103.6,
+        "trigger_close": 103.495,
+        "trigger_dif": 0.212
+      },
+      {
         "date": "2024-02-06",
         "ref_date": "2024-01-09",
         "ref_high": 103.115,
@@ -21142,6 +21276,114 @@ const FUTURES_DATA = {
         "trigger_high": 103.585,
         "trigger_close": 103.28,
         "trigger_dif": 0.213
+      },
+      {
+        "date": "2024-02-07",
+        "ref_date": "2024-01-09",
+        "ref_high": 103.115,
+        "ref_dif": 0.22,
+        "trigger_high": 103.485,
+        "trigger_close": 103.41,
+        "trigger_dif": 0.204
+      },
+      {
+        "date": "2024-02-08",
+        "ref_date": "2024-01-09",
+        "ref_high": 103.115,
+        "ref_dif": 0.22,
+        "trigger_high": 103.495,
+        "trigger_close": 103.25,
+        "trigger_dif": 0.183
+      },
+      {
+        "date": "2024-02-19",
+        "ref_date": "2024-01-09",
+        "ref_high": 103.115,
+        "ref_dif": 0.22,
+        "trigger_high": 103.46,
+        "trigger_close": 103.415,
+        "trigger_dif": 0.177
+      },
+      {
+        "date": "2024-02-22",
+        "ref_date": "2024-02-05",
+        "ref_high": 103.72,
+        "ref_dif": 0.233,
+        "trigger_high": 103.775,
+        "trigger_close": 103.765,
+        "trigger_dif": 0.202
+      },
+      {
+        "date": "2024-02-23",
+        "ref_date": "2024-02-05",
+        "ref_high": 103.72,
+        "ref_dif": 0.233,
+        "trigger_high": 103.955,
+        "trigger_close": 103.77,
+        "trigger_dif": 0.212
+      },
+      {
+        "date": "2024-02-26",
+        "ref_date": "2024-02-05",
+        "ref_high": 103.72,
+        "ref_dif": 0.233,
+        "trigger_high": 103.885,
+        "trigger_close": 103.88,
+        "trigger_dif": 0.226
+      },
+      {
+        "date": "2024-02-27",
+        "ref_date": "2024-02-05",
+        "ref_high": 103.72,
+        "ref_dif": 0.233,
+        "trigger_high": 104.025,
+        "trigger_close": 103.85,
+        "trigger_dif": 0.232
+      },
+      {
+        "date": "2024-03-04",
+        "ref_date": "2024-02-05",
+        "ref_high": 103.72,
+        "ref_dif": 0.233,
+        "trigger_high": 103.93,
+        "trigger_close": 103.87,
+        "trigger_dif": 0.231
+      },
+      {
+        "date": "2024-03-05",
+        "ref_date": "2024-02-05",
+        "ref_high": 103.72,
+        "ref_dif": 0.233,
+        "trigger_high": 103.995,
+        "trigger_close": 103.96,
+        "trigger_dif": 0.231
+      },
+      {
+        "date": "2024-03-07",
+        "ref_date": "2024-02-29",
+        "ref_high": 104.12,
+        "ref_dif": 0.264,
+        "trigger_high": 104.44,
+        "trigger_close": 104.125,
+        "trigger_dif": 0.252
+      },
+      {
+        "date": "2024-03-08",
+        "ref_date": "2024-02-29",
+        "ref_high": 104.12,
+        "ref_dif": 0.264,
+        "trigger_high": 104.255,
+        "trigger_close": 104.055,
+        "trigger_dif": 0.246
+      },
+      {
+        "date": "2024-03-11",
+        "ref_date": "2024-02-29",
+        "ref_high": 104.12,
+        "ref_dif": 0.264,
+        "trigger_high": 104.225,
+        "trigger_close": 103.985,
+        "trigger_dif": 0.234
       },
       {
         "date": "2024-04-12",
@@ -21153,6 +21395,96 @@ const FUTURES_DATA = {
         "trigger_dif": 0.128
       },
       {
+        "date": "2024-04-15",
+        "ref_date": "2024-03-07",
+        "ref_high": 104.44,
+        "ref_dif": 0.252,
+        "trigger_high": 104.595,
+        "trigger_close": 104.415,
+        "trigger_dif": 0.144
+      },
+      {
+        "date": "2024-04-16",
+        "ref_date": "2024-03-07",
+        "ref_high": 104.44,
+        "ref_dif": 0.252,
+        "trigger_high": 104.48,
+        "trigger_close": 104.46,
+        "trigger_dif": 0.158
+      },
+      {
+        "date": "2024-04-17",
+        "ref_date": "2024-03-07",
+        "ref_high": 104.44,
+        "ref_dif": 0.252,
+        "trigger_high": 104.545,
+        "trigger_close": 104.465,
+        "trigger_dif": 0.168
+      },
+      {
+        "date": "2024-04-18",
+        "ref_date": "2024-03-07",
+        "ref_high": 104.44,
+        "ref_dif": 0.252,
+        "trigger_high": 104.66,
+        "trigger_close": 104.61,
+        "trigger_dif": 0.186
+      },
+      {
+        "date": "2024-04-19",
+        "ref_date": "2024-03-07",
+        "ref_high": 104.44,
+        "ref_dif": 0.252,
+        "trigger_high": 104.65,
+        "trigger_close": 104.575,
+        "trigger_dif": 0.195
+      },
+      {
+        "date": "2024-04-22",
+        "ref_date": "2024-03-07",
+        "ref_high": 104.44,
+        "ref_dif": 0.252,
+        "trigger_high": 104.745,
+        "trigger_close": 104.645,
+        "trigger_dif": 0.205
+      },
+      {
+        "date": "2024-04-23",
+        "ref_date": "2024-03-07",
+        "ref_high": 104.44,
+        "ref_dif": 0.252,
+        "trigger_high": 104.9,
+        "trigger_close": 104.845,
+        "trigger_dif": 0.226
+      },
+      {
+        "date": "2024-04-24",
+        "ref_date": "2024-03-07",
+        "ref_high": 104.44,
+        "ref_dif": 0.252,
+        "trigger_high": 104.665,
+        "trigger_close": 104.48,
+        "trigger_dif": 0.212
+      },
+      {
+        "date": "2024-04-25",
+        "ref_date": "2024-03-07",
+        "ref_high": 104.44,
+        "ref_dif": 0.252,
+        "trigger_high": 104.58,
+        "trigger_close": 104.47,
+        "trigger_dif": 0.197
+      },
+      {
+        "date": "2024-04-26",
+        "ref_date": "2024-03-07",
+        "ref_high": 104.44,
+        "ref_dif": 0.252,
+        "trigger_high": 104.585,
+        "trigger_close": 104.195,
+        "trigger_dif": 0.161
+      },
+      {
         "date": "2024-06-19",
         "ref_date": "2024-04-23",
         "ref_high": 104.9,
@@ -21160,6 +21492,114 @@ const FUTURES_DATA = {
         "trigger_high": 104.975,
         "trigger_close": 104.975,
         "trigger_dif": 0.143
+      },
+      {
+        "date": "2024-06-20",
+        "ref_date": "2024-04-23",
+        "ref_high": 104.9,
+        "ref_dif": 0.226,
+        "trigger_high": 105.04,
+        "trigger_close": 105.015,
+        "trigger_dif": 0.155
+      },
+      {
+        "date": "2024-06-21",
+        "ref_date": "2024-04-23",
+        "ref_high": 104.9,
+        "ref_dif": 0.226,
+        "trigger_high": 104.945,
+        "trigger_close": 104.91,
+        "trigger_dif": 0.155
+      },
+      {
+        "date": "2024-06-24",
+        "ref_date": "2024-04-23",
+        "ref_high": 104.9,
+        "ref_dif": 0.226,
+        "trigger_high": 105.08,
+        "trigger_close": 105.055,
+        "trigger_dif": 0.165
+      },
+      {
+        "date": "2024-06-25",
+        "ref_date": "2024-04-23",
+        "ref_high": 104.9,
+        "ref_dif": 0.226,
+        "trigger_high": 105.19,
+        "trigger_close": 105.15,
+        "trigger_dif": 0.178
+      },
+      {
+        "date": "2024-06-26",
+        "ref_date": "2024-04-23",
+        "ref_high": 104.9,
+        "ref_dif": 0.226,
+        "trigger_high": 105.205,
+        "trigger_close": 105.135,
+        "trigger_dif": 0.185
+      },
+      {
+        "date": "2024-06-27",
+        "ref_date": "2024-04-23",
+        "ref_high": 104.9,
+        "ref_dif": 0.226,
+        "trigger_high": 105.345,
+        "trigger_close": 105.305,
+        "trigger_dif": 0.202
+      },
+      {
+        "date": "2024-06-28",
+        "ref_date": "2024-04-23",
+        "ref_high": 104.9,
+        "ref_dif": 0.226,
+        "trigger_high": 105.4,
+        "trigger_close": 105.32,
+        "trigger_dif": 0.214
+      },
+      {
+        "date": "2024-07-01",
+        "ref_date": "2024-04-23",
+        "ref_high": 104.9,
+        "ref_dif": 0.226,
+        "trigger_high": 105.495,
+        "trigger_close": 104.975,
+        "trigger_dif": 0.194
+      },
+      {
+        "date": "2024-07-02",
+        "ref_date": "2024-04-23",
+        "ref_high": 104.9,
+        "ref_dif": 0.226,
+        "trigger_high": 105.26,
+        "trigger_close": 105.24,
+        "trigger_dif": 0.197
+      },
+      {
+        "date": "2024-07-03",
+        "ref_date": "2024-04-23",
+        "ref_high": 104.9,
+        "ref_dif": 0.226,
+        "trigger_high": 105.395,
+        "trigger_close": 105.37,
+        "trigger_dif": 0.207
+      },
+      {
+        "date": "2024-07-04",
+        "ref_date": "2024-04-23",
+        "ref_high": 104.9,
+        "ref_dif": 0.226,
+        "trigger_high": 105.38,
+        "trigger_close": 105.27,
+        "trigger_dif": 0.205
+      },
+      {
+        "date": "2024-07-05",
+        "ref_date": "2024-04-23",
+        "ref_high": 104.9,
+        "ref_dif": 0.226,
+        "trigger_high": 105.275,
+        "trigger_close": 105.135,
+        "trigger_dif": 0.19
       },
       {
         "date": "2024-07-22",
@@ -21180,6 +21620,96 @@ const FUTURES_DATA = {
         "trigger_dif": 0.167
       },
       {
+        "date": "2024-09-11",
+        "ref_date": "2024-08-05",
+        "ref_high": 106.55,
+        "ref_dif": 0.341,
+        "trigger_high": 106.745,
+        "trigger_close": 106.7,
+        "trigger_dif": 0.199
+      },
+      {
+        "date": "2024-09-12",
+        "ref_date": "2024-08-05",
+        "ref_high": 106.55,
+        "ref_dif": 0.341,
+        "trigger_high": 106.74,
+        "trigger_close": 106.635,
+        "trigger_dif": 0.216
+      },
+      {
+        "date": "2024-09-13",
+        "ref_date": "2024-08-05",
+        "ref_high": 106.55,
+        "ref_dif": 0.341,
+        "trigger_high": 106.81,
+        "trigger_close": 106.805,
+        "trigger_dif": 0.241
+      },
+      {
+        "date": "2024-09-18",
+        "ref_date": "2024-08-05",
+        "ref_high": 106.55,
+        "ref_dif": 0.341,
+        "trigger_high": 106.95,
+        "trigger_close": 106.905,
+        "trigger_dif": 0.265
+      },
+      {
+        "date": "2024-09-19",
+        "ref_date": "2024-08-05",
+        "ref_high": 106.55,
+        "ref_dif": 0.341,
+        "trigger_high": 107.03,
+        "trigger_close": 106.785,
+        "trigger_dif": 0.272
+      },
+      {
+        "date": "2024-09-20",
+        "ref_date": "2024-08-05",
+        "ref_high": 106.55,
+        "ref_dif": 0.341,
+        "trigger_high": 106.975,
+        "trigger_close": 106.965,
+        "trigger_dif": 0.288
+      },
+      {
+        "date": "2024-09-23",
+        "ref_date": "2024-08-05",
+        "ref_high": 106.55,
+        "ref_dif": 0.341,
+        "trigger_high": 107.07,
+        "trigger_close": 106.93,
+        "trigger_dif": 0.295
+      },
+      {
+        "date": "2024-09-24",
+        "ref_date": "2024-08-05",
+        "ref_high": 106.55,
+        "ref_dif": 0.341,
+        "trigger_high": 107.135,
+        "trigger_close": 106.67,
+        "trigger_dif": 0.276
+      },
+      {
+        "date": "2024-09-25",
+        "ref_date": "2024-08-05",
+        "ref_high": 106.55,
+        "ref_dif": 0.341,
+        "trigger_high": 106.96,
+        "trigger_close": 106.95,
+        "trigger_dif": 0.281
+      },
+      {
+        "date": "2024-09-26",
+        "ref_date": "2024-08-05",
+        "ref_high": 106.55,
+        "ref_dif": 0.341,
+        "trigger_high": 107.05,
+        "trigger_close": 106.605,
+        "trigger_dif": 0.253
+      },
+      {
         "date": "2024-11-25",
         "ref_date": "2024-09-24",
         "ref_high": 107.135,
@@ -21187,6 +21717,60 @@ const FUTURES_DATA = {
         "trigger_high": 107.15,
         "trigger_close": 107.095,
         "trigger_dif": 0.216
+      },
+      {
+        "date": "2024-11-26",
+        "ref_date": "2024-09-24",
+        "ref_high": 107.135,
+        "ref_dif": 0.276,
+        "trigger_high": 107.165,
+        "trigger_close": 107.04,
+        "trigger_dif": 0.225
+      },
+      {
+        "date": "2024-11-27",
+        "ref_date": "2024-09-24",
+        "ref_high": 107.135,
+        "ref_dif": 0.276,
+        "trigger_high": 107.22,
+        "trigger_close": 107.01,
+        "trigger_dif": 0.227
+      },
+      {
+        "date": "2024-11-28",
+        "ref_date": "2024-09-24",
+        "ref_high": 107.135,
+        "ref_dif": 0.276,
+        "trigger_high": 107.195,
+        "trigger_close": 107.17,
+        "trigger_dif": 0.239
+      },
+      {
+        "date": "2024-11-29",
+        "ref_date": "2024-09-24",
+        "ref_high": 107.135,
+        "ref_dif": 0.276,
+        "trigger_high": 107.305,
+        "trigger_close": 107.09,
+        "trigger_dif": 0.239
+      },
+      {
+        "date": "2024-12-02",
+        "ref_date": "2024-09-24",
+        "ref_high": 107.135,
+        "ref_dif": 0.276,
+        "trigger_high": 107.55,
+        "trigger_close": 107.5,
+        "trigger_dif": 0.269
+      },
+      {
+        "date": "2024-12-03",
+        "ref_date": "2024-09-24",
+        "ref_high": 107.135,
+        "ref_dif": 0.276,
+        "trigger_high": 107.485,
+        "trigger_close": 107.3,
+        "trigger_dif": 0.273
       },
       {
         "date": "2024-12-27",
@@ -21198,6 +21782,60 @@ const FUTURES_DATA = {
         "trigger_dif": 0.463
       },
       {
+        "date": "2025-01-02",
+        "ref_date": "2024-12-23",
+        "ref_high": 109.12,
+        "ref_dif": 0.529,
+        "trigger_high": 109.23,
+        "trigger_close": 109.18,
+        "trigger_dif": 0.45
+      },
+      {
+        "date": "2025-01-03",
+        "ref_date": "2024-12-23",
+        "ref_high": 109.12,
+        "ref_dif": 0.529,
+        "trigger_high": 109.495,
+        "trigger_close": 109.44,
+        "trigger_dif": 0.478
+      },
+      {
+        "date": "2025-01-06",
+        "ref_date": "2024-12-23",
+        "ref_high": 109.12,
+        "ref_dif": 0.529,
+        "trigger_high": 109.47,
+        "trigger_close": 109.47,
+        "trigger_dif": 0.497
+      },
+      {
+        "date": "2025-01-07",
+        "ref_date": "2024-12-23",
+        "ref_high": 109.12,
+        "ref_dif": 0.529,
+        "trigger_high": 109.455,
+        "trigger_close": 109.38,
+        "trigger_dif": 0.498
+      },
+      {
+        "date": "2025-01-08",
+        "ref_date": "2024-12-23",
+        "ref_high": 109.12,
+        "ref_dif": 0.529,
+        "trigger_high": 109.49,
+        "trigger_close": 109.425,
+        "trigger_dif": 0.498
+      },
+      {
+        "date": "2025-01-09",
+        "ref_date": "2024-12-23",
+        "ref_high": 109.12,
+        "ref_dif": 0.529,
+        "trigger_high": 109.44,
+        "trigger_close": 109.19,
+        "trigger_dif": 0.473
+      },
+      {
         "date": "2025-02-06",
         "ref_date": "2025-01-03",
         "ref_high": 109.495,
@@ -21207,6 +21845,15 @@ const FUTURES_DATA = {
         "trigger_dif": 0.237
       },
       {
+        "date": "2025-02-07",
+        "ref_date": "2025-01-03",
+        "ref_high": 109.495,
+        "ref_dif": 0.478,
+        "trigger_high": 109.59,
+        "trigger_close": 109.405,
+        "trigger_dif": 0.231
+      },
+      {
         "date": "2026-04-20",
         "ref_date": "2025-11-05",
         "ref_high": 108.75,
@@ -21214,6 +21861,60 @@ const FUTURES_DATA = {
         "trigger_high": 108.795,
         "trigger_close": 108.715,
         "trigger_dif": 0.09
+      },
+      {
+        "date": "2026-04-21",
+        "ref_date": "2025-11-05",
+        "ref_high": 108.75,
+        "ref_dif": 0.181,
+        "trigger_high": 108.8,
+        "trigger_close": 108.755,
+        "trigger_dif": 0.104
+      },
+      {
+        "date": "2026-04-22",
+        "ref_date": "2025-11-05",
+        "ref_high": 108.75,
+        "ref_dif": 0.181,
+        "trigger_high": 108.885,
+        "trigger_close": 108.84,
+        "trigger_dif": 0.122
+      },
+      {
+        "date": "2026-04-23",
+        "ref_date": "2025-11-05",
+        "ref_high": 108.75,
+        "ref_dif": 0.181,
+        "trigger_high": 108.84,
+        "trigger_close": 108.75,
+        "trigger_dif": 0.127
+      },
+      {
+        "date": "2026-04-24",
+        "ref_date": "2025-11-05",
+        "ref_high": 108.75,
+        "ref_dif": 0.181,
+        "trigger_high": 108.865,
+        "trigger_close": 108.72,
+        "trigger_dif": 0.127
+      },
+      {
+        "date": "2026-05-15",
+        "ref_date": "2026-04-22",
+        "ref_high": 108.885,
+        "ref_dif": 0.122,
+        "trigger_high": 108.9,
+        "trigger_close": 108.815,
+        "trigger_dif": 0.092
+      },
+      {
+        "date": "2026-05-18",
+        "ref_date": "2026-04-22",
+        "ref_high": 108.885,
+        "ref_dif": 0.122,
+        "trigger_high": 108.97,
+        "trigger_close": 108.96,
+        "trigger_dif": 0.105
       },
       {
         "date": "2026-05-26",
@@ -21234,6 +21935,24 @@ const FUTURES_DATA = {
         "trigger_dif": 0.068
       },
       {
+        "date": "2026-06-30",
+        "ref_date": "2026-06-04",
+        "ref_high": 109.3,
+        "ref_dif": 0.164,
+        "trigger_high": 109.36,
+        "trigger_close": 109.22,
+        "trigger_dif": 0.074
+      },
+      {
+        "date": "2026-07-23",
+        "ref_date": "2026-06-30",
+        "ref_high": 109.36,
+        "ref_dif": 0.074,
+        "trigger_high": 109.44,
+        "trigger_close": 109.215,
+        "trigger_dif": 0.05
+      },
+      {
         "date": "2026-09-29",
         "ref_date": "2026-08-18",
         "ref_high": 109.65,
@@ -21241,42 +21960,60 @@ const FUTURES_DATA = {
         "trigger_high": 109.66,
         "trigger_close": 109.655,
         "trigger_dif": 0.053
+      },
+      {
+        "date": "2026-10-13",
+        "ref_date": "2026-09-29",
+        "ref_high": 109.66,
+        "ref_dif": 0.053,
+        "trigger_high": 109.7,
+        "trigger_close": 109.66,
+        "trigger_dif": 0.037
+      },
+      {
+        "date": "2026-10-14",
+        "ref_date": "2026-09-29",
+        "ref_high": 109.66,
+        "ref_dif": 0.053,
+        "trigger_high": 109.715,
+        "trigger_close": 109.68,
+        "trigger_dif": 0.047
       }
     ],
     "last": {
-      "date": "2026-09-29",
-      "ref_date": "2026-08-18",
-      "ref_high": 109.65,
-      "ref_dif": 0.1,
-      "trigger_high": 109.66,
-      "trigger_close": 109.655,
-      "trigger_dif": 0.053
+      "date": "2026-10-14",
+      "ref_date": "2026-09-29",
+      "ref_high": 109.66,
+      "ref_dif": 0.053,
+      "trigger_high": 109.715,
+      "trigger_close": 109.68,
+      "trigger_dif": 0.047
     },
     "active": {
       "state": "invalid",
-      "date": "2026-09-29",
-      "ref_date": "2026-08-18",
-      "ref_high": 109.65,
-      "ref_dif": 0.1,
-      "trigger_high": 109.66,
-      "trigger_close": 109.655,
-      "trigger_dif": 0.053,
+      "date": "2026-10-14",
+      "ref_date": "2026-09-29",
+      "ref_high": 109.66,
+      "ref_dif": 0.053,
+      "trigger_high": 109.715,
+      "trigger_close": 109.68,
+      "trigger_dif": 0.047,
       "current_dif": 0.157,
-      "day": 23,
+      "day": 17,
       "window": 15,
-      "entry": 109.62,
+      "entry": 109.755,
       "current": 110.28,
-      "ret": 0.6,
-      "max_dd": -0.24,
-      "invalid_date": "2026-10-20",
+      "ret": 0.48,
+      "max_dd": -0.07,
+      "invalid_date": "2026-10-15",
       "last_date": "2026-11-06"
     },
     "stats": {
-      "n": 16,
-      "win01": 93.8,
-      "win05": 43.8,
-      "mdd_median": -0.4,
-      "trough_med": 12.0
+      "n": 99,
+      "win01": 80.8,
+      "win05": 40.4,
+      "mdd_median": -0.34,
+      "trough_med": 6.0
     }
   },
   "divergence_tl": {
@@ -21285,7 +22022,7 @@ const FUTURES_DATA = {
       "price": "high",
       "k": 3,
       "ref": "highest120",
-      "gap": 20,
+      "gap": 0,
       "window": 15
     },
     "signals": [
@@ -21299,6 +22036,42 @@ const FUTURES_DATA = {
         "trigger_dif": 0.157
       },
       {
+        "date": "2023-06-13",
+        "ref_date": "2023-05-11",
+        "ref_high": 97.69,
+        "ref_dif": 0.29,
+        "trigger_high": 98.21,
+        "trigger_close": 98.04,
+        "trigger_dif": 0.214
+      },
+      {
+        "date": "2023-06-14",
+        "ref_date": "2023-05-11",
+        "ref_high": 97.69,
+        "ref_dif": 0.29,
+        "trigger_high": 98.51,
+        "trigger_close": 98.33,
+        "trigger_dif": 0.279
+      },
+      {
+        "date": "2023-06-15",
+        "ref_date": "2023-05-11",
+        "ref_high": 97.69,
+        "ref_dif": 0.29,
+        "trigger_high": 98.2,
+        "trigger_close": 97.76,
+        "trigger_dif": 0.281
+      },
+      {
+        "date": "2023-06-16",
+        "ref_date": "2023-05-11",
+        "ref_high": 97.69,
+        "ref_dif": 0.29,
+        "trigger_high": 97.71,
+        "trigger_close": 97.38,
+        "trigger_dif": 0.249
+      },
+      {
         "date": "2023-08-11",
         "ref_date": "2023-07-24",
         "ref_high": 99.59,
@@ -21306,6 +22079,24 @@ const FUTURES_DATA = {
         "trigger_high": 99.62,
         "trigger_close": 99.55,
         "trigger_dif": 0.355
+      },
+      {
+        "date": "2023-08-15",
+        "ref_date": "2023-07-24",
+        "ref_high": 99.59,
+        "ref_dif": 0.442,
+        "trigger_high": 100.41,
+        "trigger_close": 100.18,
+        "trigger_dif": 0.379
+      },
+      {
+        "date": "2023-08-16",
+        "ref_date": "2023-07-24",
+        "ref_high": 99.59,
+        "ref_dif": 0.442,
+        "trigger_high": 100.53,
+        "trigger_close": 100.5,
+        "trigger_dif": 0.433
       },
       {
         "date": "2023-12-22",
@@ -21317,6 +22108,69 @@ const FUTURES_DATA = {
         "trigger_dif": 0.529
       },
       {
+        "date": "2023-12-25",
+        "ref_date": "2023-08-25",
+        "ref_high": 101.47,
+        "ref_dif": 0.658,
+        "trigger_high": 102.3,
+        "trigger_close": 102.19,
+        "trigger_dif": 0.622
+      },
+      {
+        "date": "2023-12-26",
+        "ref_date": "2023-08-25",
+        "ref_high": 101.47,
+        "ref_dif": 0.658,
+        "trigger_high": 102.38,
+        "trigger_close": 101.82,
+        "trigger_dif": 0.657
+      },
+      {
+        "date": "2024-01-02",
+        "ref_date": "2023-08-25",
+        "ref_high": 101.47,
+        "ref_dif": 0.658,
+        "trigger_high": 101.83,
+        "trigger_close": 101.61,
+        "trigger_dif": 0.647
+      },
+      {
+        "date": "2024-01-12",
+        "ref_date": "2023-12-26",
+        "ref_high": 102.38,
+        "ref_dif": 0.657,
+        "trigger_high": 102.41,
+        "trigger_close": 102.07,
+        "trigger_dif": 0.636
+      },
+      {
+        "date": "2024-01-15",
+        "ref_date": "2023-12-26",
+        "ref_high": 102.38,
+        "ref_dif": 0.657,
+        "trigger_high": 102.41,
+        "trigger_close": 102.32,
+        "trigger_dif": 0.612
+      },
+      {
+        "date": "2024-01-18",
+        "ref_date": "2024-01-09",
+        "ref_high": 102.82,
+        "ref_dif": 0.673,
+        "trigger_high": 102.88,
+        "trigger_close": 102.61,
+        "trigger_dif": 0.572
+      },
+      {
+        "date": "2024-01-19",
+        "ref_date": "2024-01-09",
+        "ref_high": 102.82,
+        "ref_dif": 0.673,
+        "trigger_high": 103.02,
+        "trigger_close": 102.97,
+        "trigger_dif": 0.587
+      },
+      {
         "date": "2024-01-22",
         "ref_date": "2024-01-09",
         "ref_high": 102.82,
@@ -21326,6 +22180,24 @@ const FUTURES_DATA = {
         "trigger_dif": 0.649
       },
       {
+        "date": "2024-02-23",
+        "ref_date": "2024-02-05",
+        "ref_high": 105.9,
+        "ref_dif": 1.004,
+        "trigger_high": 106.02,
+        "trigger_close": 105.83,
+        "trigger_dif": 0.843
+      },
+      {
+        "date": "2024-02-26",
+        "ref_date": "2024-02-05",
+        "ref_high": 105.9,
+        "ref_dif": 1.004,
+        "trigger_high": 106.33,
+        "trigger_close": 106.33,
+        "trigger_dif": 0.882
+      },
+      {
         "date": "2024-02-27",
         "ref_date": "2024-02-05",
         "ref_high": 105.9,
@@ -21333,6 +22205,60 @@ const FUTURES_DATA = {
         "trigger_high": 106.94,
         "trigger_close": 106.57,
         "trigger_dif": 0.922
+      },
+      {
+        "date": "2024-02-28",
+        "ref_date": "2024-02-05",
+        "ref_high": 105.9,
+        "ref_dif": 1.004,
+        "trigger_high": 106.91,
+        "trigger_close": 106.91,
+        "trigger_dif": 0.969
+      },
+      {
+        "date": "2024-03-01",
+        "ref_date": "2024-02-05",
+        "ref_high": 105.9,
+        "ref_dif": 1.004,
+        "trigger_high": 107.07,
+        "trigger_close": 106.15,
+        "trigger_dif": 0.971
+      },
+      {
+        "date": "2024-03-04",
+        "ref_date": "2024-02-05",
+        "ref_high": 105.9,
+        "ref_dif": 1.004,
+        "trigger_high": 107.18,
+        "trigger_close": 107.05,
+        "trigger_dif": 0.985
+      },
+      {
+        "date": "2024-03-05",
+        "ref_date": "2024-02-05",
+        "ref_high": 105.9,
+        "ref_dif": 1.004,
+        "trigger_high": 107.08,
+        "trigger_close": 106.66,
+        "trigger_dif": 0.954
+      },
+      {
+        "date": "2024-03-06",
+        "ref_date": "2024-02-05",
+        "ref_high": 105.9,
+        "ref_dif": 1.004,
+        "trigger_high": 107.46,
+        "trigger_close": 107.28,
+        "trigger_dif": 0.968
+      },
+      {
+        "date": "2024-03-07",
+        "ref_date": "2024-02-29",
+        "ref_high": 107.56,
+        "ref_dif": 1.03,
+        "trigger_high": 108.09,
+        "trigger_close": 107.19,
+        "trigger_dif": 0.961
       },
       {
         "date": "2024-04-23",
@@ -21362,6 +22288,24 @@ const FUTURES_DATA = {
         "trigger_dif": 0.447
       },
       {
+        "date": "2024-07-26",
+        "ref_date": "2024-07-01",
+        "ref_high": 110.1,
+        "ref_dif": 0.644,
+        "trigger_high": 110.58,
+        "trigger_close": 110.42,
+        "trigger_dif": 0.505
+      },
+      {
+        "date": "2024-07-29",
+        "ref_date": "2024-07-01",
+        "ref_high": 110.1,
+        "ref_dif": 0.644,
+        "trigger_high": 110.95,
+        "trigger_close": 110.93,
+        "trigger_dif": 0.586
+      },
+      {
         "date": "2024-09-10",
         "ref_date": "2024-08-05",
         "ref_high": 113.0,
@@ -21369,6 +22313,60 @@ const FUTURES_DATA = {
         "trigger_high": 113.31,
         "trigger_close": 113.28,
         "trigger_dif": 0.565
+      },
+      {
+        "date": "2024-09-11",
+        "ref_date": "2024-08-05",
+        "ref_high": 113.0,
+        "ref_dif": 0.975,
+        "trigger_high": 113.56,
+        "trigger_close": 113.51,
+        "trigger_dif": 0.629
+      },
+      {
+        "date": "2024-09-12",
+        "ref_date": "2024-08-05",
+        "ref_high": 113.0,
+        "ref_dif": 0.975,
+        "trigger_high": 113.74,
+        "trigger_close": 113.59,
+        "trigger_dif": 0.678
+      },
+      {
+        "date": "2024-09-13",
+        "ref_date": "2024-08-05",
+        "ref_high": 113.0,
+        "ref_dif": 0.975,
+        "trigger_high": 114.34,
+        "trigger_close": 114.33,
+        "trigger_dif": 0.768
+      },
+      {
+        "date": "2024-09-18",
+        "ref_date": "2024-08-05",
+        "ref_high": 113.0,
+        "ref_dif": 0.975,
+        "trigger_high": 115.2,
+        "trigger_close": 115.13,
+        "trigger_dif": 0.894
+      },
+      {
+        "date": "2024-09-19",
+        "ref_date": "2024-08-05",
+        "ref_high": 113.0,
+        "ref_dif": 0.975,
+        "trigger_high": 115.54,
+        "trigger_close": 114.7,
+        "trigger_dif": 0.947
+      },
+      {
+        "date": "2024-09-26",
+        "ref_date": "2024-08-05",
+        "ref_high": 113.0,
+        "ref_dif": 0.975,
+        "trigger_high": 115.35,
+        "trigger_close": 113.58,
+        "trigger_dif": 0.917
       },
       {
         "date": "2024-12-10",
@@ -21380,6 +22378,51 @@ const FUTURES_DATA = {
         "trigger_dif": 0.915
       },
       {
+        "date": "2024-12-11",
+        "ref_date": "2024-09-24",
+        "ref_high": 116.0,
+        "ref_dif": 1.063,
+        "trigger_high": 117.12,
+        "trigger_close": 117.01,
+        "trigger_dif": 0.999
+      },
+      {
+        "date": "2024-12-12",
+        "ref_date": "2024-09-24",
+        "ref_high": 116.0,
+        "ref_dif": 1.063,
+        "trigger_high": 117.42,
+        "trigger_close": 117.09,
+        "trigger_dif": 1.059
+      },
+      {
+        "date": "2024-12-23",
+        "ref_date": "2024-12-16",
+        "ref_high": 118.69,
+        "ref_dif": 1.247,
+        "trigger_high": 119.14,
+        "trigger_close": 118.09,
+        "trigger_dif": 1.238
+      },
+      {
+        "date": "2025-01-02",
+        "ref_date": "2024-12-23",
+        "ref_high": 119.14,
+        "ref_dif": 1.238,
+        "trigger_high": 120.0,
+        "trigger_close": 119.98,
+        "trigger_dif": 1.124
+      },
+      {
+        "date": "2025-01-03",
+        "ref_date": "2024-12-23",
+        "ref_high": 119.14,
+        "ref_dif": 1.238,
+        "trigger_high": 120.99,
+        "trigger_close": 120.16,
+        "trigger_dif": 1.207
+      },
+      {
         "date": "2025-01-27",
         "ref_date": "2025-01-03",
         "ref_high": 120.99,
@@ -21387,6 +22430,69 @@ const FUTURES_DATA = {
         "trigger_high": 121.28,
         "trigger_close": 121.24,
         "trigger_dif": 0.866
+      },
+      {
+        "date": "2025-02-05",
+        "ref_date": "2025-01-03",
+        "ref_high": 120.99,
+        "ref_dif": 1.207,
+        "trigger_high": 121.7,
+        "trigger_close": 121.69,
+        "trigger_dif": 0.914
+      },
+      {
+        "date": "2025-02-06",
+        "ref_date": "2025-01-03",
+        "ref_high": 120.99,
+        "ref_dif": 1.207,
+        "trigger_high": 122.16,
+        "trigger_close": 122.1,
+        "trigger_dif": 0.974
+      },
+      {
+        "date": "2025-02-07",
+        "ref_date": "2025-01-03",
+        "ref_high": 120.99,
+        "ref_dif": 1.207,
+        "trigger_high": 122.28,
+        "trigger_close": 121.81,
+        "trigger_dif": 0.987
+      },
+      {
+        "date": "2025-02-10",
+        "ref_date": "2025-01-03",
+        "ref_high": 120.99,
+        "ref_dif": 1.207,
+        "trigger_high": 121.74,
+        "trigger_close": 121.33,
+        "trigger_dif": 0.948
+      },
+      {
+        "date": "2025-02-11",
+        "ref_date": "2025-01-03",
+        "ref_high": 120.99,
+        "ref_dif": 1.207,
+        "trigger_high": 121.84,
+        "trigger_close": 121.81,
+        "trigger_dif": 0.944
+      },
+      {
+        "date": "2025-02-12",
+        "ref_date": "2025-01-03",
+        "ref_high": 120.99,
+        "ref_dif": 1.207,
+        "trigger_high": 122.08,
+        "trigger_close": 121.63,
+        "trigger_dif": 0.917
+      },
+      {
+        "date": "2025-02-13",
+        "ref_date": "2025-01-03",
+        "ref_high": 120.99,
+        "ref_dif": 1.207,
+        "trigger_high": 121.97,
+        "trigger_close": 121.89,
+        "trigger_dif": 0.905
       },
       {
         "date": "2026-06-29",
@@ -21398,6 +22504,24 @@ const FUTURES_DATA = {
         "trigger_dif": 0.192
       },
       {
+        "date": "2026-07-22",
+        "ref_date": "2026-06-29",
+        "ref_high": 114.53,
+        "ref_dif": 0.192,
+        "trigger_high": 114.6,
+        "trigger_close": 114.6,
+        "trigger_dif": 0.125
+      },
+      {
+        "date": "2026-07-23",
+        "ref_date": "2026-06-29",
+        "ref_high": 114.53,
+        "ref_dif": 0.192,
+        "trigger_high": 114.84,
+        "trigger_close": 114.72,
+        "trigger_dif": 0.182
+      },
+      {
         "date": "2026-09-22",
         "ref_date": "2026-08-25",
         "ref_high": 116.84,
@@ -21407,6 +22531,87 @@ const FUTURES_DATA = {
         "trigger_dif": 0.237
       },
       {
+        "date": "2026-09-23",
+        "ref_date": "2026-08-25",
+        "ref_high": 116.84,
+        "ref_dif": 0.511,
+        "trigger_high": 117.11,
+        "trigger_close": 116.99,
+        "trigger_dif": 0.265
+      },
+      {
+        "date": "2026-09-24",
+        "ref_date": "2026-08-25",
+        "ref_high": 116.84,
+        "ref_dif": 0.511,
+        "trigger_high": 117.37,
+        "trigger_close": 117.37,
+        "trigger_dif": 0.315
+      },
+      {
+        "date": "2026-09-28",
+        "ref_date": "2026-08-25",
+        "ref_high": 116.84,
+        "ref_dif": 0.511,
+        "trigger_high": 117.45,
+        "trigger_close": 117.06,
+        "trigger_dif": 0.326
+      },
+      {
+        "date": "2026-09-29",
+        "ref_date": "2026-08-25",
+        "ref_high": 116.84,
+        "ref_dif": 0.511,
+        "trigger_high": 117.7,
+        "trigger_close": 117.69,
+        "trigger_dif": 0.381
+      },
+      {
+        "date": "2026-09-30",
+        "ref_date": "2026-08-25",
+        "ref_high": 116.84,
+        "ref_dif": 0.511,
+        "trigger_high": 117.47,
+        "trigger_close": 116.84,
+        "trigger_dif": 0.352
+      },
+      {
+        "date": "2026-10-08",
+        "ref_date": "2026-08-25",
+        "ref_high": 116.84,
+        "ref_dif": 0.511,
+        "trigger_high": 117.0,
+        "trigger_close": 116.86,
+        "trigger_dif": 0.326
+      },
+      {
+        "date": "2026-10-09",
+        "ref_date": "2026-08-25",
+        "ref_high": 116.84,
+        "ref_dif": 0.511,
+        "trigger_high": 117.25,
+        "trigger_close": 117.24,
+        "trigger_dif": 0.333
+      },
+      {
+        "date": "2026-10-12",
+        "ref_date": "2026-08-25",
+        "ref_high": 116.84,
+        "ref_dif": 0.511,
+        "trigger_high": 117.85,
+        "trigger_close": 117.78,
+        "trigger_dif": 0.378
+      },
+      {
+        "date": "2026-10-27",
+        "ref_date": "2026-10-20",
+        "ref_high": 118.51,
+        "ref_dif": 0.505,
+        "trigger_high": 118.64,
+        "trigger_close": 118.53,
+        "trigger_dif": 0.447
+      },
+      {
         "date": "2026-10-28",
         "ref_date": "2026-10-20",
         "ref_high": 118.51,
@@ -21414,42 +22619,87 @@ const FUTURES_DATA = {
         "trigger_high": 118.66,
         "trigger_close": 118.56,
         "trigger_dif": 0.467
+      },
+      {
+        "date": "2026-10-29",
+        "ref_date": "2026-10-20",
+        "ref_high": 118.51,
+        "ref_dif": 0.505,
+        "trigger_high": 118.68,
+        "trigger_close": 118.64,
+        "trigger_dif": 0.485
+      },
+      {
+        "date": "2026-10-30",
+        "ref_date": "2026-10-20",
+        "ref_high": 118.51,
+        "ref_dif": 0.505,
+        "trigger_high": 118.76,
+        "trigger_close": 117.42,
+        "trigger_dif": 0.395
+      },
+      {
+        "date": "2026-11-04",
+        "ref_date": "2026-10-20",
+        "ref_high": 118.51,
+        "ref_dif": 0.505,
+        "trigger_high": 118.71,
+        "trigger_close": 118.34,
+        "trigger_dif": 0.355
+      },
+      {
+        "date": "2026-11-05",
+        "ref_date": "2026-10-20",
+        "ref_high": 118.51,
+        "ref_dif": 0.505,
+        "trigger_high": 118.56,
+        "trigger_close": 118.39,
+        "trigger_dif": 0.355
+      },
+      {
+        "date": "2026-11-06",
+        "ref_date": "2026-10-30",
+        "ref_high": 118.76,
+        "ref_dif": 0.395,
+        "trigger_high": 118.89,
+        "trigger_close": 118.88,
+        "trigger_dif": 0.389
       }
     ],
     "last": {
-      "date": "2026-10-28",
-      "ref_date": "2026-10-20",
-      "ref_high": 118.51,
-      "ref_dif": 0.505,
-      "trigger_high": 118.66,
-      "trigger_close": 118.56,
-      "trigger_dif": 0.467
+      "date": "2026-11-06",
+      "ref_date": "2026-10-30",
+      "ref_high": 118.76,
+      "ref_dif": 0.395,
+      "trigger_high": 118.89,
+      "trigger_close": 118.88,
+      "trigger_dif": 0.389
     },
     "active": {
       "state": "active",
-      "date": "2026-10-28",
-      "ref_date": "2026-10-20",
-      "ref_high": 118.51,
-      "ref_dif": 0.505,
-      "trigger_high": 118.66,
-      "trigger_close": 118.56,
-      "trigger_dif": 0.467,
+      "date": "2026-11-06",
+      "ref_date": "2026-10-30",
+      "ref_high": 118.76,
+      "ref_dif": 0.395,
+      "trigger_high": 118.89,
+      "trigger_close": 118.88,
+      "trigger_dif": 0.389,
       "current_dif": 0.389,
-      "day": 7,
+      "day": 0,
       "window": 15,
-      "entry": 118.45,
+      "entry": null,
       "current": 118.88,
-      "ret": 0.36,
-      "max_dd": -0.87,
+      "ret": null,
+      "max_dd": null,
       "invalid_date": null,
       "last_date": "2026-11-06"
     },
     "stats": {
-      "n": 14,
-      "win01": 92.9,
+      "n": 70,
+      "win01": 82.9,
       "win05": 64.3,
-      "mdd_median": -0.89,
-      "trough_med": 10.0
+      "mdd_median": -1.05,
+      "trough_med": 9.0
     }
   },
   "bottom_t": {
@@ -21458,26 +22708,35 @@ const FUTURES_DATA = {
       "price": "low",
       "k": 3,
       "ref": "recent",
-      "gap": 5
+      "gap": 0
     },
     "signals": [
       {
         "date": "2022-03-04",
         "ref_date": "2022-02-22",
         "ref_low": 99.76,
-        "ref_rsi": 31.4,
+        "ref_rsi": 31.3,
         "trigger_low": 99.58,
         "trigger_close": 99.795,
-        "trigger_rsi": 37.7
+        "trigger_rsi": 37.6
+      },
+      {
+        "date": "2022-03-07",
+        "ref_date": "2022-02-22",
+        "ref_low": 99.76,
+        "ref_rsi": 31.3,
+        "trigger_low": 99.605,
+        "trigger_close": 99.88,
+        "trigger_rsi": 40.0
       },
       {
         "date": "2022-03-11",
         "ref_date": "2022-03-03",
         "ref_low": 99.56,
-        "ref_rsi": 31.6,
+        "ref_rsi": 31.5,
         "trigger_low": 99.53,
         "trigger_close": 100.22,
-        "trigger_rsi": 50.6
+        "trigger_rsi": 50.5
       },
       {
         "date": "2022-06-30",
@@ -21489,6 +22748,15 @@ const FUTURES_DATA = {
         "trigger_rsi": 43.3
       },
       {
+        "date": "2022-07-05",
+        "ref_date": "2022-06-28",
+        "ref_low": 99.625,
+        "ref_rsi": 31.0,
+        "trigger_low": 99.61,
+        "trigger_close": 99.86,
+        "trigger_rsi": 41.3
+      },
+      {
         "date": "2022-10-12",
         "ref_date": "2022-09-16",
         "ref_low": 101.085,
@@ -21498,6 +22766,15 @@ const FUTURES_DATA = {
         "trigger_rsi": 47.4
       },
       {
+        "date": "2022-10-13",
+        "ref_date": "2022-09-16",
+        "ref_low": 101.085,
+        "ref_rsi": 45.7,
+        "trigger_low": 100.99,
+        "trigger_close": 101.12,
+        "trigger_rsi": 49.2
+      },
+      {
         "date": "2022-11-30",
         "ref_date": "2022-11-17",
         "ref_low": 99.235,
@@ -21505,6 +22782,15 @@ const FUTURES_DATA = {
         "trigger_low": 99.125,
         "trigger_close": 99.295,
         "trigger_rsi": 28.7
+      },
+      {
+        "date": "2022-12-01",
+        "ref_date": "2022-11-17",
+        "ref_low": 99.235,
+        "ref_rsi": 23.4,
+        "trigger_low": 99.2,
+        "trigger_close": 99.58,
+        "trigger_rsi": 35.9
       },
       {
         "date": "2023-01-30",
@@ -21525,6 +22811,15 @@ const FUTURES_DATA = {
         "trigger_rsi": 38.5
       },
       {
+        "date": "2023-09-27",
+        "ref_date": "2023-09-18",
+        "ref_low": 101.585,
+        "ref_rsi": 38.4,
+        "trigger_low": 101.53,
+        "trigger_close": 101.62,
+        "trigger_rsi": 39.3
+      },
+      {
         "date": "2023-10-12",
         "ref_date": "2023-09-26",
         "ref_low": 101.44,
@@ -21541,6 +22836,15 @@ const FUTURES_DATA = {
         "trigger_low": 101.185,
         "trigger_close": 101.47,
         "trigger_rsi": 42.3
+      },
+      {
+        "date": "2023-10-25",
+        "ref_date": "2023-10-12",
+        "ref_low": 101.36,
+        "ref_rsi": 40.5,
+        "trigger_low": 101.315,
+        "trigger_close": 101.715,
+        "trigger_rsi": 50.5
       },
       {
         "date": "2024-03-13",
@@ -21561,6 +22865,15 @@ const FUTURES_DATA = {
         "trigger_rsi": 33.9
       },
       {
+        "date": "2025-03-12",
+        "ref_date": "2025-02-25",
+        "ref_low": 107.54,
+        "ref_rsi": 33.6,
+        "trigger_low": 107.045,
+        "trigger_close": 107.675,
+        "trigger_rsi": 38.7
+      },
+      {
         "date": "2025-03-18",
         "ref_date": "2025-02-25",
         "ref_low": 107.54,
@@ -21579,6 +22892,24 @@ const FUTURES_DATA = {
         "trigger_rsi": 44.4
       },
       {
+        "date": "2025-08-04",
+        "ref_date": "2025-07-14",
+        "ref_low": 108.655,
+        "ref_rsi": 38.3,
+        "trigger_low": 108.455,
+        "trigger_close": 108.47,
+        "trigger_rsi": 44.3
+      },
+      {
+        "date": "2025-08-05",
+        "ref_date": "2025-07-14",
+        "ref_low": 108.655,
+        "ref_rsi": 38.3,
+        "trigger_low": 108.44,
+        "trigger_close": 108.54,
+        "trigger_rsi": 46.9
+      },
+      {
         "date": "2025-08-25",
         "ref_date": "2025-07-30",
         "ref_low": 108.095,
@@ -21588,6 +22919,24 @@ const FUTURES_DATA = {
         "trigger_rsi": 39.6
       },
       {
+        "date": "2025-08-26",
+        "ref_date": "2025-07-30",
+        "ref_low": 108.095,
+        "ref_rsi": 37.6,
+        "trigger_low": 107.825,
+        "trigger_close": 107.995,
+        "trigger_rsi": 41.1
+      },
+      {
+        "date": "2025-08-27",
+        "ref_date": "2025-07-30",
+        "ref_low": 108.095,
+        "ref_rsi": 37.6,
+        "trigger_low": 107.865,
+        "trigger_close": 108.02,
+        "trigger_rsi": 42.0
+      },
+      {
         "date": "2025-09-15",
         "ref_date": "2025-09-01",
         "ref_low": 107.7,
@@ -21595,16 +22944,25 @@ const FUTURES_DATA = {
         "trigger_low": 107.67,
         "trigger_close": 107.805,
         "trigger_rsi": 44.5
+      },
+      {
+        "date": "2025-09-16",
+        "ref_date": "2025-09-01",
+        "ref_low": 107.7,
+        "ref_rsi": 44.2,
+        "trigger_low": 107.58,
+        "trigger_close": 108.0,
+        "trigger_rsi": 50.2
       }
     ],
     "last": {
-      "date": "2025-09-15",
+      "date": "2025-09-16",
       "ref_date": "2025-09-01",
       "ref_low": 107.7,
       "ref_rsi": 44.2,
-      "trigger_low": 107.67,
-      "trigger_close": 107.805,
-      "trigger_rsi": 44.5
+      "trigger_low": 107.58,
+      "trigger_close": 108.0,
+      "trigger_rsi": 50.2
     }
   },
   "bottom_tl": {
@@ -21613,7 +22971,7 @@ const FUTURES_DATA = {
       "price": "low",
       "k": 3,
       "ref": "recent",
-      "gap": 5
+      "gap": 0
     },
     "signals": [
       {
@@ -21633,6 +22991,15 @@ const FUTURES_DATA = {
         "trigger_low": 97.88,
         "trigger_close": 98.43,
         "trigger_rsi": 42.9
+      },
+      {
+        "date": "2023-10-25",
+        "ref_date": "2023-10-12",
+        "ref_low": 98.21,
+        "ref_rsi": 40.6,
+        "trigger_low": 97.72,
+        "trigger_close": 98.41,
+        "trigger_rsi": 43.7
       },
       {
         "date": "2023-10-30",
@@ -21662,6 +23029,15 @@ const FUTURES_DATA = {
         "trigger_rsi": 40.0
       },
       {
+        "date": "2025-03-24",
+        "ref_date": "2025-02-25",
+        "ref_low": 116.09,
+        "ref_rsi": 36.5,
+        "trigger_low": 114.51,
+        "trigger_close": 115.59,
+        "trigger_rsi": 42.5
+      },
+      {
         "date": "2025-08-04",
         "ref_date": "2025-07-14",
         "ref_low": 120.06,
@@ -21669,6 +23045,15 @@ const FUTURES_DATA = {
         "trigger_low": 119.12,
         "trigger_close": 119.19,
         "trigger_rsi": 45.7
+      },
+      {
+        "date": "2025-08-05",
+        "ref_date": "2025-07-14",
+        "ref_low": 120.06,
+        "ref_rsi": 44.9,
+        "trigger_low": 119.06,
+        "trigger_close": 119.32,
+        "trigger_rsi": 47.1
       },
       {
         "date": "2025-08-25",
@@ -21680,6 +23065,24 @@ const FUTURES_DATA = {
         "trigger_rsi": 40.4
       },
       {
+        "date": "2025-08-26",
+        "ref_date": "2025-07-30",
+        "ref_low": 117.64,
+        "ref_rsi": 36.7,
+        "trigger_low": 116.66,
+        "trigger_close": 117.27,
+        "trigger_rsi": 44.6
+      },
+      {
+        "date": "2025-08-27",
+        "ref_date": "2025-07-30",
+        "ref_low": 117.64,
+        "ref_rsi": 36.7,
+        "trigger_low": 116.83,
+        "trigger_close": 117.4,
+        "trigger_rsi": 45.7
+      },
+      {
         "date": "2025-09-25",
         "ref_date": "2025-09-11",
         "ref_low": 114.35,
@@ -21689,6 +23092,33 @@ const FUTURES_DATA = {
         "trigger_rsi": 33.4
       },
       {
+        "date": "2025-09-26",
+        "ref_date": "2025-09-11",
+        "ref_low": 114.35,
+        "ref_rsi": 31.3,
+        "trigger_low": 114.07,
+        "trigger_close": 114.19,
+        "trigger_rsi": 34.4
+      },
+      {
+        "date": "2025-09-30",
+        "ref_date": "2025-09-11",
+        "ref_low": 114.35,
+        "ref_rsi": 31.3,
+        "trigger_low": 113.34,
+        "trigger_close": 113.9,
+        "trigger_rsi": 33.8
+      },
+      {
+        "date": "2025-10-09",
+        "ref_date": "2025-09-11",
+        "ref_low": 114.35,
+        "ref_rsi": 31.3,
+        "trigger_low": 113.8,
+        "trigger_close": 114.53,
+        "trigger_rsi": 41.4
+      },
+      {
         "date": "2025-10-13",
         "ref_date": "2025-09-11",
         "ref_low": 114.35,
@@ -21696,6 +23126,15 @@ const FUTURES_DATA = {
         "trigger_low": 114.25,
         "trigger_close": 114.44,
         "trigger_rsi": 42.5
+      },
+      {
+        "date": "2025-10-14",
+        "ref_date": "2025-09-11",
+        "ref_low": 114.35,
+        "ref_rsi": 31.3,
+        "trigger_low": 113.63,
+        "trigger_close": 114.76,
+        "trigger_rsi": 45.8
       },
       {
         "date": "2025-12-17",
@@ -21714,6 +23153,24 @@ const FUTURES_DATA = {
         "trigger_low": 110.4,
         "trigger_close": 111.0,
         "trigger_rsi": 36.9
+      },
+      {
+        "date": "2026-01-12",
+        "ref_date": "2025-12-16",
+        "ref_low": 111.28,
+        "ref_rsi": 25.6,
+        "trigger_low": 110.85,
+        "trigger_close": 111.2,
+        "trigger_rsi": 39.9
+      },
+      {
+        "date": "2026-01-13",
+        "ref_date": "2025-12-16",
+        "ref_low": 111.28,
+        "ref_rsi": 25.6,
+        "trigger_low": 111.09,
+        "trigger_close": 111.35,
+        "trigger_rsi": 41.6
       },
       {
         "date": "2026-03-23",
