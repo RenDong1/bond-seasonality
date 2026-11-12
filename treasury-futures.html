@@ -226,7 +226,7 @@
 <body data-site="inner" data-page="treasury-futures">
 
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-11 13:13</span><span class="site-stamp site-stamp-data">数据截至 2026-11-10</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-12 09:04</span><span class="site-stamp site-stamp-data">数据截至 2026-11-11</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html" class="active" aria-current="page">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -298,21 +298,11 @@
 <script>
 // ====== DATA INJECTION ======
 const FUTURES_DATA = {
-  "date": "2026-11-10",
-  "day_of_week": "周二",
+  "date": "2026-11-11",
+  "day_of_week": "周三",
   "status": "已收盘",
   "oi_source": "total",
   "data_t": [
-    {
-      "date": "2021-11-12",
-      "o": 99.83,
-      "h": 99.995,
-      "l": 99.74,
-      "c": 99.785,
-      "v": 52940.0,
-      "oi": 173505.0,
-      "oi_main": 109531.0
-    },
     {
       "date": "2021-11-15",
       "o": 99.81,
@@ -12402,6 +12392,16 @@ const FUTURES_DATA = {
       "v": 114000.0,
       "oi": 472150.0,
       "oi_main": 394065.0
+    },
+    {
+      "date": "2026-11-11",
+      "o": 110.13,
+      "h": 110.2,
+      "l": 110.015,
+      "c": 110.035,
+      "v": 158445.0,
+      "oi": 466393.0,
+      "oi_main": 368743.0
     }
   ],
   "data_tl": [
@@ -21004,99 +21004,109 @@ const FUTURES_DATA = {
       "v": 110644.0,
       "oi": 258926.0,
       "oi_main": 200080.0
+    },
+    {
+      "date": "2026-11-11",
+      "o": 118.27,
+      "h": 118.57,
+      "l": 117.87,
+      "c": 117.92,
+      "v": 162530.0,
+      "oi": 260088.0,
+      "oi_main": 190760.0
     }
   ],
   "indicators_t": {
-    "macd_diff": 0.1546,
+    "macd_diff": 0.1404,
     "macd_sub": "正区间，偏多",
-    "kdj_k": 81.85,
+    "kdj_k": 72.56,
     "kdj_sub": "偏强区间",
-    "rsi_6": 57.44,
+    "rsi_6": 45.59,
     "rsi_sub": "中性",
-    "boll_mid": 109.9675,
+    "boll_mid": 109.9852,
     "boll_sub": "价格贴近中轨",
-    "atr_14": 0.1353,
+    "atr_14": 0.1389,
     "atr_sub": "低波环境",
-    "obv": 606.07,
+    "obv": 584.23,
     "obv_sub": "万手，年化",
-    "volatility": 0.097,
+    "volatility": 0.1006,
     "vol_sub": "高波动",
-    "cci": 82.99,
+    "cci": 25.39,
     "cci_sub": "正常区间",
-    "psy": 66.67,
+    "psy": 58.33,
     "psy_sub": "偏多情绪",
-    "bias": -0.0189,
+    "bias": -0.1157,
     "bias_sub": "贴近均线",
-    "vr": 161.04,
-    "vr_sub": "放量活跃",
-    "dma": 0.4252,
-    "dma_sub": "短均>长均，偏多",
-    "trix": 0.0217,
-    "trix_sub": "温和上升",
-    "mtm": 0.14,
-    "mtm_sub": "上涨动能",
-    "mfi": 54.39,
-    "mfi_sub": "资金流入偏多",
-    "ctd_bond": null,
-    "irr": null,
-    "bnoc": null,
-    "basis": null,
-    "member_long": 62061,
-    "member_short": 66323,
-    "member_net": -4262
-  },
-  "indicators_tl": {
-    "macd_diff": 0.374,
-    "macd_sub": "正区间，强多头",
-    "kdj_k": 77.95,
-    "kdj_sub": "偏强区间",
-    "rsi_6": 52.97,
-    "rsi_sub": "中性",
-    "boll_mid": 118.1805,
-    "boll_sub": "价格贴近中轨",
-    "atr_14": 0.5294,
-    "atr_sub": "高波环境",
-    "obv": 411.9,
-    "obv_sub": "万手，年化",
-    "volatility": 0.3614,
-    "vol_sub": "高波动",
-    "cci": 50.45,
-    "cci_sub": "正常区间",
-    "psy": 66.67,
-    "psy_sub": "偏多情绪",
-    "bias": -0.0605,
-    "bias_sub": "贴近均线",
-    "vr": 144.9,
+    "vr": 135.23,
     "vr_sub": "正常量能",
-    "dma": 1.1274,
-    "dma_sub": "短均远高于长均",
-    "trix": 0.0458,
+    "dma": 0.4181,
+    "dma_sub": "短均>长均，偏多",
+    "trix": 0.0213,
     "trix_sub": "温和上升",
-    "mtm": -0.1,
-    "mtm_sub": "下跌动能",
-    "mfi": 43.5,
+    "mtm": 0.03,
+    "mtm_sub": "上涨动能",
+    "mfi": 46.59,
     "mfi_sub": "资金流出偏空",
     "ctd_bond": null,
     "irr": null,
     "bnoc": null,
     "basis": null,
-    "member_long": 43059,
-    "member_short": 27602,
-    "member_net": 15457
+    "member_long": 58017,
+    "member_short": 64588,
+    "member_net": -6571
+  },
+  "indicators_tl": {
+    "macd_diff": 0.3148,
+    "macd_sub": "正区间，强多头",
+    "kdj_k": 66.39,
+    "kdj_sub": "中性区间",
+    "rsi_6": 39.6,
+    "rsi_sub": "中性偏空",
+    "boll_mid": 118.175,
+    "boll_sub": "价格贴近中轨",
+    "atr_14": 0.5415,
+    "atr_sub": "高波环境",
+    "obv": 395.65,
+    "obv_sub": "万手，年化",
+    "volatility": 0.3722,
+    "vol_sub": "高波动",
+    "cci": -28.87,
+    "cci_sub": "正常区间",
+    "psy": 58.33,
+    "psy_sub": "偏多情绪",
+    "bias": -0.432,
+    "bias_sub": "小幅负偏离",
+    "vr": 121.93,
+    "vr_sub": "正常量能",
+    "dma": 1.0374,
+    "dma_sub": "短均远高于长均",
+    "trix": 0.0431,
+    "trix_sub": "温和上升",
+    "mtm": -0.64,
+    "mtm_sub": "强下跌动能",
+    "mfi": 42.99,
+    "mfi_sub": "资金流出偏空",
+    "ctd_bond": null,
+    "irr": null,
+    "bnoc": null,
+    "basis": null,
+    "member_long": 43318,
+    "member_short": 29354,
+    "member_net": 13964
   },
   "quick_stats": {
-    "t_close": 110.145,
-    "t_change": -0.0499,
+    "t_close": 110.035,
+    "t_change": -0.0999,
     "t_direction": "down",
-    "tl_close": 118.43,
-    "tl_change": -0.1686,
+    "tl_close": 117.92,
+    "tl_change": -0.4306,
     "tl_direction": "down",
-    "t_margin": "22,029",
-    "tl_margin": "41,451",
-    "t_fund": 208.0,
-    "t_fund_change": 3.7,
+    "t_margin": "22,007",
+    "tl_margin": "41,272",
+    "t_fund": 205.3,
+    "t_fund_change": -2.7,
     "tl_fund": 214.7,
-    "tl_fund_change": -0.9
+    "tl_fund_change": 0.0
   },
   "divergence_t": {
     "rule": {
@@ -21112,19 +21122,19 @@ const FUTURES_DATA = {
         "date": "2022-01-17",
         "ref_date": "2021-12-30",
         "ref_high": 100.88,
-        "ref_dif": 0.185,
+        "ref_dif": 0.165,
         "trigger_high": 101.02,
         "trigger_close": 100.73,
-        "trigger_dif": 0.147
+        "trigger_dif": 0.138
       },
       {
         "date": "2022-01-18",
         "ref_date": "2021-12-30",
         "ref_high": 100.88,
-        "ref_dif": 0.185,
+        "ref_dif": 0.165,
         "trigger_high": 101.085,
         "trigger_close": 101.055,
-        "trigger_dif": 0.173
+        "trigger_dif": 0.165
       },
       {
         "date": "2023-06-12",
@@ -22018,15 +22028,15 @@ const FUTURES_DATA = {
       "trigger_high": 109.715,
       "trigger_close": 109.68,
       "trigger_dif": 0.047,
-      "current_dif": 0.155,
-      "day": 19,
+      "current_dif": 0.14,
+      "day": 20,
       "window": 15,
       "entry": 109.755,
-      "current": 110.145,
-      "ret": 0.36,
+      "current": 110.035,
+      "ret": 0.26,
       "max_dd": -0.07,
       "invalid_date": "2026-10-15",
-      "last_date": "2026-11-10"
+      "last_date": "2026-11-11"
     },
     "stats": {
       "n": 99,
@@ -22713,20 +22723,20 @@ const FUTURES_DATA = {
       "trigger_high": 118.83,
       "trigger_close": 118.63,
       "trigger_dif": 0.392,
-      "current_dif": 0.374,
-      "day": 1,
+      "current_dif": 0.315,
+      "day": 2,
       "window": 15,
       "entry": 118.5,
-      "current": 118.43,
-      "ret": -0.06,
-      "max_dd": -0.06,
+      "current": 117.92,
+      "ret": -0.49,
+      "max_dd": -0.49,
       "invalid_date": null,
-      "last_date": "2026-11-10"
+      "last_date": "2026-11-11"
     },
     "stats": {
       "n": 72,
-      "win01": 83.3,
-      "win05": 62.5,
+      "win01": 86.1,
+      "win05": 65.3,
       "mdd_median": -1.0,
       "trough_med": 8.0
     }
@@ -22744,28 +22754,28 @@ const FUTURES_DATA = {
         "date": "2022-03-04",
         "ref_date": "2022-02-22",
         "ref_low": 99.76,
-        "ref_rsi": 32.5,
+        "ref_rsi": 31.4,
         "trigger_low": 99.58,
         "trigger_close": 99.795,
-        "trigger_rsi": 38.3
+        "trigger_rsi": 37.8
       },
       {
         "date": "2022-03-07",
         "ref_date": "2022-02-22",
         "ref_low": 99.76,
-        "ref_rsi": 32.5,
+        "ref_rsi": 31.4,
         "trigger_low": 99.605,
         "trigger_close": 99.88,
-        "trigger_rsi": 40.6
+        "trigger_rsi": 40.2
       },
       {
         "date": "2022-03-11",
         "ref_date": "2022-03-03",
         "ref_low": 99.56,
-        "ref_rsi": 32.3,
+        "ref_rsi": 31.7,
         "trigger_low": 99.53,
         "trigger_close": 100.22,
-        "trigger_rsi": 50.9
+        "trigger_rsi": 50.7
       },
       {
         "date": "2022-06-30",
