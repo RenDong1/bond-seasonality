@@ -1,7 +1,7 @@
 window.MONITOR_DATA = {
  "meta": {
-  "as_of": "2026-11-12",
-  "generated_at": "2026-11-13 09:03:54",
+  "as_of": "2026-11-13",
+  "generated_at": "2026-11-15 18:14:23",
   "event_count": 18,
   "path_event_count": 15,
   "start": "2023-04-21",
@@ -17,19 +17,19 @@ window.MONITOR_DATA = {
   ]
  },
  "current": {
-  "spread": 45.08,
-  "sr20": -2.507,
-  "sr40": -12.535,
+  "spread": 44.72,
+  "sr20": -4.18,
+  "sr40": -13.25,
   "down_score": 4,
   "up_score": 0,
-  "g_tl": -1.771,
-  "g_t": 1.639,
-  "rel_oi": -3.409,
-  "relret": -0.2605,
-  "y10": 1.6032,
-  "y30": 2.054,
-  "beta": 3.3495,
-  "met_count": 1,
+  "g_tl": -1.34,
+  "g_t": -2.269,
+  "rel_oi": 0.929,
+  "relret": -0.1712,
+  "y10": 1.6123,
+  "y30": 2.0595,
+  "beta": 3.3112,
+  "met_count": 2,
   "roll_day": false
  },
  "conditions": [
@@ -46,40 +46,40 @@ window.MONITOR_DATA = {
   {
    "key": "g_tl",
    "label": "TL 全合约持仓日增",
-   "value": -1.771,
+   "value": -1.34,
    "threshold": 1.0,
    "op": ">",
    "unit": "%",
    "pass": false,
-   "gap": 2.771
+   "gap": 2.34
   },
   {
    "key": "rel_oi",
    "label": "TL−T 相对增仓",
-   "value": -3.409,
+   "value": 0.929,
    "threshold": 0.0,
    "op": ">",
    "unit": "pp",
-   "pass": false,
-   "gap": 3.409
+   "pass": true,
+   "gap": -0.929
   },
   {
    "key": "relret",
    "label": "TL 对 T 的 DV01 中性收益",
-   "value": -0.2605,
+   "value": -0.1712,
    "threshold": 0.1,
    "op": ">",
    "unit": "%",
    "pass": false,
-   "gap": 0.361
+   "gap": 0.271
   }
  ],
  "last_event": {
   "date": "2026-10-14",
-  "elapsed": 21,
-  "dS": 4.24,
-  "dy30": -0.6,
-  "dy10": -4.84,
+  "elapsed": 22,
+  "dS": 3.88,
+  "dy30": -0.05,
+  "dy10": -3.93,
   "active": true
  },
  "events": [
@@ -96,7 +96,7 @@ window.MONITOR_DATA = {
    "relret": 0.1113,
    "spread": 35.86,
    "class20": "熊平",
-   "elapsed": 781,
+   "elapsed": 782,
    "status": "finished",
    "dS5": -4.11,
    "rel5": 0.354,
@@ -130,7 +130,7 @@ window.MONITOR_DATA = {
    "relret": 0.2877,
    "spread": 34.7,
    "class20": "熊平",
-   "elapsed": 762,
+   "elapsed": 763,
    "status": "finished",
    "dS5": -2.06,
    "rel5": -0.334,
@@ -164,7 +164,7 @@ window.MONITOR_DATA = {
    "relret": 0.1446,
    "spread": 29.0,
    "class20": "牛平",
-   "elapsed": 743,
+   "elapsed": 744,
    "status": "finished",
    "dS5": 0.02,
    "rel5": -0.568,
@@ -198,7 +198,7 @@ window.MONITOR_DATA = {
    "relret": 0.3861,
    "spread": 23.99,
    "class20": "牛平",
-   "elapsed": 696,
+   "elapsed": 697,
    "status": "finished",
    "dS5": 4.22,
    "rel5": -0.346,
@@ -232,7 +232,7 @@ window.MONITOR_DATA = {
    "relret": 0.1366,
    "spread": 26.44,
    "class20": "牛平",
-   "elapsed": 682,
+   "elapsed": 683,
    "status": "finished",
    "dS5": -3.42,
    "rel5": 0.768,
@@ -266,7 +266,7 @@ window.MONITOR_DATA = {
    "relret": 0.2798,
    "spread": 19.72,
    "class20": "牛平",
-   "elapsed": 667,
+   "elapsed": 668,
    "status": "finished",
    "dS5": -1.02,
    "rel5": 0.215,
@@ -300,7 +300,7 @@ window.MONITOR_DATA = {
    "relret": 0.2456,
    "spread": 24.97,
    "class20": "牛平",
-   "elapsed": 586,
+   "elapsed": 587,
    "status": "finished",
    "dS5": -2.34,
    "rel5": 0.329,
@@ -334,7 +334,7 @@ window.MONITOR_DATA = {
    "relret": 0.3219,
    "spread": 23.01,
    "class20": "牛平",
-   "elapsed": 569,
+   "elapsed": 570,
    "status": "finished",
    "dS5": -0.7,
    "rel5": -0.169,
@@ -368,7 +368,7 @@ window.MONITOR_DATA = {
    "relret": 0.1158,
    "spread": 23.54,
    "class20": "扭曲变平（30Y 下行、10Y 上行）",
-   "elapsed": 551,
+   "elapsed": 552,
    "status": "finished",
    "dS5": -4.64,
    "rel5": 0.438,
@@ -402,7 +402,7 @@ window.MONITOR_DATA = {
    "relret": 0.3828,
    "spread": 23.2,
    "class20": "牛平",
-   "elapsed": 449,
+   "elapsed": 450,
    "status": "finished",
    "dS5": 2.44,
    "rel5": -0.328,
@@ -436,7 +436,7 @@ window.MONITOR_DATA = {
    "relret": 0.1022,
    "spread": 23.76,
    "class20": "熊平",
-   "elapsed": 432,
+   "elapsed": 433,
    "status": "finished",
    "dS5": -5.75,
    "rel5": 0.546,
@@ -470,7 +470,7 @@ window.MONITOR_DATA = {
    "relret": 0.1306,
    "spread": 25.49,
    "class20": "扭曲变平（30Y 下行、10Y 上行）",
-   "elapsed": 380,
+   "elapsed": 381,
    "status": "finished",
    "dS5": 1.21,
    "rel5": 0.622,
@@ -504,7 +504,7 @@ window.MONITOR_DATA = {
    "relret": 0.106,
    "spread": 54.26,
    "class20": "牛平",
-   "elapsed": 147,
+   "elapsed": 148,
    "status": "finished",
    "dS5": -4.5,
    "rel5": 0.511,
@@ -538,7 +538,7 @@ window.MONITOR_DATA = {
    "relret": 0.1647,
    "spread": 50.21,
    "class20": "牛平",
-   "elapsed": 78,
+   "elapsed": 79,
    "status": "finished",
    "dS5": -4.33,
    "rel5": 0.61,
@@ -572,7 +572,7 @@ window.MONITOR_DATA = {
    "relret": 0.2129,
    "spread": 46.67,
    "class20": "牛平",
-   "elapsed": 63,
+   "elapsed": 64,
    "status": "finished",
    "dS5": 0.13,
    "rel5": 0.34,
@@ -606,7 +606,7 @@ window.MONITOR_DATA = {
    "relret": 0.107,
    "spread": 45.22,
    "class20": "扭曲变平（30Y 下行、10Y 上行）",
-   "elapsed": 44,
+   "elapsed": 45,
    "status": "active",
    "dS5": 0.71,
    "rel5": 0.033,
@@ -640,7 +640,7 @@ window.MONITOR_DATA = {
    "relret": 0.2086,
    "spread": 44.4,
    "class20": "牛平",
-   "elapsed": 33,
+   "elapsed": 34,
    "status": "active",
    "dS5": -2.6,
    "rel5": 0.399,
@@ -674,7 +674,7 @@ window.MONITOR_DATA = {
    "relret": 0.1465,
    "spread": 40.84,
    "class20": "走陡",
-   "elapsed": 21,
+   "elapsed": 22,
    "status": "active",
    "dS5": 1.34,
    "rel5": -0.583,
@@ -765,27 +765,27 @@ window.MONITOR_DATA = {
  },
  "baseline": {
   "5": {
-   "n": 300,
-   "median": -0.32
+   "n": 301,
+   "median": -0.31
   },
   "10": {
-   "n": 295,
-   "median": -0.96
+   "n": 296,
+   "median": -0.945
   },
   "20": {
-   "n": 285,
-   "median": -2.08
+   "n": 286,
+   "median": -2.06
   },
   "40": {
-   "n": 267,
-   "median": -3.62
+   "n": 268,
+   "median": -3.615
   },
   "60": {
-   "n": 250,
-   "median": -3.475
+   "n": 251,
+   "median": -3.47
   }
  },
- "extra20": -1.065,
+ "extra20": -1.085,
  "path": [
   {
    "offset": -20,
@@ -1443,6 +1443,10 @@ window.MONITOR_DATA = {
   {
    "offset": 21,
    "dS": 4.239999999999974
+  },
+  {
+   "offset": 22,
+   "dS": 3.879999999999974
   }
  ],
  "history": {
@@ -2308,7 +2312,8 @@ window.MONITOR_DATA = {
    "2026-11-09",
    "2026-11-10",
    "2026-11-11",
-   "2026-11-12"
+   "2026-11-12",
+   "2026-11-13"
   ],
   "spread": [
    34.68,
@@ -3172,7 +3177,8 @@ window.MONITOR_DATA = {
    44.06,
    43.98,
    44.81,
-   45.08
+   45.08,
+   44.72
   ],
   "sr20": [
    null,
@@ -4036,7 +4042,8 @@ window.MONITOR_DATA = {
    -6.585,
    -5.822,
    -3.488,
-   -2.507
+   -2.507,
+   -4.18
   ],
   "sr40": [
    null,
@@ -4900,7 +4907,8 @@ window.MONITOR_DATA = {
    -11.91,
    -12.109,
    -11.363,
-   -12.535
+   -12.535,
+   -13.25
   ],
   "score_down": [
    0,
@@ -5764,6 +5772,7 @@ window.MONITOR_DATA = {
    4,
    4,
    4,
+   4,
    4
   ],
   "score_up": [
@@ -6587,6 +6596,7 @@ window.MONITOR_DATA = {
    1,
    0,
    1,
+   0,
    0,
    0,
    0,
@@ -7492,7 +7502,8 @@ window.MONITOR_DATA = {
    -2.595,
    -0.254,
    0.449,
-   -1.771
+   -1.771,
+   -1.34
   ],
   "g_t": [
    null,
@@ -8356,7 +8367,8 @@ window.MONITOR_DATA = {
    -0.962,
    1.871,
    -1.219,
-   1.639
+   1.639,
+   -2.269
   ],
   "rel_oi": [
    null,
@@ -9220,7 +9232,8 @@ window.MONITOR_DATA = {
    -1.633,
    -2.124,
    1.668,
-   -3.409
+   -3.409,
+   0.929
   ],
   "relret": [
    null,
@@ -10084,7 +10097,8 @@ window.MONITOR_DATA = {
    0.0343,
    -0.0013,
    -0.0982,
-   -0.2605
+   -0.2605,
+   -0.1712
   ],
   "y10": [
    2.8258,
@@ -10948,7 +10962,8 @@ window.MONITOR_DATA = {
    1.5874,
    1.5965,
    1.6039,
-   1.6032
+   1.6032,
+   1.6123
   ],
   "y30": [
    3.1726,
@@ -11812,7 +11827,8 @@ window.MONITOR_DATA = {
    2.028,
    2.0363,
    2.052,
-   2.054
+   2.054,
+   2.0595
   ],
   "trigger": [
    0,
@@ -12656,6 +12672,7 @@ window.MONITOR_DATA = {
    0,
    0,
    1,
+   0,
    0,
    0,
    0,
@@ -13540,15 +13557,16 @@ window.MONITOR_DATA = {
    0,
    0,
    0,
+   0,
    0
   ]
  },
  "diagnostics": {
-  "last_quote_T": "2026-11-12",
-  "last_quote_TL": "2026-11-12",
-  "last_stock": "2026-11-12",
-  "last_yield": "2026-11-12",
-  "last_oi": "2026-11-12",
+  "last_quote_T": "2026-11-13",
+  "last_quote_TL": "2026-11-13",
+  "last_stock": "2026-11-13",
+  "last_yield": "2026-11-13",
+  "last_oi": "2026-11-13",
   "n_contracts_T": 3,
   "n_contracts_TL": 3
  },
@@ -13565,8 +13583,8 @@ window.MONITOR_DATA = {
  },
  "widening": {
   "meta": {
-   "as_of": "2026-11-12",
-   "generated_at": "2026-11-13 09:03:59",
+   "as_of": "2026-11-13",
+   "generated_at": "2026-11-15 18:14:28",
    "event_count": 23,
    "path_event_count": 23,
    "start": "2023-04-21",
@@ -13582,19 +13600,19 @@ window.MONITOR_DATA = {
    ]
   },
   "current": {
-   "spread": 45.08,
-   "sr20": -2.507,
-   "sr40": -12.535,
+   "spread": 44.72,
+   "sr20": -4.18,
+   "sr40": -13.25,
    "down_score": 4,
    "up_score": 0,
-   "g_tl": -1.771,
-   "g_t": 1.639,
-   "rel_oi": -3.409,
-   "relret": -0.2605,
-   "y10": 1.6032,
-   "y30": 2.054,
-   "beta": 3.3495,
-   "met_count": 2,
+   "g_tl": -1.34,
+   "g_t": -2.269,
+   "rel_oi": 0.929,
+   "relret": -0.1712,
+   "y10": 1.6123,
+   "y30": 2.0595,
+   "beta": 3.3112,
+   "met_count": 1,
    "roll_day": false
   },
   "conditions": [
@@ -13611,30 +13629,30 @@ window.MONITOR_DATA = {
    {
     "key": "rel_oi",
     "label": "TL−T 相对增仓",
-    "value": -3.409,
+    "value": 0.929,
     "threshold": 0.0,
     "op": "<",
     "unit": "pp",
-    "pass": true,
-    "gap": -3.409
+    "pass": false,
+    "gap": 0.929
    },
    {
     "key": "relret",
     "label": "TL 对 T 的 DV01 中性收益",
-    "value": -0.2605,
+    "value": -0.1712,
     "threshold": -0.1,
     "op": "<",
     "unit": "%",
     "pass": true,
-    "gap": -0.161
+    "gap": -0.071
    }
   ],
   "last_event": {
    "date": "2026-06-24",
-   "elapsed": 95,
-   "dS": -3.49,
-   "dy30": -17.71,
-   "dy10": -14.22,
+   "elapsed": 96,
+   "dS": -3.85,
+   "dy30": -17.16,
+   "dy10": -13.31,
    "active": false
   },
   "events": [
@@ -13650,7 +13668,7 @@ window.MONITOR_DATA = {
     "rel_oi": -1.488,
     "relret": -0.577,
     "spread": 16.25,
-    "elapsed": 652,
+    "elapsed": 653,
     "status": "finished",
     "dS5": 3.14,
     "rel5": -1.109,
@@ -13683,7 +13701,7 @@ window.MONITOR_DATA = {
     "rel_oi": -0.573,
     "relret": -0.5333,
     "spread": 17.64,
-    "elapsed": 640,
+    "elapsed": 641,
     "status": "finished",
     "dS5": -1.26,
     "rel5": -0.092,
@@ -13716,7 +13734,7 @@ window.MONITOR_DATA = {
     "rel_oi": -0.693,
     "relret": -0.1233,
     "spread": 18.35,
-    "elapsed": 629,
+    "elapsed": 630,
     "status": "finished",
     "dS5": 1.59,
     "rel5": -0.846,
@@ -13749,7 +13767,7 @@ window.MONITOR_DATA = {
     "rel_oi": -1.836,
     "relret": -0.3479,
     "spread": 27.04,
-    "elapsed": 609,
+    "elapsed": 610,
     "status": "finished",
     "dS5": 0.86,
     "rel5": -0.011,
@@ -13782,7 +13800,7 @@ window.MONITOR_DATA = {
     "rel_oi": -1.721,
     "relret": -0.1036,
     "spread": 16.66,
-    "elapsed": 489,
+    "elapsed": 490,
     "status": "finished",
     "dS5": 0.58,
     "rel5": -0.098,
@@ -13815,7 +13833,7 @@ window.MONITOR_DATA = {
     "rel_oi": -3.086,
     "relret": -0.2065,
     "spread": 19.47,
-    "elapsed": 474,
+    "elapsed": 475,
     "status": "finished",
     "dS5": -1.84,
     "rel5": 0.325,
@@ -13848,7 +13866,7 @@ window.MONITOR_DATA = {
     "rel_oi": -0.035,
     "relret": -0.5111,
     "spread": 25.09,
-    "elapsed": 458,
+    "elapsed": 459,
     "status": "finished",
     "dS5": 0.7,
     "rel5": 0.116,
@@ -13881,7 +13899,7 @@ window.MONITOR_DATA = {
     "rel_oi": -2.398,
     "relret": -0.4792,
     "spread": 16.66,
-    "elapsed": 423,
+    "elapsed": 424,
     "status": "finished",
     "dS5": 1.59,
     "rel5": -0.549,
@@ -13914,7 +13932,7 @@ window.MONITOR_DATA = {
     "rel_oi": -2.501,
     "relret": -0.3105,
     "spread": 17.91,
-    "elapsed": 406,
+    "elapsed": 407,
     "status": "finished",
     "dS5": 5.52,
     "rel5": -0.778,
@@ -13947,7 +13965,7 @@ window.MONITOR_DATA = {
     "rel_oi": -0.169,
     "relret": -0.1067,
     "spread": 22.19,
-    "elapsed": 350,
+    "elapsed": 351,
     "status": "finished",
     "dS5": -2.09,
     "rel5": 0.31,
@@ -13980,7 +13998,7 @@ window.MONITOR_DATA = {
     "rel_oi": -0.577,
     "relret": -0.1404,
     "spread": 20.77,
-    "elapsed": 336,
+    "elapsed": 337,
     "status": "finished",
     "dS5": -0.22,
     "rel5": 0.085,
@@ -14013,7 +14031,7 @@ window.MONITOR_DATA = {
     "rel_oi": -0.406,
     "relret": -0.1117,
     "spread": 26.16,
-    "elapsed": 305,
+    "elapsed": 306,
     "status": "finished",
     "dS5": 3.18,
     "rel5": -0.517,
@@ -14046,7 +14064,7 @@ window.MONITOR_DATA = {
     "rel_oi": -0.169,
     "relret": -0.1646,
     "spread": 29.08,
-    "elapsed": 288,
+    "elapsed": 289,
     "status": "finished",
     "dS5": 0.53,
     "rel5": -0.405,
@@ -14079,7 +14097,7 @@ window.MONITOR_DATA = {
     "rel_oi": -2.728,
     "relret": -0.101,
     "spread": 34.02,
-    "elapsed": 269,
+    "elapsed": 270,
     "status": "finished",
     "dS5": 9.44,
     "rel5": -0.708,
@@ -14112,7 +14130,7 @@ window.MONITOR_DATA = {
     "rel_oi": -0.342,
     "relret": -0.1097,
     "spread": 35.21,
-    "elapsed": 253,
+    "elapsed": 254,
     "status": "finished",
     "dS5": -0.84,
     "rel5": -0.104,
@@ -14145,7 +14163,7 @@ window.MONITOR_DATA = {
     "rel_oi": -1.883,
     "relret": -0.1994,
     "spread": 38.66,
-    "elapsed": 211,
+    "elapsed": 212,
     "status": "finished",
     "dS5": 3.72,
     "rel5": -0.132,
@@ -14178,7 +14196,7 @@ window.MONITOR_DATA = {
     "rel_oi": -1.563,
     "relret": -0.2858,
     "spread": 45.34,
-    "elapsed": 199,
+    "elapsed": 200,
     "status": "finished",
     "dS5": 1.8,
     "rel5": 0.169,
@@ -14211,7 +14229,7 @@ window.MONITOR_DATA = {
     "rel_oi": -2.399,
     "relret": -0.3872,
     "spread": 47.78,
-    "elapsed": 187,
+    "elapsed": 188,
     "status": "finished",
     "dS5": -3.7,
     "rel5": 0.283,
@@ -14244,7 +14262,7 @@ window.MONITOR_DATA = {
     "rel_oi": -1.064,
     "relret": -0.1568,
     "spread": 43.92,
-    "elapsed": 175,
+    "elapsed": 176,
     "status": "finished",
     "dS5": 5.92,
     "rel5": -0.149,
@@ -14277,7 +14295,7 @@ window.MONITOR_DATA = {
     "rel_oi": -0.063,
     "relret": -0.3918,
     "spread": 48.71,
-    "elapsed": 134,
+    "elapsed": 135,
     "status": "finished",
     "dS5": -1.35,
     "rel5": -0.286,
@@ -14310,7 +14328,7 @@ window.MONITOR_DATA = {
     "rel_oi": -3.113,
     "relret": -0.2392,
     "spread": 48.72,
-    "elapsed": 122,
+    "elapsed": 123,
     "status": "finished",
     "dS5": -0.46,
     "rel5": 0.414,
@@ -14343,7 +14361,7 @@ window.MONITOR_DATA = {
     "rel_oi": -1.43,
     "relret": -0.2162,
     "spread": 48.74,
-    "elapsed": 110,
+    "elapsed": 111,
     "status": "finished",
     "dS5": -0.5,
     "rel5": 0.016,
@@ -14376,7 +14394,7 @@ window.MONITOR_DATA = {
     "rel_oi": -1.045,
     "relret": -0.1987,
     "spread": 48.57,
-    "elapsed": 95,
+    "elapsed": 96,
     "status": "finished",
     "dS5": 2.2,
     "rel5": -0.121,
@@ -15197,11 +15215,11 @@ window.MONITOR_DATA = {
    "oos_start": "2025-01-01"
   },
   "diagnostics": {
-   "last_quote_T": "2026-11-12",
-   "last_quote_TL": "2026-11-12",
-   "last_stock": "2026-11-12",
-   "last_yield": "2026-11-12",
-   "last_oi": "2026-11-12",
+   "last_quote_T": "2026-11-13",
+   "last_quote_TL": "2026-11-13",
+   "last_stock": "2026-11-13",
+   "last_yield": "2026-11-13",
+   "last_oi": "2026-11-13",
    "n_contracts_T": 3,
    "n_contracts_TL": 3
   },
