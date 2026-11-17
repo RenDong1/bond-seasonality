@@ -109,7 +109,6 @@ body .cBrand{display:inline-flex;align-items:center;gap:6px;flex:none;width:104p
 body .cBrand:hover{color:var(--violet);}
 body .cBrand:hover .cN{color:var(--violet);}
 .cBrand i{flex:none;width:15px;border-top:2px solid;}
-.cBrand i.dash{border-top-style:dashed;}
 .cBrand .cN{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;}
 .cSeg{display:inline-flex;border:var(--hair) solid var(--rule);background:var(--paper-2);}
 .cT{position:relative;cursor:pointer;user-select:none;}
@@ -236,7 +235,7 @@ body .evStatsT{width:100%;min-width:760px;border-collapse:collapse;font-size:var
 </head>
 <body data-site="inner" data-page="yield-seasonality">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-17 13:28</span><span class="site-stamp site-stamp-data">数据截至 2026-11-16</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-17 13:40</span><span class="site-stamp site-stamp-data">数据截至 2026-11-16</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html" class="active" aria-current="page">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html" class="active" aria-current="page">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -255,15 +254,14 @@ const PANELS = DATA.panels;
 const REVIEW = DATA.review;
 
 // 债市复盘：曲线 / 事件配色
-// 三个品牌各占一个色相——国债=紫(≈285°)、国开=青蓝(≈200°)、二永=琥珀(≈35°)，族内按时限由浅到深。
-// 国债与国开的浅档色相仍接近，给国开再加一道虚线（非颜色编码），缩图后也能分开。
-const GOV_COLORS = {'1Y':'#CFC2DC','3Y':'#BBA6CC','5Y':'#A48AB9','7Y':'#8A6EA4','10Y':'#6F518B','30Y':'#553A6F'};
-const CDB_COLORS = {'1Y':'#C3DDE5','3Y':'#A4CBD8','5Y':'#82B7CA','7Y':'#62A0B9','10Y':'#4589A7','30Y':'#2C7092'};
-// 二永债：第三族琥珀阶，与国债紫、国开青、事件芦笋绿都不撞色
-const EY_COLORS  = {'2Y':'#E5C995','3Y':'#D8B473','5Y':'#C89B52','7Y':'#AD7D35','10Y':'#8D6123'};
+// 只用颜色区分三个品牌，靠拉开色相 + 提高饱和度：国债=梅紫(≈292°)、国开=青(≈192°)、二永=琥珀(≈38°)，族内按时限由浅到深。
+// 实测浅档跨品牌最小 Lab ΔE≈29（国债1Y vs 国开1Y），与事件芦笋绿 #769365 的 ΔE≥35，不与事件点撞色。
+const GOV_COLORS = {'1Y':'#D8BCDC','3Y':'#C396CA','5Y':'#AF6FB8','7Y':'#974EA2','10Y':'#7A3E84','30Y':'#613069'};
+const CDB_COLORS = {'1Y':'#A8D9E6','3Y':'#7AC8DC','5Y':'#4AB8D3','7Y':'#2AA2C0','10Y':'#1F849E','30Y':'#16697E'};
+// 二永债：第三族琥珀阶，与梅紫、青、事件绿都不撞色
+const EY_COLORS  = {'2Y':'#ECD4AC','3Y':'#E1BD7F','5Y':'#D4A554','7Y':'#BD8A32','10Y':'#976F2B'};
 const BRAND_LIST = ['国债','国开','二永AAA-'];
 const BRAND_COLORS = {'国债':GOV_COLORS,'国开':CDB_COLORS,'二永AAA-':EY_COLORS};
-const BRAND_DASH = {'国开':[7,4]};      // 线型第二重编码：国开虚线
 const CAT_COLORS = {'降准降息':'#769365','政治局会议':'#769365','央行敲打':'#769365',
                    '新闻发布会':'#769365','宽信用':'#769365','金融街与陆家嘴论坛':'#769365'};
 function fmtDate(v){ const d=new Date(v); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
@@ -655,7 +653,7 @@ function reviewPanelHTML(){
         <div class="chart revChart"></div>
         <div class="evWrap"></div>
       </div>
-      <div class="note revNote">横轴 = 真实日期；曲线按品牌分行，点组名可整组勾选/取消，国开为虚线。可多选国债/国开收益率曲线（1Y~30Y）与二永债 AAA- 曲线（2/3/5/7/10Y，2018-12 起；本地库无银行永续债曲线，按中债商业银行二级资本债同评级近似）。事件默认只显示圆点（点越大 = 同日事件越多），悬停查看当日数值与全部事件；勾选「事件文字」后在图上标注。勾选「显示实施日」后叠加实施日。勾选上方事件类别后，右侧出现清单，点击可定位事件。</div>
+      <div class="note revNote">横轴 = 真实日期；曲线按品牌分行，点组名可整组勾选/取消；三组曲线按颜色区分（国债梅紫、国开青、二永琥珀，同组内期限越长颜色越深）。可多选国债/国开收益率曲线（1Y~30Y）与二永债 AAA- 曲线（2/3/5/7/10Y，2018-12 起；本地库无银行永续债曲线，按中债商业银行二级资本债同评级近似）。事件默认只显示圆点（点越大 = 同日事件越多），悬停查看当日数值与全部事件；勾选「事件文字」后在图上标注。勾选「显示实施日」后叠加实施日。勾选上方事件类别后，右侧出现清单，点击可定位事件。</div>
     </div>
     <div class="card evCard">
       <div class="cardhead"><h2>事件清单</h2><span class="evCnt"></span></div>
@@ -693,8 +691,7 @@ function makeReviewPanel(RV){
   const CURVES = [];
   const brandTenors = RV.brandTenors || {国债:RV.tenors, 国开:RV.tenors};
   BRAND_LIST.forEach(b => (brandTenors[b] || []).forEach(t => {
-    CURVES.push({key:b+t, brand:b, t, name:b+t, color:(BRAND_COLORS[b] || {})[t] || '#9A958C',
-                 dash:BRAND_DASH[b] || null});
+    CURVES.push({key:b+t, brand:b, t, name:b+t, color:(BRAND_COLORS[b] || {})[t] || '#9A958C'});
   }));
 
   const firstD = RV.dates[0], lastD = RV.dates[RV.dates.length-1];
@@ -731,7 +728,7 @@ function makeReviewPanel(RV){
       const rows = byBrand[b], nOn = rows.filter(c => st.curves.has(c.key)).length;
       const sw = rows[rows.length-1].color;                 // 代表色 = 该组最长期限
       return `<div class="cRow"><button type="button" class="cBrand" data-brand="${b}"`+
-        ` title="点击整组勾选/取消「${b}」"><i class="${rows[0].dash?'dash':''}" style="border-color:${sw}"></i>`+
+        ` title="点击整组勾选/取消「${b}」"><i style="border-color:${sw}"></i>`+
         `${b}<span class="cN">${nOn}/${rows.length}</span></button><div class="cSeg">`+
         rows.map(c => `<label class="cT" title="${c.name}">`+
           `<input type="checkbox" data-key="${c.key}" ${st.curves.has(c.key)?'checked':''}>`+
@@ -1054,7 +1051,7 @@ function makeReviewPanel(RV){
       }
       activeCurves.push({name:c.name, vals});
       series.push({name:c.name, type:'line', data, showSymbol:false, connectNulls:true,
-        lineStyle:{width:1.8, color:c.color, type:c.dash || 'solid'},
+        lineStyle:{width:1.8, color:c.color, type:'solid'},
         itemStyle:{color:c.color}, z:2});
     });
     if (!isFinite(dMin)){ dMin = 0; dMax = 1; }
