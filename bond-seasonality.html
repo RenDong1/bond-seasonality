@@ -45,14 +45,15 @@ select:focus{outline:none;border-color:var(--violet)}
 .xun-title{font-family:var(--serif);font-size:var(--t-body);font-weight:600;color:var(--ink)}
 .xun-title span{font-family:var(--sans);font-weight:400;font-size:var(--t-small);color:var(--muted);margin-left:10px}
 .xun-legend{display:inline-flex;align-items:center;gap:6px;font-family:var(--serif);font-size:11px;color:var(--muted)}
-.xun-bar{display:inline-block;width:132px;height:8px;border:var(--hair) solid var(--rule);background:linear-gradient(90deg,#122244,#1f3864,#2d5494,#8aa6d6,#e2eaf4,#faf6f6,#f0cdcd,#d64646,#ac0000)}
+.xun-bar{display:inline-block;width:132px;height:8px;border:var(--hair) solid var(--rule);background:linear-gradient(90deg,#344C5E,#749AB2,#C6D6E5,#FAFBFC,#E8E1EC,#9E8AA9,#685475,#4A3A54)}
 .xun-scroll{overflow-x:auto;border:var(--hair) solid var(--rule)}
 .xun-tbl{border-collapse:separate;border-spacing:1px;width:100%;min-width:900px;font-size:var(--t-small);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
 .xun-tbl th,.xun-tbl td{text-align:center;white-space:nowrap;height:24px;line-height:24px;padding:0 4px;font-weight:400}
-.xun-tbl thead th{position:sticky;top:0;z-index:2;background:#1f3864;color:#fff;font-family:var(--serif);font-weight:500;padding:5px 6px;line-height:1.3}
-.xun-tbl thead th.corner{position:sticky;left:0;top:0;z-index:3;background:#1f3864;text-align:left;padding:6px 12px;line-height:1.35;min-width:170px}
+.xun-tbl thead th{position:sticky;top:0;z-index:2;background:var(--ink);color:#fff;font-family:var(--serif);font-weight:500;padding:5px 6px;line-height:1.3}
+.xun-tbl thead th em{display:block;font-family:var(--sans);font-style:normal;font-weight:400;font-size:10px;color:var(--columbia);margin-top:1px}
+.xun-tbl thead th.corner{position:sticky;left:0;top:0;z-index:3;background:var(--ink);text-align:left;padding:6px 12px;line-height:1.35;min-width:170px}
 .xun-tbl thead th.corner b{display:block;font-size:var(--t-body);font-weight:600}
-.xun-tbl thead th.corner span{display:block;font-family:var(--sans);font-weight:400;font-size:11px;color:#b9c7de;margin-top:2px}
+.xun-tbl thead th.corner span{display:block;font-family:var(--sans);font-weight:400;font-size:11px;color:var(--columbia);margin-top:2px}
 .xun-tbl tbody th{position:sticky;left:0;z-index:1;background:var(--paper-3);color:var(--ink-2);font-family:var(--serif);font-weight:500;text-align:left;padding:0 12px;border-right:var(--hair) solid var(--rule)}
 .xun-tbl td{cursor:default}
 
@@ -152,7 +153,7 @@ select:focus{outline:none;border-color:var(--violet)}
 </head>
 <body data-site="inner" data-page="bond-seasonality">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-17 13:54</span><span class="site-stamp site-stamp-data">数据截至 2026-11-16</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-17 14:10</span><span class="site-stamp site-stamp-data">数据截至 2026-11-16</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html" class="active" aria-current="page">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html" class="active" aria-current="page">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -783,10 +784,10 @@ function renderHeatmap(){
 }
 
 // ===== 旬度期限利差走扩概率（数据见 scripts/compute_xun_spreads.py → DATA.xun）=====
-// 深蓝(0%) → 近白(50%) → 深红(100%) 发散色阶
-var XUN_STOPS=[[0,[18,34,68]],[0.10,[31,56,100]],[0.22,[45,84,148]],[0.33,[138,166,214]],
-    [0.44,[226,234,244]],[0.50,[250,246,246]],[0.56,[240,205,205]],[0.67,[214,70,70]],
-    [0.78,[196,44,40]],[0.89,[172,0,0]],[1,[135,0,0]]];
+// 发散色阶，取站点调色板：--air(#749AB2)/--columbia(#C6D6E5) 低 → --paper 50% → --violet 高
+var XUN_STOPS=[[0.00,[52,76,94]],[0.14,[116,154,178]],[0.32,[198,214,229]],
+    [0.46,[250,251,252]],[0.54,[232,225,236]],[0.70,[158,138,169]],
+    [0.86,[104,84,117]],[1.00,[74,58,84]]];
 function xunColor(p){
     p=Math.max(0,Math.min(1,p));
     for(var i=1;i<XUN_STOPS.length;i++){
@@ -797,18 +798,26 @@ function xunColor(p){
                 +Math.round(a[1][2]+(b[1][2]-a[1][2])*t)+')';
         }
     }
-    return 'rgb(135,0,0)';
+    return 'rgb(74,58,84)';
 }
-function xunTextColor(p){return (p<=0.30||p>=0.62)?'#fff':'#1b1b1b';}
+// 按底色的相对亮度选文字色，深底白字、浅底墨字
+function xunTextColor(p){
+    var c=xunColor(p).slice(4,-1).split(',').map(Number);
+    var lin=function(v){v/=255;return v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4);};
+    var L=0.2126*lin(c[0])+0.7152*lin(c[1])+0.0722*lin(c[2]);
+    return L<0.19?'#fff':'#15150F';
+}
 function renderXun(){
     var x=DATA.xun,blk=document.getElementById('xun-block'),tbl=document.getElementById('xun-tbl');
     if(!x||!tbl){if(blk)blk.hidden=true;return;}
     blk.hidden=false;
+    var ns=(x.col_n||x.cols.map(function(){return x.n_years;})),nMin=Math.min.apply(null,ns),nMax=Math.max.apply(null,ns);
     document.getElementById('xun-title').innerHTML='旬度期限利差走扩概率'
-        +'<span>'+x.start+'–'+x.end+' 年 · 国债 · '+x.n_years+' 个年度</span>';
+        +'<span>'+x.start+'–'+x.end+' 年 · 国债 · '
+        +(nMin===nMax?nMin+' 个年度':'各列 '+nMin+'–'+nMax+' 个年度')+'</span>';
     var h='<thead><tr><th class="corner"><b>'+x.start+'–'+x.end+' 年</b>'
         +'<span>期限利差走扩概率（旬均 vs 上旬均）</span></th>';
-    x.cols.forEach(function(c){h+='<th>'+c+'</th>';});
+    x.cols.forEach(function(c,i){h+='<th>'+c+'<em>'+ns[i]+' 年</em></th>';});
     h+='</tr></thead><tbody>';
     x.rows.forEach(function(r){
         h+='<tr><th>'+r.label+'</th>';
@@ -825,6 +834,8 @@ function renderXun(){
     tbl.innerHTML=h+'</tbody>';
     document.getElementById('xun-note').textContent='每格为本旬旬均利差高于上一旬旬均利差的年度占比；'
         +'悬停查看走扩年数与平均变化（bp）。1 月上旬对比上年 12 月下旬。'
+        +'样本取各期限利差有数据以来的全部完整年度（2–30Y 相关列 '+x.start+' 年起，'
+        +'含 50Y 的列因中债 50Y 国债 2009 年末才有报价，自 2010 年起）。'
         +'50Y-30Y 利差常年仅 0–3bp，概率对数据源较敏感，仅供参考。';
 }
 
