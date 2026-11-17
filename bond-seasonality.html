@@ -39,13 +39,13 @@ select:focus{outline:none;border-color:var(--violet)}
 .chart-box{width:100%;height:320px}
 .chart-note{font-family:var(--serif);font-weight:500;font-size:var(--t-small);color:var(--muted);line-height:1.7;margin-top:6px}
 
-/* 月度 / 旬度两张热力图的统一版式：标题 + 图例（绿=压缩/上行，红=走扩/下行） */
+/* 日度 / 旬度两张热力图的统一版式：标题 + 图例（红=下行/压缩，绿=上行/走扩） */
 .hm-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px 18px;flex-wrap:wrap;margin-bottom:8px}
 .hm-title{font-family:var(--serif);font-size:var(--t-body);font-weight:600;color:var(--ink)}
 .hm-title span{font-family:var(--sans);font-weight:400;font-size:var(--t-small);color:var(--muted);margin-left:10px}
 .hm-right{display:inline-flex;align-items:center;gap:14px;flex-wrap:wrap}
 .hm-legend{display:inline-flex;align-items:center;gap:6px;font-family:var(--serif);font-size:11px;color:var(--muted)}
-.hm-bar{display:inline-block;width:132px;height:8px;border:var(--hair) solid var(--rule);background:linear-gradient(90deg,#2E8B57,#78AB8C,#A9C7AE,#FBFCFD,#E4A49E,#C23531)}
+.hm-bar{display:inline-block;width:132px;height:8px;border:var(--hair) solid var(--rule);background:linear-gradient(90deg,#C23531,#E4A49E,#FBFCFD,#A9C7AE,#78AB8C,#2E8B57)}
 .xun-block{margin-top:16px;padding-top:14px;border-top:var(--hair) solid var(--rule)}
 .xun-scroll{overflow-x:auto;border:var(--hair) solid var(--rule)}
 .xun-tbl{border-collapse:separate;border-spacing:1px;width:100%;min-width:900px;font-size:var(--t-small);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
@@ -156,7 +156,7 @@ select:focus{outline:none;border-color:var(--violet)}
 </head>
 <body data-site="inner" data-page="bond-seasonality">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-17 15:15</span><span class="site-stamp site-stamp-data">数据截至 2026-11-16</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-17 15:26</span><span class="site-stamp site-stamp-data">数据截至 2026-11-16</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html" class="active" aria-current="page">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html">国债期货</a><a href="bond-calendar.html">债市日历</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html" class="active" aria-current="page">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html">国债期货</a><a href="bond-calendar.html">债市日历</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -764,14 +764,15 @@ function renderHeatmap(){
     if(!window.echarts){ whenEcharts(function(){ renderHeatmap(); }); return; }
     var series=document.getElementById('heatmap-series').value;
     var h=DATA.heatmap[series];if(!h)return;
-    // 利差按走扩/压缩表述；两张热力图共用一套色义：红=上行/走扩（值大），绿=下行/压缩
+    // 利差按走扩/压缩表述；两张热力图共用一套色义：红=下行/压缩，绿=上行/走扩（全站方向色：利好红、利空绿）
     var isSpr=isSpreadSeries(series);
     var loWord=isSpr?'压缩':'下行',hiWord=isSpr?'走扩':'上行';
     // 标题随品种切换：利率讲「下行概率」，利差讲「压缩概率」
     document.getElementById('hm-title-text').textContent='日度'+(isSpr?'利差压缩概率':'利率下行概率');
+    // 值 = 下行/压缩概率（0~1）；色带 0=绿(易上行/走扩) → 1=红(易下行/压缩)
     var ramp=['#2E8B57','#A9C7AE','#FBFCFD','#E4A49E','#C23531'];
     document.getElementById('hm-legend').innerHTML='<span>'+loWord+'</span><span class="hm-bar"></span><span>'+hiWord+'</span>';
-    document.getElementById('hm-note').textContent='红色越深表示未来 10 个交易日'+hiWord+'概率越高，绿色越深表示'+loWord
+    document.getElementById('hm-note').textContent='红色越深表示未来 10 个交易日'+loWord+'概率越高，绿色越深表示'+hiWord
         +'概率越高；格子内为历史同期的中位变化（bp），点击查看详情';
     var chart=echarts.init(document.getElementById('heatmap-chart'));
     var cData=[];
@@ -781,7 +782,7 @@ function renderHeatmap(){
         var m=parseInt(parts[0])-1;
         var t=parseInt(parts[1])-1;
         var s2=h[mdKey];
-        var val=s2.d>s2.u?-s2.d:s2.u;
+        var val=s2.d;                       // 只取下下行/压缩概率，色带另端自然对应上行/走扩
         cData.push([t,m,val,mdKey]);
     });
     chart.setOption({
@@ -793,7 +794,7 @@ function renderHeatmap(){
         xAxis:{type:'category',data:Array.from({length:31},function(_,i){return (i+1)+'日';}),name:'日期',splitArea:{show:true,areaStyle:{color:['#FBFCFD','#F4F7F9']}}},
         yAxis:{type:'category',data:['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],splitArea:{show:true,areaStyle:{color:['#FBFCFD','#F4F7F9']}}},
         // 图例改由 HTML 的 .hm-head 承载（与旬度表同版式），ECharts 自带的色节隐藏
-        visualMap:{show:false,min:-1,max:1,inRange:{color:ramp}},
+        visualMap:{show:false,min:0,max:1,inRange:{color:ramp}},
         series:[{type:'heatmap',data:cData.map(function(d){return [d[0],d[1],d[2]];}),label:{show:false}}],
         grid:{left:50,right:15,top:10,bottom:34}
     });
@@ -806,7 +807,7 @@ function renderHeatmap(){
 }
 
 // ===== 旬度期限利差压缩概率（数据见 scripts/compute_xun_spreads.py → DATA.xun）=====
-// 表里展示压缩概率 = 1 − 走扩概率；配色仍按方向语义：绿=压缩 → 白 50% → 红=走扩
+// 表里展示压缩概率 = 1 − 走扩概率；配色按全站方向色：红=易压缩 → 白 50% → 绿=易走扩
 var XUN_STOPS=[[0.00,[46,139,87]],[0.16,[120,171,140]],[0.32,[169,199,174]],
     [0.46,[251,252,253]],[0.54,[247,236,234]],[0.68,[228,164,158]],
     [0.84,[194,53,49]],[1.00,[150,38,34]]];
@@ -863,19 +864,19 @@ function renderXun(){
         for(var i=0;i<x.cols.length;i++){
             var n=r.n[i],p=r.p[i],avg=r.avg[i];
             if(!n){h+='<td style="background:var(--paper-3);color:var(--muted)">–</td>';continue;}
-            // 展示压缩概率 = 1 − 走扩概率；底色仍按走扩概率取色（红=易走扩，绿=易压缩）
+            // 展示压缩概率 = 1 − 走扩概率；底色按压缩概率取色（红=易压缩，绿=易走扩）
             var nmc=n-r.cnt[i],c=nmc/n;
             var tip=r.label+' · '+x.cols[i]+'\n压缩概率 '+(c*100).toFixed(1)+'%（'+nmc+'/'+n+' 年）'
                 +'\n走扩概率 '+(p*100).toFixed(1)+'%'
                 +'\n旬均较上旬 '+(avg>0?'+':'')+avg.toFixed(2)+'bp';
-            h+='<td style="background:'+xunColor(p)+';color:'+xunTextColor(p)+'" title="'+tip+'">'
+            h+='<td style="background:'+xunColor(c)+';color:'+xunTextColor(c)+'" title="'+tip+'">'
                 +Math.round(c*100)+'%</td>';
         }
         h+='</tr>';
     });
     tbl.innerHTML=h+'</tbody>';
     document.getElementById('xun-note').textContent='每格为本旬旬均利差低于上一旬旬均利差（压缩）的年度占比，即压缩概率；'
-        +'底色仍按方向取色，红=易走扩、绿=易压缩。悬停查看压缩/走扩年数与平均变化（bp）。1 月上旬对比上年 12 月下旬。'
+        +'底色按压缩概率取色，红=易压缩、绿=易走扩。悬停查看压缩/走扩年数与平均变化（bp）。1 月上旬对比上年 12 月下旬。'
         +'样本取各期限利差有数据以来的全部完整年度（2–30Y 相关列 '+x.start+' 年起，'
         +'含 50Y 的列因中债 50Y 国债 2009 年末才有报价，自 2010 年起）。'
         +'50Y-30Y 利差常年仅 0–3bp，概率对数据源较敏感，仅供参考。';
