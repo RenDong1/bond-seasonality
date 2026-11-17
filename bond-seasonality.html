@@ -35,10 +35,26 @@ select:focus{outline:none;border-color:var(--violet)}
 .tab:hover{color:var(--ink)}
 .tab-bar .tab.active{background:none;border-color:transparent;border-bottom-color:var(--violet);color:var(--ink);font-weight:600}
 .panel{background:none;border:0;border-radius:0;box-shadow:none;padding:10px 0 0;margin:0}
-#panel-events,#panel-heatmap,#panel-calendar{padding:10px 0 0;margin:0;border:0;box-shadow:none}
+#panel-events,#panel-heatmap{padding:10px 0 0;margin:0;border:0;box-shadow:none}
 .chart-box{width:100%;height:320px}
-#calendar-prob{border-top:var(--hair) solid var(--rule);margin-top:6px}
 .chart-note{font-family:var(--serif);font-weight:500;font-size:var(--t-small);color:var(--muted);line-height:1.7;margin-top:6px}
+
+/* 旬度期限利差走扩概率：深蓝→白→红发散色热力表 */
+.xun-block{margin-top:16px;padding-top:14px;border-top:var(--hair) solid var(--rule)}
+.xun-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px 18px;flex-wrap:wrap;margin-bottom:8px}
+.xun-title{font-family:var(--serif);font-size:var(--t-body);font-weight:600;color:var(--ink)}
+.xun-title span{font-family:var(--sans);font-weight:400;font-size:var(--t-small);color:var(--muted);margin-left:10px}
+.xun-legend{display:inline-flex;align-items:center;gap:6px;font-family:var(--serif);font-size:11px;color:var(--muted)}
+.xun-bar{display:inline-block;width:132px;height:8px;border:var(--hair) solid var(--rule);background:linear-gradient(90deg,#122244,#1f3864,#2d5494,#8aa6d6,#e2eaf4,#faf6f6,#f0cdcd,#d64646,#ac0000)}
+.xun-scroll{overflow-x:auto;border:var(--hair) solid var(--rule)}
+.xun-tbl{border-collapse:separate;border-spacing:1px;width:100%;min-width:900px;font-size:var(--t-small);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+.xun-tbl th,.xun-tbl td{text-align:center;white-space:nowrap;height:24px;line-height:24px;padding:0 4px;font-weight:400}
+.xun-tbl thead th{position:sticky;top:0;z-index:2;background:#1f3864;color:#fff;font-family:var(--serif);font-weight:500;padding:5px 6px;line-height:1.3}
+.xun-tbl thead th.corner{position:sticky;left:0;top:0;z-index:3;background:#1f3864;text-align:left;padding:6px 12px;line-height:1.35;min-width:170px}
+.xun-tbl thead th.corner b{display:block;font-size:var(--t-body);font-weight:600}
+.xun-tbl thead th.corner span{display:block;font-family:var(--sans);font-weight:400;font-size:11px;color:#b9c7de;margin-top:2px}
+.xun-tbl tbody th{position:sticky;left:0;z-index:1;background:var(--paper-3);color:var(--ink-2);font-family:var(--serif);font-weight:500;text-align:left;padding:0 12px;border-right:var(--hair) solid var(--rule)}
+.xun-tbl td{cursor:default}
 
 /* 未来 5 日：纸面 3 号底 + 哥蓝细边 */
 .upcoming{border:var(--hair) solid var(--rule-strong);background:var(--paper-3);margin-bottom:12px}
@@ -136,7 +152,7 @@ select:focus{outline:none;border-color:var(--violet)}
 </head>
 <body data-site="inner" data-page="bond-seasonality">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-17 09:05</span><span class="site-stamp site-stamp-data">数据截至 2026-11-16</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-17 13:54</span><span class="site-stamp site-stamp-data">数据截至 2026-11-16</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html" class="active" aria-current="page">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html" class="active" aria-current="page">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="treasury-futures.html">国债期货</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -174,7 +190,6 @@ select:focus{outline:none;border-color:var(--violet)}
 <div class="tab-bar">
 <div class="tab active" data-tab="events">高概率事件</div>
 <div class="tab" data-tab="heatmap">热力图</div>
-<div class="tab" data-tab="calendar">月度柱状图</div>
 </div>
 <div class="panel" id="panel-events">
 <div class="upcoming">
@@ -203,26 +218,24 @@ select:focus{outline:none;border-color:var(--violet)}
 </div>
 <div class="panel hidden" id="panel-heatmap">
 <div class="control-row">
-<span class="control-label">选择品种</span>
+<span class="control-label">类型</span>
+<div class="btn-group" id="hm-type">
+<button class="btn active" data-type="yield">利率</button>
+<button class="btn" data-type="spread">利差</button>
+</div>
+<span class="control-label is-inline">选择品种</span>
 <select id="heatmap-series"></select>
 </div>
 <div id="heatmap-chart" class="chart-box"></div>
 <p class="chart-note">红色越深表示未来 10 个交易日下行概率越高，绿色越深表示上行概率越高；格子内为历史同期的中位变化（bp），点击查看详情</p>
+<div class="xun-block" id="xun-block" hidden>
+<div class="xun-head">
+<span class="xun-title" id="xun-title">旬度期限利差走扩概率</span>
+<span class="xun-legend">低<span class="xun-bar"></span>高</span>
 </div>
-<div class="panel hidden" id="panel-calendar">
-<div class="control-row">
-<span class="control-label">选择品种</span>
-<select id="calendar-series"></select>
-<span class="control-label is-inline">月份</span>
-<select id="calendar-month">
-<option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
-<option value="4">4月</option><option value="5">5月</option><option value="6" selected>6月</option>
-<option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
-<option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
-</select>
+<div class="xun-scroll"><table class="xun-tbl" id="xun-tbl"></table></div>
+<p class="chart-note" id="xun-note"></p>
 </div>
-<div id="calendar-chart" class="chart-box" style="height:240px"></div>
-<div id="calendar-prob" class="chart-box" style="height:170px"></div>
 </div>
 </div>
 <div class="modal-overlay" id="modal">
@@ -769,52 +782,50 @@ function renderHeatmap(){
     });
 }
 
-function renderCalendar(){
-    if(!window.echarts){ whenEcharts(function(){ renderCalendar(); }); return; }
-    var series=document.getElementById('calendar-series').value;
-    var month=parseInt(document.getElementById('calendar-month').value);
-    var h=DATA.heatmap[series];if(!h)return;
-    var chart=echarts.init(document.getElementById('calendar-chart'));
-    var ms=month<10?'0'+month:''+month;
-    var days=[],avgs=[],probs=[],keys=[];
-    for(var t=1;t<=31;t++){
-        var mdKey=ms+'-'+(t<10?'0'+t:''+t);
-        if(h[mdKey]){
-            days.push(mdLabel(mdKey));
-            avgs.push(h[mdKey].a);
-            probs.push(h[mdKey].d>h[mdKey].u?-h[mdKey].d*100:h[mdKey].u*100);
-            keys.push(mdKey);
+// ===== 旬度期限利差走扩概率（数据见 scripts/compute_xun_spreads.py → DATA.xun）=====
+// 深蓝(0%) → 近白(50%) → 深红(100%) 发散色阶
+var XUN_STOPS=[[0,[18,34,68]],[0.10,[31,56,100]],[0.22,[45,84,148]],[0.33,[138,166,214]],
+    [0.44,[226,234,244]],[0.50,[250,246,246]],[0.56,[240,205,205]],[0.67,[214,70,70]],
+    [0.78,[196,44,40]],[0.89,[172,0,0]],[1,[135,0,0]]];
+function xunColor(p){
+    p=Math.max(0,Math.min(1,p));
+    for(var i=1;i<XUN_STOPS.length;i++){
+        if(p<=XUN_STOPS[i][0]){
+            var a=XUN_STOPS[i-1],b=XUN_STOPS[i],t=(p-a[0])/(b[0]-a[0]);
+            return 'rgb('+Math.round(a[1][0]+(b[1][0]-a[1][0])*t)+','
+                +Math.round(a[1][1]+(b[1][1]-a[1][1])*t)+','
+                +Math.round(a[1][2]+(b[1][2]-a[1][2])*t)+')';
         }
     }
-    chart.setOption({
-        title:{text:formatName(series)+' '+month+' 月各日平均变化（bp）',top:0,textStyle:{fontSize:13,fontWeight:600,color:'#42423A'}},
-        tooltip:{trigger:'axis'},
-        xAxis:{type:'category',data:days,axisLabel:{show:false},axisTick:{show:false}},
-        yAxis:{type:'value'},
-        series:[{type:'bar',barMaxWidth:22,data:avgs.map(function(v){return {value:v,itemStyle:{color:v<0?'#C23531':'#2E8B57'}};})}],
-        grid:{left:48,right:20,top:36,bottom:10}
+    return 'rgb(135,0,0)';
+}
+function xunTextColor(p){return (p<=0.30||p>=0.62)?'#fff':'#1b1b1b';}
+function renderXun(){
+    var x=DATA.xun,blk=document.getElementById('xun-block'),tbl=document.getElementById('xun-tbl');
+    if(!x||!tbl){if(blk)blk.hidden=true;return;}
+    blk.hidden=false;
+    document.getElementById('xun-title').innerHTML='旬度期限利差走扩概率'
+        +'<span>'+x.start+'–'+x.end+' 年 · 国债 · '+x.n_years+' 个年度</span>';
+    var h='<thead><tr><th class="corner"><b>'+x.start+'–'+x.end+' 年</b>'
+        +'<span>期限利差走扩概率（旬均 vs 上旬均）</span></th>';
+    x.cols.forEach(function(c){h+='<th>'+c+'</th>';});
+    h+='</tr></thead><tbody>';
+    x.rows.forEach(function(r){
+        h+='<tr><th>'+r.label+'</th>';
+        for(var i=0;i<x.cols.length;i++){
+            var n=r.n[i],p=r.p[i],avg=r.avg[i];
+            if(!n){h+='<td style="background:var(--paper-3);color:var(--muted)">–</td>';continue;}
+            var tip=r.label+' · '+x.cols[i]+'\n走扩概率 '+(p*100).toFixed(1)+'%（'+r.cnt[i]+'/'+n+' 年）'
+                +'\n旬均较上旬 '+(avg>0?'+':'')+avg.toFixed(2)+'bp';
+            h+='<td style="background:'+xunColor(p)+';color:'+xunTextColor(p)+'" title="'+tip+'">'
+                +Math.round(p*100)+'%</td>';
+        }
+        h+='</tr>';
     });
-    chart.on('click',function(p){
-        var idx=p.dataIndex;
-        if(keys[idx])showDetail(series,keys[idx]);
-    });
-    var chart2=echarts.init(document.getElementById('calendar-prob'));
-    chart2.setOption({
-        title:{text:'方向概率（%），负值为下行、正值为上行',top:4,textStyle:{fontSize:13,fontWeight:600,color:'#42423A'}},
-        tooltip:{trigger:'axis',formatter:function(p){
-            var v=p[0].value;
-            return p[0].name+'　'+(v<0?'下行 '+(0-v).toFixed(0)+'%':'上行 '+v.toFixed(0)+'%');
-        }},
-        xAxis:{type:'category',data:days,axisLabel:{rotate:45,fontSize:13}},
-        yAxis:{type:'value',min:-100,max:100,interval:50},
-        series:[{type:'line',data:probs,lineStyle:{color:'#749AB2',width:2},itemStyle:{color:'#749AB2'},symbol:'circle',symbolSize:6,
-            markLine:{silent:true,symbol:'none',label:{show:false},lineStyle:{color:'#C6D6E5',type:'solid',width:0.5},data:[{yAxis:0}]}}],
-        grid:{left:48,right:20,top:40,bottom:62}
-    });
-    chart2.on('click',function(p){
-        var idx=p.dataIndex;
-        if(keys[idx])showDetail(series,keys[idx]);
-    });
+    tbl.innerHTML=h+'</tbody>';
+    document.getElementById('xun-note').textContent='每格为本旬旬均利差高于上一旬旬均利差的年度占比；'
+        +'悬停查看走扩年数与平均变化（bp）。1 月上旬对比上年 12 月下旬。'
+        +'50Y-30Y 利差常年仅 0–3bp，概率对数据源较敏感，仅供参考。';
 }
 
 // Init
@@ -830,12 +841,28 @@ function renderCalendar(){
     document.getElementById('cur-month').value=now.getMonth()+1;
     tdSel.value=now.getDate();
     renderUpcoming();
-    var allS=Object.keys(DATA.heatmap).sort();
-    ['heatmap-series','calendar-series'].forEach(function(id){
-        var sel=document.getElementById(id);
-        allS.forEach(function(s){var o=document.createElement('option');o.value=s;o.textContent=formatName(s);sel.appendChild(o);});
-        sel.value='10Y国债_chg10';
-    });
+    // 热力图品种下拉：按 利率 / 利差 过滤
+    var hmType='yield',curHmSeries='10Y国债_chg10';
+    function updateHeatmapOptions(){
+        var sel=document.getElementById('heatmap-series');
+        var list=Object.keys(DATA.heatmap).sort().filter(function(s){
+            return hmType==='spread'?isSpreadSeries(s):!isSpreadSeries(s);
+        });
+        sel.innerHTML='';
+        list.forEach(function(s){var o=document.createElement('option');o.value=s;o.textContent=formatName(s);sel.appendChild(o);});
+        var want=hmType==='yield'?'10Y国债_chg10':'10-5国债_chg10';
+        if(list.indexOf(curHmSeries)<0)curHmSeries=list.indexOf(want)>=0?want:(list[0]||'');
+        sel.value=curHmSeries;
+    }
+    updateHeatmapOptions();
+    document.querySelectorAll('#hm-type .btn').forEach(function(b){b.addEventListener('click',function(){
+        document.querySelectorAll('#hm-type .btn').forEach(function(x){x.classList.remove('active');});
+        b.classList.add('active');
+        hmType=b.dataset.type;
+        curHmSeries=hmType==='yield'?'10Y国债_chg10':'10-5国债_chg10';
+        updateHeatmapOptions();
+        renderHeatmap();
+    });});
     document.querySelectorAll('#cat-btns .btn').forEach(function(b){b.addEventListener('click',function(){
         document.querySelectorAll('#cat-btns .btn').forEach(function(x){x.classList.remove('active');});
         b.classList.add('active');curCat=b.dataset.cat;curSeriesFilter='all';updateSeriesDropdown();renderEvents();
@@ -855,18 +882,18 @@ function renderCalendar(){
     document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){
         document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
         t.classList.add('active');
-        ['events','heatmap','calendar'].forEach(function(p){document.getElementById('panel-'+p).classList.add('hidden');});
+        ['events','heatmap'].forEach(function(p){document.getElementById('panel-'+p).classList.add('hidden');});
         document.getElementById('panel-'+t.dataset.tab).classList.remove('hidden');
         if(t.dataset.tab==='heatmap')renderHeatmap();
-        if(t.dataset.tab==='calendar')renderCalendar();
     });});
-    document.getElementById('heatmap-series').addEventListener('change',renderHeatmap);
-    document.getElementById('calendar-series').addEventListener('change',renderCalendar);
-    document.getElementById('calendar-month').addEventListener('change',renderCalendar);
+    document.getElementById('heatmap-series').addEventListener('change',function(e){
+        curHmSeries=e.target.value;renderHeatmap();
+    });
     document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
     document.getElementById('modal').addEventListener('click',function(e){if(e.target===e.currentTarget)closeModal();});
     updateSeriesDropdown();
     renderEvents();
+    renderXun();
     // 首屏渲染完成后再拉各年走势序列（约 1MB，不阻塞首屏）；点开详情时若还没到就等它
     setTimeout(function(){ensureSeries();},600);
 })();
