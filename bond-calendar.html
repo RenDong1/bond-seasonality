@@ -31,34 +31,38 @@
 .cal-legend .i-net{background:#1E6B43}
 .cal-legend .i-evt{background:#3B6E9E}
 
-.cal-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 0 10px}
-.cal-inner{min-width:1296px;font-family:var(--sans);font-variant-numeric:tabular-nums}
-.cal-hd,.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr)) 152px;
+.cal-wrap{margin:0 0 10px}
+/* 表格字号统一由 --cal-fs 驱动（内部尺寸全用 em 派生）：
+   渲染后 JS 按容器宽度等比缩放，保证每格一行、不留横向滚动条 */
+.cal-inner{width:100%;--cal-fs:13px;font-size:var(--cal-fs);
+  font-family:var(--sans);font-variant-numeric:tabular-nums}
+.cal-hd,.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr)) 11.7em;
   border-top:1px solid var(--rule-strong);border-left:1px solid var(--rule-strong);
-  font-size:var(--t-small);line-height:1.35;color:var(--ink-2)}
+  line-height:1.35;color:var(--ink-2)}
 .cal-hd>div,.cal>div{border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);
-  padding:3px 6px;min-height:23px;box-sizing:border-box}
-.cal-hd>div{background:var(--paper-3);font-weight:600;font-size:12px;text-align:center;
-  letter-spacing:.06em;color:var(--ink-2);padding:6px 0;border-bottom-color:var(--rule-strong)}
+  padding:.23em .46em;min-height:1.8em;box-sizing:border-box;
+  white-space:nowrap;overflow:hidden}
+.cal-hd>div{background:var(--paper-3);font-weight:600;font-size:.92em;text-align:center;
+  letter-spacing:.06em;color:var(--ink-2);padding:.46em 0;border-bottom-color:var(--rule-strong)}
 .cal-hd>div:last-child{color:var(--violet)}
 .cal-dh{line-height:1.3}
-.cal-dn{font-weight:600;font-size:var(--t-small);color:var(--ink)}
-.cal-dn.mark{background:#E9C46A;color:#3A3628;border-radius:2px;padding:0 4px}
-.cal-bdg{font-size:11px;line-height:16px;padding:0 5px;border-radius:2px;margin-left:4px;
+.cal-dn{font-weight:600;color:var(--ink)}
+.cal-dn.mark{background:#E9C46A;color:#3A3628;border-radius:2px;padding:0 .3em}
+.cal-bdg{font-size:.85em;line-height:1.24em;padding:0 .38em;border-radius:2px;margin-left:.3em;
   vertical-align:1px;letter-spacing:.02em;white-space:nowrap}
 .cal-bdg.tax{background:var(--violet);color:#fff}
 .cal-bdg.tag{background:var(--paper-2);color:var(--violet);border:var(--hair) solid var(--rule-strong)}
-.cal-fire{font-size:11px;margin-left:3px}
-.cal-mon{float:right;color:var(--faint);font-weight:400;font-size:12px;letter-spacing:.04em}
+.cal-fire{font-size:.85em;margin-left:.2em}
+.cal-mon{float:right;color:var(--faint);font-weight:400;font-size:.92em;letter-spacing:.04em}
 .cal-hol{background:#F3F1F6!important}
-.cal-c{text-align:center;font-size:var(--t-small)}
-.cal-tot{text-align:left;padding-left:8px;font-weight:600;background:#F7F9FA}
+.cal-c{text-align:center}
+.cal-tot{text-align:left;padding-left:.6em;font-weight:600;background:#F7F9FA}
 .cal-omo{color:var(--faint)}
 .cal-bd{color:var(--violet)}
 .cal-iss{color:#A15A36}
 .cal-mat{color:#2C6F65}
 .cal-evt{color:#3B6E9E}
-.cal-det{color:#C08A6E;font-size:12px}
+.cal-det{color:#C08A6E;font-size:.92em}
 .cal-net{color:var(--sig-bear);font-weight:600}
 .cal-net.neg{color:var(--sig-bull)}
 .cal-empty{padding:56px 0;text-align:center;color:var(--muted);font-size:var(--t-small)}
@@ -78,7 +82,7 @@
 </head>
 <body data-site="inner" data-page="bond-calendar">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-18 08:50</span><span class="site-stamp site-stamp-data">数据截至 2026-11-17</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-18 09:09</span><span class="site-stamp site-stamp-data">数据截至 2026-11-17</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="bond-calendar.html" class="active" aria-current="page">债市日历</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="treasury-futures.html">国债期货</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="bond-calendar.html" class="active" aria-current="page">债市日历</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="treasury-futures.html">国债期货</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -307,6 +311,45 @@ var hintEl = document.getElementById('range-hint');
 var inpS = document.getElementById('range-start');
 var inpE = document.getElementById('range-end');
 
+// ---- 自适应字号：先把 --cal-fs 复位到基准再量最宽格，
+//      按「7 列×最宽格 + 合计列」与可用宽度的比例等比缩字，保证不换行、不出滚动条
+var BASE_FS = 13, MIN_FS = 7;   // 7px 以下中文已不可读，到点即止
+
+function widest(){
+  var cs = bodyEl.querySelectorAll('.cal>div'), m = 0;
+  for (var i = 0; i < cs.length; i++){
+    var w = cs[i].scrollWidth;
+    if (w > m) m = w;
+  }
+  return m;
+}
+function fitTable(){
+  if (!bodyEl) return;
+  var avail = bodyEl.clientWidth;
+  if (!avail) return;
+  bodyEl.style.setProperty('--cal-fs', BASE_FS + 'px');
+  var mx = widest();
+  var tot = bodyEl.querySelector('.cal-tot');
+  var tw = tot ? tot.clientWidth : 0;
+  if (!mx || !tw) return;
+  var cur = BASE_FS * avail / (7 * mx + tw);
+  if (cur > BASE_FS) cur = BASE_FS;
+  // 字体度量非线性，最多再收 4 轮，每轮 1.5%
+  for (var i = 0; i < 4; i++){
+    if (cur < MIN_FS) cur = MIN_FS;
+    bodyEl.style.setProperty('--cal-fs', cur.toFixed(2) + 'px');
+    if (!overflowing() || cur <= MIN_FS) break;
+    cur *= 0.985;
+  }
+}
+function overflowing(){
+  var cs = bodyEl.querySelectorAll('.cal>div,.cal-hd>div'), n = 0;
+  for (var i = 0; i < cs.length; i++){
+    if (cs[i].scrollWidth > cs[i].clientWidth + 1) n++;
+  }
+  return n;
+}
+
 function render(){
   var r = curRange(), lo = r[0], hi = r[1];
   var html = ['<div class="cal-hd">' +
@@ -326,6 +369,7 @@ function render(){
   if (mode !== 'custom'){
     inpS.value = fDate(lo); inpE.value = fDate(hi);
   }
+  fitTable();
 }
 
 // ---- 交互
@@ -370,6 +414,13 @@ if (!Object.keys(P.days).length){
 } else {
   render();
 }
+
+// ---- 窗口缩放 / 浏览器缩放 / 字体加载完成后重新适配字号
+var pend = 0, ro = null;
+function refit(){ clearTimeout(pend); pend = setTimeout(fitTable, 80); }
+window.addEventListener('resize', refit);
+if (window.ResizeObserver){ ro = new ResizeObserver(refit); ro.observe(bodyEl); }
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitTable);
 })();
 </script>
 <!--FOOTER_START-->
