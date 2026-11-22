@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>个券跟踪</title>
+<style>
+.bt-wrap{max-width:1680px;margin:0 auto;padding:28px}
+.bt-head h1{font-family:var(--serif,Georgia,serif);font-size:32px;line-height:1.2;margin:0 0 8px;color:var(--ink,#1E1E1A)}
+#bt-summary{font-size:20px;line-height:1.4;color:var(--ink-2,#5B5B51);font-variant-numeric:tabular-nums}
+.bt-note{font-size:16px;color:var(--muted,#66665B);margin:6px 0 0}
+.bt-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:18px 0 6px}
+.bt-bar select{font-size:16px;padding:4px 8px;border:1px solid var(--rule,#DFE7ED);border-radius:2px;background:var(--paper,#FBFCFD);color:var(--ink,#1E1E1A)}
+.bt-win{display:flex}
+.bt-win button{font-size:13px;padding:5px 12px;border:1px solid var(--rule,#DFE7ED);background:var(--paper,#FBFCFD);color:var(--ink-2,#5B5B51);cursor:pointer;margin-left:-1px;border-radius:0}
+.bt-win button:first-child{margin-left:0;border-radius:2px 0 0 2px}
+.bt-win button:last-child{border-radius:0 2px 2px 0}
+.bt-win button.on{background:var(--paper-3,#EEF3F7);color:var(--ink,#1E1E1A);font-weight:600}
+#bt-ribbon{margin-top:-6px}
+.bt-tbl-wrap{margin:18px 0 0;overflow-x:auto}
+.bt-tbl{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.bt-tbl th,.bt-tbl td{padding:6px 10px;border-bottom:1px solid var(--rule,#DFE7ED);text-align:right;white-space:nowrap}
+.bt-tbl th{color:var(--muted,#66665B);font-weight:600;border-bottom:1px solid var(--rule-strong,#CBD8E2)}
+.bt-tbl th:nth-child(2),.bt-tbl th:nth-child(3),.bt-tbl td:nth-child(2),.bt-tbl td:nth-child(3){text-align:left}
+.bt-tbl td{color:var(--ink,#1E1E1A)}
+.bt-tbl tbody tr:hover{background:var(--paper-3,#EEF3F7)}
+.bt-tbl .bt-rank{color:var(--ink-2,#5B5B51)}
+.bt-tbl .bt-bull{color:#B8352C}
+.bt-tbl .bt-bear{color:#1E6B43}
+.bt-tbl tfoot td{font-size:13px;color:var(--muted,#66665B);text-align:left;border-bottom:0}
+.bt-cmp-wrap{margin-top:22px}
+#bt-cmp-title{font-size:20px;color:var(--ink,#1E1E1A);margin:0 0 4px}
+.bt-foot{font-size:13px;color:var(--faint,#75756A);margin:24px 0 0;line-height:1.7}
+.bt-foot p{margin:0}
+@media (max-width:900px){
+.bt-head,.bt-bar{align-items:flex-start;flex-direction:column}
+#bt-main,#bt-ribbon,#bt-cmp{width:100%!important}
+}
+</style>
+<!--THEME_START-->
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="site.css">
+<script src="site.js"></script>
+<!--THEME_END-->
+<!--FAVICON_START-->
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#FBFCFD">
+<!--FAVICON_END-->
+</head>
+<body data-site="inner" data-page="bond-tracking">
+<!--NAV_START-->
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-23 00:43</span></span></div></div>
+<nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="bond-tracking.html" class="active" aria-current="page">个券跟踪</a><a href="bond-calendar.html">债市日历</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="treasury-futures.html">国债期货</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="bond-tracking.html" class="active" aria-current="page">个券跟踪</a><a href="bond-calendar.html">债市日历</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="treasury-futures.html">国债期货</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
+<script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
+<!--NAV_END-->
+<div class="bt-wrap">
+<header class="bt-head">
+  <h1>个券跟踪</h1>
+  <div id="bt-summary">加载中</div>
+  <p class="bt-note" id="bt-note" hidden></p>
+</header>
+<div class="bt-bar">
+  <select id="bt-kind" aria-label="基准品种"></select>
+  <select id="bt-bucket" aria-label="期限桶"></select>
+  <div class="bt-win" id="bt-win"></div>
+</div>
+<div id="bt-main" style="height:420px"></div>
+<div id="bt-ribbon" style="height:72px"></div>
+<div class="bt-tbl-wrap">
+<table id="bt-table" class="bt-tbl">
+<thead><tr><th>排名</th><th>代码</th><th>简称</th><th>剩余期限</th>
+<th>5日成交</th><th>当日估值</th><th>日变动</th><th>窗口累计</th></tr></thead>
+<tbody id="bt-table-body"></tbody>
+<tfoot><tr><td colspan="8" id="bt-table-foot"></td></tr></tfoot>
+</table>
+</div>
+<div class="bt-cmp-wrap">
+  <div id="bt-cmp-title"></div>
+  <div id="bt-cmp" style="height:340px"></div>
+</div>
+<footer class="bt-foot" id="bt-foot"><p>数据来源：利率债个券日频大表（iFinD 日频，成交额按亿元计）与中债收益率曲线（本地库 curve_id 9 / 50）。</p><p>口径：活跃度 = 近 5 个有效交易日成交额之和；排名并列时剩余期限长者在前；期限桶为左开右闭的 (0,30] 连续划分。</p><p>已剔除 83 个伪交易日（剩余期限非空数 &lt; 100），有效交易日 2886 个，成交额合计占比 0.0000%。</p><p>全字段无数据的券：2500102 25续作特别国债02、2600802 26注资特别国债02、1602301 16国开301、1702301 17国开301、1702302 17国开302、1702303 17国开303（成交为 0，不影响前 10）。</p><p>收益率变动 = 当日估值 - 本券在本桶起算日估值，单位 bp；缺失日断开不插值。</p><p>估值截至 2026-11-18。</p></footer>
+</div>
+<script src="echarts.min.js"></script>
+<script src="bond-tracking-data.js"></script>
+<script>
+(function () {
+  var D = window.BT_DATA;
+  var sumEl = document.getElementById("bt-summary");
+  if (!D) { sumEl.textContent = "数据未加载"; return; }
+
+  var S = {kind: D.default.kind, bucket: D.default.bucket, window: D.default.window};
+  var PALETTE = ["#5D4C68", "#C0762E", "#3B6E9E", "#974EA2", "#8A6A2F",
+                 "#749AB2", "#7A4E8C", "#A15A36", "#6B7FA8", "#94663C"];
+  var GREY = "#b9b4ab";
+  var CUR = null;
+  var META1 = [];
+  var chart1 = echarts.init(document.getElementById("bt-main"));
+  var chart2 = echarts.init(document.getElementById("bt-ribbon"));
+  var chart3 = echarts.init(document.getElementById("bt-cmp"));
+
+  function key() { return S.kind + "|" + S.bucket + "|" + S.window; }
+  function code4(c) { return String(c || "").replace(".IB", ""); }
+  function sgn(x, n) { return (x >= 0 ? "+" : "") + x.toFixed(n); }
+  function dec(x, n) { return (x === null || x === undefined) ? "—" : x.toFixed(n); }
+  function amt(x) {
+    if (x === null || x === undefined) return "—";
+    return x >= 100 ? String(Math.round(x)) : x.toFixed(1);
+  }
+  function legendName(l) {
+    return ("0" + l.rank).slice(-2) + " " + code4(l.code) + " " + l.short;
+  }
+
+  function tip1(p) {
+    var l = META1[p.seriesIndex];
+    if (!l || !CUR) return "";
+    var v = CUR, i = p.dataIndex;
+    var cum = l.cum[i];
+    var prev = i > 0 ? l.cum[i - 1] : null;
+    var y0 = (l.y0 === null || l.y0 === undefined) ? null : l.y0;
+    var yld = (y0 !== null && cum !== null) ? y0 + cum / 100 : null;
+    var d1 = (cum !== null && prev !== null) ? cum - prev : null;
+    var rows = [code4(l.code) + "　" + l.short];
+    var head = l.top ? ("活" + l.rank + "　") : "";
+    if (yld === null) {
+      rows.push(head + "当日无估值");
+    } else {
+      rows.push(head + "当日估值 " + yld.toFixed(4) + "%　日变动 " +
+                (d1 === null ? "—" : sgn(d1, 1) + "bp"));
+    }
+    rows.push("近5日成交 " + amt(l.amt5) + "亿　剩余期限 " + dec(l.rem, 2) + "年");
+    if (l.start !== null && cum !== null) {
+      rows.push("自起算日（" + v.dates[l.start] + "）累计 " + sgn(cum, 1) + "bp");
+    }
+    if (!l.top) {
+      rows.push("窗口内最高名次 活" + l.best);
+      rows.push("最后在榜 " + (l.last || "—"));
+      if (l.leave !== null && l.leave !== undefined) {
+        rows.push("离桶 " + v.dates[l.leave]);
+      }
+    }
+    return rows.join("<br>");
+  }
+
+  function draw1(v) {
+    CUR = v;
+    META1 = [];
+    var series = [], legend = [], firstTop = -1;
+    v.lines.forEach(function (l) {
+      META1.push(l);
+      var isTop = !!l.top;
+      var color = isTop ? PALETTE[l.rank - 1] : GREY;
+      var s = {
+        name: isTop ? legendName(l) : code4(l.code),
+        type: "line",
+        data: l.cum,
+        connectNulls: false,
+        showSymbol: false,
+        symbolSize: 6,
+        smooth: false,
+        z: isTop ? 10 : 2,
+        lineStyle: {width: isTop ? (l.rank === 1 ? 3 : 2) : 1,
+                    color: color, opacity: isTop ? 1 : 0.55},
+        itemStyle: {color: color},
+        emphasis: {focus: "series", blurScope: "coordinateSystem",
+                   lineStyle: {width: 3, opacity: 1}},
+        legendHoverLink: isTop
+      };
+      if (isTop) {
+        legend.push(s.name);
+        if (firstTop < 0) firstTop = series.length;
+      }
+      series.push(s);
+    });
+    if (firstTop >= 0) {
+      series[firstTop].markLine = {
+        silent: true, symbol: "none",
+        lineStyle: {type: "dashed", width: 1, color: "#DFE7ED"},
+        data: [{yAxis: 0}]
+      };
+    }
+    chart1.setOption({
+      grid: {left: 64, right: 24, top: 52, bottom: 36},
+      xAxis: {type: "category", data: v.dates, boundaryGap: false,
+              axisLabel: {formatter: function (d) { return d.slice(5); }}},
+      yAxis: {type: "value", name: "bp", scale: true,
+              splitLine: {lineStyle: {color: "#E7EEF3", type: "dashed"}}},
+      tooltip: {trigger: "item", formatter: tip1},
+      legend: {top: 0, itemWidth: 12, itemHeight: 12, itemGap: 12,
+               textStyle: {fontSize: 13}, data: legend},
+      series: series
+    }, true);
+  }
+
+  function draw2(v) {
+    var now = {};
+    v.top.forEach(function (t) { now[t.code] = t.rank; });
+    var data = [];
+    v.ribbon.forEach(function (s) {
+      if (!s.code) return;
+      data.push({
+        value: [s.i0, 3 - s.rank, s.i1],
+        seg: s,
+        itemStyle: {color: now[s.code] ? PALETTE[now[s.code] - 1] : GREY}
+      });
+    });
+    chart2.setOption({
+      animation: false,
+      grid: {left: 64, right: 24, top: 4, bottom: 4},
+      xAxis: {type: "category", data: v.dates, boundaryGap: false,
+              axisLabel: {show: false}, axisTick: {show: false},
+              axisLine: {show: true, lineStyle: {color: "#DFE7ED"}}},
+      yAxis: {type: "category", data: ["活3", "活2", "活1"],
+              axisLabel: {fontSize: 13}, axisTick: {show: false},
+              axisLine: {show: false}},
+      tooltip: {trigger: "item", formatter: function (p) {
+        var s = p.data.seg, c = code4(s.code);
+        return "活" + s.rank + "　" + s.date +
+          (s.prev ? " 起由 " + code4(s.prev) + " 换为 " + c
+                  : " 起（窗口首日）" + c);
+      }},
+      series: [{
+        type: "custom",
+        encode: {x: [0, 2], y: 1},
+        renderItem: function (params, api) {
+          var i0 = api.value(0), row = api.value(1), i1 = api.value(2);
+          var x0 = api.coord([i0 - 0.5, row])[0];
+          var x1 = api.coord([i1 + 0.5, row])[0];
+          var y = api.coord([0, row])[1] - 8;
+          var w = Math.max(1, x1 - x0);
+          var kids = [{type: "rect",
+                       shape: {x: x0, y: y, width: w, height: 16, r: 2},
+                       style: {fill: params.data.itemStyle.color}}];
+          if (i1 - i0 + 1 >= 3 && w >= 30) {
+            kids.push({type: "text", style: {
+              text: code4(params.data.seg.code).slice(-4),
+              x: x0 + w / 2, y: y + 8, fill: "#fff", fontSize: 13,
+              align: "center", verticalAlign: "middle",
+              textShadowColor: "rgba(0,0,0,.35)", textShadowBlur: 2}});
+          }
+          return {type: "group", children: kids};
+        },
+        data: data
+      }]
+    }, true);
+  }
+
+  function dirCls(x) {
+    if (x === null || x === undefined || x === 0) return "";
+    return x < 0 ? "bt-bull" : "bt-bear";          // 收益率下行利多显红，上行利空显绿
+  }
+  function bps(x) {
+    return (x === null || x === undefined) ? "—" : sgn(x, 1) + "bp";
+  }
+
+  function drawTable(v) {
+    var rows = v.top.map(function (t) {
+      return "<tr>" +
+        '<td class="bt-rank"><span style="display:inline-block;width:8px;height:8px;'" +
+        'border-radius:50%;background:' + PALETTE[t.rank - 1] +
+        ';margin-right:6px;vertical-align:middle"></span>' + t.rank + "</td>" +
+        "<td>" + code4(t.code) + "</td>" +
+        "<td>" + t.short + "</td>" +
+        "<td>" + (t.rem === null ? "—" : t.rem.toFixed(2) + "年") + "</td>" +
+        "<td>" + (t.amt5 === null ? "—"
+                  : Math.round(t.amt5).toLocaleString() + "亿") + "</td>" +
+        "<td>" + (t.yld === null ? "—" : t.yld.toFixed(4) + "%") + "</td>" +
+        '<td class="' + dirCls(t.d1) + '">' + bps(t.d1) + "</td>" +
+        '<td class="' + dirCls(t.cum) + '">' + bps(t.cum) + "</td>" +
+        "</tr>";
+    });
+    document.getElementById("bt-table-body").innerHTML = rows.join("");
+    document.getElementById("bt-table-foot").textContent =
+      "前 " + v.n + " 名合计 5 日成交 " + amt(v.top_amt_sum) + "亿";
+  }
+
+  function draw3(v) {
+    document.getElementById("bt-cmp-title").textContent =
+      "成交额加权综合估值 vs " + v.curve_name;
+    var wt = [], cv = [], df = [];
+    v.w.forEach(function (r) { wt.push(r.wt); cv.push(r.cv); df.push(r.diff); });
+    chart3.setOption({
+      animation: false,
+      grid: {left: 64, right: 64, top: 48, bottom: 36},
+      xAxis: {type: "category", data: v.dates, boundaryGap: false,
+              axisLabel: {formatter: function (d) { return d.slice(5); }}},
+      yAxis: [
+        {type: "value", name: "%", scale: true,
+         axisLabel: {formatter: function (x) { return x.toFixed(2) + "%"; }},
+         splitLine: {lineStyle: {color: "#E7EEF3", type: "dashed"}}},
+        {type: "value", name: "bp", scale: true, splitLine: {show: false}}
+      ],
+      tooltip: {trigger: "axis", formatter: function (ps) {
+        if (!ps || !ps.length) return "";
+        var r = v.w[ps[0].dataIndex];
+        if (!r) return "";
+        var out = [r.date];
+        out.push("加权综合 " + (r.wt === null ? "—" : r.wt.toFixed(4) + "%") +
+                 "（久期加权 " + dec(r.wrem, 2) + "年）");
+        out.push(v.curve_name + " " + (r.cv === null ? "—" : r.cv.toFixed(4) + "%") +
+                 "（按 " + dec(r.wrem, 2) + " 年插值）");
+        out.push("差值 " + (r.diff === null ? "—"
+                 : sgn(r.diff, 1) + "bp（券池减曲线）"));
+        return out.join("<br>");
+      }},
+      legend: {top: 0, itemWidth: 12, itemHeight: 12, itemGap: 12,
+               textStyle: {fontSize: 13}},
+      series: [
+        {name: "加权综合", type: "line", data: wt, yAxisIndex: 0,
+         connectNulls: false, showSymbol: false, smooth: false, z: 6,
+         lineStyle: {width: 2, color: "#5D4C68"}, itemStyle: {color: "#5D4C68"}},
+        {name: v.curve_name, type: "line", data: cv, yAxisIndex: 0,
+         connectNulls: false, showSymbol: false, smooth: false, z: 4,
+         lineStyle: {width: 1.5, color: "#C0762E", type: "dashed"},
+         itemStyle: {color: "#C0762E"}},
+        {name: "差值（bp，右轴）", type: "line", data: df, yAxisIndex: 1,
+         connectNulls: false, showSymbol: false, smooth: false, z: 3,
+         lineStyle: {width: 1, color: "#3B6E9E"}, itemStyle: {color: "#3B6E9E"},
+         markLine: {silent: true, symbol: "none",
+                    lineStyle: {type: "dashed", width: 1, color: "#DFE7ED"},
+                    data: [{yAxis: 0}]}}
+      ]
+    }, true);
+  }
+
+  function summary(v) {
+    var out = [];
+    var t1 = v.top.length ? v.top[0] : null;
+    if (t1) {
+      out.push("活1 " + code4(t1.code) + "　" +
+               (t1.yld === null ? "—" : t1.yld.toFixed(4) + "%"));
+    }
+    out.push("前" + v.n + "合计成交 " + amt(v.top_amt_sum) + "亿");
+    out.push("桶内存活 " + v.n_live + " 只");
+    if (v.dates.length) {
+      out.push("估值截至 " + v.dates[v.dates.length - 1].slice(5));
+    }
+    sumEl.textContent = out.join("　");
+  }
+
+  function fillSel(id, items, cur, field) {
+    var el = document.getElementById(id);
+    el.innerHTML = items.map(function (x) {
+      return '<option value="' + x + '"' + (x === cur ? " selected" : "") +
+             ">" + x + "</option>";
+    }).join("");
+    el.onchange = function () { S[field] = el.value; render(); };
+  }
+
+  function fillWin() {
+    var box = document.getElementById("bt-win");
+    box.innerHTML = D.windows.map(function (w) {
+      return '<button type="button" data-win="' + w + '"' +
+             (w === S.window ? ' class="on"' : "") + ">" + w + "</button>";
+    }).join("");
+    box.onclick = function (e) {
+      var b = e.target.closest("button[data-win]");
+      if (!b) return;
+      S.window = b.getAttribute("data-win");
+      Array.prototype.forEach.call(box.querySelectorAll("button"), function (x) {
+        x.className = (x === b) ? "on" : "";
+      });
+      render();
+    };
+  }
+
+  function render() {
+    var v = D.views[key()];
+    if (!v) return;
+    draw1(v);
+    draw2(v);
+    drawTable(v);
+    draw3(v);
+    summary(v);
+  }
+
+  fillSel("bt-kind", D.kinds, S.kind, "kind");
+  fillSel("bt-bucket", D.buckets, S.bucket, "bucket");
+  fillWin();
+  render();
+  window.addEventListener("resize", function () {
+    chart1.resize();
+    chart2.resize();
+    chart3.resize();
+  });
+})();
+</script>
+<!--FOOTER_START-->
+<footer class="site-footer"><div class="site-wrap"><span>数据来源 中国货币网 / 同花顺 iFinD / 中债登</span><span class="site-footer-actions"><span>每日 09:00 自动更新</span><button class="glossary-open" type="button">术语与口径</button></span></div></footer>
+<!--FOOTER_END-->
+</body>
+</html>
