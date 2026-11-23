@@ -52,7 +52,7 @@
 </head>
 <body data-site="inner" data-page="bond-tracking">
 <!--NAV_START-->
-<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-23 00:43</span></span></div></div>
+<div class="site-utility"><div class="site-wrap"><span class="site-name">债市投资策略平台</span><span class="site-meta"><span class="site-stamp">页面更新 2026-11-23 08:51</span></span></div></div>
 <nav class="site-nav" aria-label="模块导航"><div class="site-wrap"><a class="site-seal" href="index.html" aria-label="返回首页"><span class="seal-mark" aria-hidden="true">债</span><span class="seal-txt">首页</span></a><div class="site-links"><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="bond-tracking.html" class="active" aria-current="page">个券跟踪</a><a href="bond-calendar.html">债市日历</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="treasury-futures.html">国债期货</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div><button class="site-menu-btn" type="button" aria-expanded="false" aria-controls="site-menu">栏目</button></div><div class="site-menu" id="site-menu" hidden><a href="bond-seasonality.html">季节性规律</a><a href="yield-seasonality.html">历史复盘</a><a href="spread-board.html">利差看板</a><a href="bond-tracking.html" class="active" aria-current="page">个券跟踪</a><a href="bond-calendar.html">债市日历</a><a href="stock-bond-monitor.html">股债联动</a><a href="bond-flow-lead.html">现券成交</a><a href="duration-tracking.html">久期跟踪</a><a href="treasury-futures.html">国债期货</a><a href="signal-eval.html">信号评价</a><a href="bond-alert.html">预警指标</a></div></nav>
 <script>(function(){var a=document.querySelector(".site-links a.active");if(a){var p=a.parentNode;p.scrollLeft=Math.max(0,a.offsetLeft-p.clientWidth/2+a.offsetWidth/2);}var b=document.querySelector(".site-menu-btn"),m=document.querySelector(".site-menu");if(!b||!m)return;function set(open){m.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");}b.addEventListener("click",function(e){e.stopPropagation();set(m.hidden);});document.addEventListener("click",function(e){if(!m.hidden&&e.target!==b&&!m.contains(e.target))set(false);});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});m.addEventListener("click",function(e){if(e.target.tagName==="A")set(false);});})();</script>
 <!--NAV_END-->
@@ -197,12 +197,12 @@
   function draw2(v) {
     var now = {};
     v.top.forEach(function (t) { now[t.code] = t.rank; });
-    var data = [];
+    var data = [], segs = [];
     v.ribbon.forEach(function (s) {
       if (!s.code) return;
+      segs.push(s);
       data.push({
         value: [s.i0, 3 - s.rank, s.i1],
-        seg: s,
         itemStyle: {color: now[s.code] ? PALETTE[now[s.code] - 1] : GREY}
       });
     });
@@ -216,7 +216,9 @@
               axisLabel: {fontSize: 13}, axisTick: {show: false},
               axisLine: {show: false}},
       tooltip: {trigger: "item", formatter: function (p) {
-        var s = p.data.seg, c = code4(s.code);
+        var s = segs[p.dataIndex];
+        if (!s) return "";
+        var c = code4(s.code);
         return "活" + s.rank + "　" + s.date +
           (s.prev ? " 起由 " + code4(s.prev) + " 换为 " + c
                   : " 起（窗口首日）" + c);
@@ -225,6 +227,8 @@
         type: "custom",
         encode: {x: [0, 2], y: 1},
         renderItem: function (params, api) {
+          // 分段数据随系列一起下发，按 dataIndex 回取（params.data 在本版本可能为空）
+          var seg = segs[params.dataIndex] || {};
           var i0 = api.value(0), row = api.value(1), i1 = api.value(2);
           var x0 = api.coord([i0 - 0.5, row])[0];
           var x1 = api.coord([i1 + 0.5, row])[0];
@@ -232,10 +236,10 @@
           var w = Math.max(1, x1 - x0);
           var kids = [{type: "rect",
                        shape: {x: x0, y: y, width: w, height: 16, r: 2},
-                       style: {fill: params.data.itemStyle.color}}];
-          if (i1 - i0 + 1 >= 3 && w >= 30) {
+                       style: {fill: api.visual("color") || GREY}}];
+          if (seg.code && i1 - i0 + 1 >= 3 && w >= 30) {
             kids.push({type: "text", style: {
-              text: code4(params.data.seg.code).slice(-4),
+              text: code4(seg.code).slice(-4),
               x: x0 + w / 2, y: y + 8, fill: "#fff", fontSize: 13,
               align: "center", verticalAlign: "middle",
               textShadowColor: "rgba(0,0,0,.35)", textShadowBlur: 2}});
@@ -258,7 +262,7 @@
   function drawTable(v) {
     var rows = v.top.map(function (t) {
       return "<tr>" +
-        '<td class="bt-rank"><span style="display:inline-block;width:8px;height:8px;'" +
+        '<td class="bt-rank"><span style="display:inline-block;width:8px;height:8px;' +
         'border-radius:50%;background:' + PALETTE[t.rank - 1] +
         ';margin-right:6px;vertical-align:middle"></span>' + t.rank + "</td>" +
         "<td>" + code4(t.code) + "</td>" +
